@@ -1,1 +1,0 @@
-# polytomic-typescript-sdk

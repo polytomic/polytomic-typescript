@@ -1,0 +1,14 @@
+/**
+ * This file was auto-generated from our API Definition.
+ */
+
+export interface RestErrResponse {
+    /** Application-specific error code. */
+    code?: number;
+    /** Application context. */
+    context?: Record<string, unknown>;
+    /** Error message. */
+    error?: string;
+    /** Status text. */
+    status?: string;
+}
