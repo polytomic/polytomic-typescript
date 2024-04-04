@@ -12,7 +12,7 @@ export declare namespace Organization {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token?: core.Supplier<core.BearerToken | undefined>;
-        polytomicVersion?: core.Supplier<"2022-12-12" | undefined>;
+        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
     }
 
     interface RequestOptions {
@@ -33,7 +33,7 @@ export class Organization {
      * @example
      *     await polytomic.organization.list()
      */
-    public async list(requestOptions?: Organization.RequestOptions): Promise<Polytomic.V2OrganizationsEnvelope> {
+    public async list(requestOptions?: Organization.RequestOptions): Promise<Polytomic.OrganizationsEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -43,19 +43,21 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2OrganizationsEnvelope;
+            return _response.body as Polytomic.OrganizationsEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -93,13 +95,18 @@ export class Organization {
      *
      * @example
      *     await polytomic.organization.create({
-     *         name: "name"
+     *         client_id: "client_id",
+     *         client_secret: "client_secret",
+     *         issuer: "https://example.com",
+     *         name: "My Organization",
+     *         sso_domain: "example.com",
+     *         sso_org_id: "123456"
      *     })
      */
     public async create(
-        request: Polytomic.V2CreateOrganizationRequestSchema,
+        request: Polytomic.CreateOrganizationRequestSchema,
         requestOptions?: Organization.RequestOptions
-    ): Promise<Polytomic.V2OrganizationEnvelope> {
+    ): Promise<Polytomic.OrganizationEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -109,12 +116,14 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             body: request,
@@ -122,7 +131,7 @@ export class Organization {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2OrganizationEnvelope;
+            return _response.body as Polytomic.OrganizationEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -164,7 +173,7 @@ export class Organization {
     public async get(
         id: string,
         requestOptions?: Organization.RequestOptions
-    ): Promise<Polytomic.V2OrganizationEnvelope> {
+    ): Promise<Polytomic.OrganizationEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -174,19 +183,21 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2OrganizationEnvelope;
+            return _response.body as Polytomic.OrganizationEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -235,12 +246,14 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
@@ -285,14 +298,19 @@ export class Organization {
      *
      * @example
      *     await polytomic.organization.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         name: "name"
+     *         client_id: "client_id",
+     *         client_secret: "client_secret",
+     *         issuer: "https://example.com",
+     *         name: "My Organization",
+     *         sso_domain: "example.com",
+     *         sso_org_id: "123456"
      *     })
      */
     public async update(
         id: string,
-        request: Polytomic.V2UpdateOrganizationRequestSchema,
+        request: Polytomic.UpdateOrganizationRequestSchema,
         requestOptions?: Organization.RequestOptions
-    ): Promise<Polytomic.V2OrganizationEnvelope> {
+    ): Promise<Polytomic.OrganizationEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -302,12 +320,14 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             body: request,
@@ -315,7 +335,7 @@ export class Organization {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2OrganizationEnvelope;
+            return _response.body as Polytomic.OrganizationEnvelope;
         }
 
         if (_response.error.reason === "status-code") {

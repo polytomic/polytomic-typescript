@@ -1,3 +1,3 @@
-export { V2CreateUserRequestSchema } from "./V2CreateUserRequestSchema";
-export { V2UpdateUserRequestSchema } from "./V2UpdateUserRequestSchema";
+export { CreateUserRequestSchema } from "./CreateUserRequestSchema";
+export { UpdateUserRequestSchema } from "./UpdateUserRequestSchema";
 export { UsersCreateApiKeyRequest } from "./UsersCreateApiKeyRequest";

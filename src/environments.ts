@@ -3,7 +3,7 @@
  */
 
 export const PolytomicEnvironment = {
-    Default: "https://app.polytomic.com/",
+    Default: "https://app.polytomic.com",
 } as const;
 
 export type PolytomicEnvironment = typeof PolytomicEnvironment.Default;

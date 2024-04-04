@@ -4,7 +4,10 @@
 
 /**
  * @example
- *     {}
+ *     {
+ *         type: "table",
+ *         search: "public.users"
+ *     }
  */
 export interface ConnectionsGetTargetRequest {
     type?: string;

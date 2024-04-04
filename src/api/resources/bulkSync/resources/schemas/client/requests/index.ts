@@ -1,1 +1,2 @@
-export { V3UpdateBulkSchema } from "./V3UpdateBulkSchema";
+export { SchemasListRequest } from "./SchemasListRequest";
+export { UpdateBulkSchema } from "./UpdateBulkSchema";

@@ -8,6 +8,7 @@ import { BulkSync } from "./api/resources/bulkSync/client/Client";
 import { Connections } from "./api/resources/connections/client/Client";
 import { Schemas } from "./api/resources/schemas/client/Client";
 import { Events } from "./api/resources/events/client/Client";
+import { Jobs } from "./api/resources/jobs/client/Client";
 import { Models } from "./api/resources/models/client/Client";
 import { Organization } from "./api/resources/organization/client/Client";
 import { Users } from "./api/resources/users/client/Client";
@@ -19,7 +20,7 @@ export declare namespace PolytomicClient {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token?: core.Supplier<core.BearerToken | undefined>;
-        polytomicVersion?: core.Supplier<"2022-12-12" | undefined>;
+        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
     }
 
     interface RequestOptions {
@@ -53,6 +54,12 @@ export class PolytomicClient {
 
     public get events(): Events {
         return (this._events ??= new Events(this._options));
+    }
+
+    protected _jobs: Jobs | undefined;
+
+    public get jobs(): Jobs {
+        return (this._jobs ??= new Jobs(this._options));
     }
 
     protected _models: Models | undefined;

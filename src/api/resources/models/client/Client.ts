@@ -12,7 +12,7 @@ export declare namespace Models {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token?: core.Supplier<core.BearerToken | undefined>;
-        polytomicVersion?: core.Supplier<"2022-12-12" | undefined>;
+        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
     }
 
     interface RequestOptions {
@@ -30,7 +30,7 @@ export class Models {
      * @example
      *     await polytomic.models.list()
      */
-    public async list(requestOptions?: Models.RequestOptions): Promise<Polytomic.V2ModelListResponseEnvelope> {
+    public async list(requestOptions?: Models.RequestOptions): Promise<Polytomic.ModelListResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -40,19 +40,21 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2ModelListResponseEnvelope;
+            return _response.body as Polytomic.ModelListResponseEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -88,13 +90,20 @@ export class Models {
      * @example
      *     await polytomic.models.create({
      *         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         name: "name"
+     *         identifier: "id",
+     *         name: "Users"
      *     })
      */
     public async create(
-        request: Polytomic.V2CreateModelRequest,
+        request: Polytomic.CreateModelRequest,
         requestOptions?: Models.RequestOptions
-    ): Promise<Polytomic.V2ModelResponseEnvelope> {
+    ): Promise<Polytomic.ModelResponseEnvelope> {
+        const { async, ..._body } = request;
+        const _queryParams: Record<string, string | string[]> = {};
+        if (async != null) {
+            _queryParams["async"] = async.toString();
+        }
+
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -104,20 +113,23 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
-            body: request,
+            queryParameters: _queryParams,
+            body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2ModelResponseEnvelope;
+            return _response.body as Polytomic.ModelResponseEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -153,7 +165,7 @@ export class Models {
      * @example
      *     await polytomic.models.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async get(id: string, requestOptions?: Models.RequestOptions): Promise<Polytomic.V2ModelResponseEnvelope> {
+    public async get(id: string, requestOptions?: Models.RequestOptions): Promise<Polytomic.ModelResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -163,19 +175,21 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2ModelResponseEnvelope;
+            return _response.body as Polytomic.ModelResponseEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -221,12 +235,14 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
@@ -268,15 +284,23 @@ export class Models {
      *
      * @example
      *     await polytomic.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         async: false,
      *         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         name: "name"
+     *         identifier: "id",
+     *         name: "Users"
      *     })
      */
     public async update(
         id: string,
-        request: Polytomic.V2UpdateModelRequest,
+        request: Polytomic.UpdateModelRequest,
         requestOptions?: Models.RequestOptions
-    ): Promise<Polytomic.V2ModelResponseEnvelope> {
+    ): Promise<Polytomic.ModelResponseEnvelope> {
+        const { async, ..._body } = request;
+        const _queryParams: Record<string, string | string[]> = {};
+        if (async != null) {
+            _queryParams["async"] = async.toString();
+        }
+
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -286,20 +310,23 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
-            body: request,
+            queryParameters: _queryParams,
+            body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2ModelResponseEnvelope;
+            return _response.body as Polytomic.ModelResponseEnvelope;
         }
 
         if (_response.error.reason === "status-code") {

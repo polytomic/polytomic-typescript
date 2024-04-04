@@ -1,2 +1,2 @@
-export { V2CreateRoleRequest } from "./V2CreateRoleRequest";
-export { V2UpdateRoleRequest } from "./V2UpdateRoleRequest";
+export { CreateRoleRequest } from "./CreateRoleRequest";
+export { UpdateRoleRequest } from "./UpdateRoleRequest";

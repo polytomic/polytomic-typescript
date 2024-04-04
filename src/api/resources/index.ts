@@ -1,13 +1,13 @@
-export * as modelSync from "./modelSync";
-export * from "./modelSync/types";
 export * as bulkSync from "./bulkSync";
 export * as connections from "./connections";
 export * as schemas from "./schemas";
 export * as events from "./events";
+export * as jobs from "./jobs";
 export * as models from "./models";
 export * as organization from "./organization";
 export * as users from "./users";
 export * as permissions from "./permissions";
+export * as modelSync from "./modelSync";
 export * as webhooks from "./webhooks";
 export * from "./bulkSync/client/requests";
 export * from "./connections/client/requests";

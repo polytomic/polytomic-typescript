@@ -12,7 +12,7 @@ export declare namespace Users {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token?: core.Supplier<core.BearerToken | undefined>;
-        polytomicVersion?: core.Supplier<"2022-12-12" | undefined>;
+        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
     }
 
     interface RequestOptions {
@@ -33,7 +33,7 @@ export class Users {
      * @example
      *     await polytomic.users.list("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async list(orgId: string, requestOptions?: Users.RequestOptions): Promise<Polytomic.V2ListUsersEnvelope> {
+    public async list(orgId: string, requestOptions?: Users.RequestOptions): Promise<Polytomic.ListUsersEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -43,19 +43,21 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2ListUsersEnvelope;
+            return _response.body as Polytomic.ListUsersEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -93,14 +95,15 @@ export class Users {
      *
      * @example
      *     await polytomic.users.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         email: "email"
+     *         email: "mail@example.com",
+     *         role: "admin"
      *     })
      */
     public async create(
         orgId: string,
-        request: Polytomic.V2CreateUserRequestSchema,
+        request: Polytomic.CreateUserRequestSchema,
         requestOptions?: Users.RequestOptions
-    ): Promise<Polytomic.V2UserEnvelope> {
+    ): Promise<Polytomic.UserEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -110,12 +113,14 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             body: request,
@@ -123,7 +128,7 @@ export class Users {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2UserEnvelope;
+            return _response.body as Polytomic.UserEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -166,7 +171,7 @@ export class Users {
         id: string,
         orgId: string,
         requestOptions?: Users.RequestOptions
-    ): Promise<Polytomic.V2UserEnvelope> {
+    ): Promise<Polytomic.UserEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -176,19 +181,21 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2UserEnvelope;
+            return _response.body as Polytomic.UserEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -231,7 +238,7 @@ export class Users {
         id: string,
         orgId: string,
         requestOptions?: Users.RequestOptions
-    ): Promise<Polytomic.V2UserEnvelope> {
+    ): Promise<Polytomic.UserEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -241,19 +248,21 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2UserEnvelope;
+            return _response.body as Polytomic.UserEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -291,15 +300,16 @@ export class Users {
      *
      * @example
      *     await polytomic.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         email: "email"
+     *         email: "mail@example.com",
+     *         role: "admin"
      *     })
      */
     public async update(
         id: string,
         orgId: string,
-        request: Polytomic.V2UpdateUserRequestSchema,
+        request: Polytomic.UpdateUserRequestSchema,
         requestOptions?: Users.RequestOptions
-    ): Promise<Polytomic.V2UserEnvelope> {
+    ): Promise<Polytomic.UserEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -309,12 +319,14 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             body: request,
@@ -322,7 +334,7 @@ export class Users {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2UserEnvelope;
+            return _response.body as Polytomic.UserEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -359,14 +371,16 @@ export class Users {
      * @throws {@link Polytomic.UnauthorizedError}
      *
      * @example
-     *     await polytomic.users.createApiKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await polytomic.users.createApiKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         force: true
+     *     })
      */
     public async createApiKey(
         orgId: string,
         id: string,
         request: Polytomic.UsersCreateApiKeyRequest = {},
         requestOptions?: Users.RequestOptions
-    ): Promise<Polytomic.V2ApiKeyResponseEnvelope> {
+    ): Promise<Polytomic.ApiKeyResponseEnvelope> {
         const { force } = request;
         const _queryParams: Record<string, string | string[]> = {};
         if (force != null) {
@@ -382,12 +396,14 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
@@ -395,7 +411,7 @@ export class Users {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2ApiKeyResponseEnvelope;
+            return _response.body as Polytomic.ApiKeyResponseEnvelope;
         }
 
         if (_response.error.reason === "status-code") {

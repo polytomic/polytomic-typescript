@@ -1,1 +1,1 @@
-export { V3StartBulkSyncRequest } from "./V3StartBulkSyncRequest";
+export { StartBulkSyncRequest } from "./StartBulkSyncRequest";

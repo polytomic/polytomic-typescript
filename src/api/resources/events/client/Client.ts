@@ -12,7 +12,7 @@ export declare namespace Events {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token?: core.Supplier<core.BearerToken | undefined>;
-        polytomicVersion?: core.Supplier<"2022-12-12" | undefined>;
+        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
     }
 
     interface RequestOptions {
@@ -37,7 +37,7 @@ export class Events {
     public async apiV2GetEvents(
         request: Polytomic.EventsApiV2GetEventsRequest = {},
         requestOptions?: Events.RequestOptions
-    ): Promise<Polytomic.V2EventsEnvelope> {
+    ): Promise<Polytomic.EventsEnvelope> {
         const {
             organization_id: organizationId,
             type: type_,
@@ -75,12 +75,14 @@ export class Events {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
@@ -88,7 +90,7 @@ export class Events {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2EventsEnvelope;
+            return _response.body as Polytomic.EventsEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
@@ -124,7 +126,7 @@ export class Events {
      * @example
      *     await polytomic.events.apiV2GetEventTypes()
      */
-    public async apiV2GetEventTypes(requestOptions?: Events.RequestOptions): Promise<Polytomic.V2EventTypesEnvelope> {
+    public async apiV2GetEventTypes(requestOptions?: Events.RequestOptions): Promise<Polytomic.EventTypesEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -134,19 +136,21 @@ export class Events {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.polytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.polytomicVersion)
+                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
+                        ? await core.Supplier.get(this._options.xPolytomicVersion)
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.0.1",
+                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2EventTypesEnvelope;
+            return _response.body as Polytomic.EventTypesEnvelope;
         }
 
         if (_response.error.reason === "status-code") {

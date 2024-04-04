@@ -4,7 +4,9 @@
 
 /**
  * @example
- *     {}
+ *     {
+ *         include_fields: true
+ *     }
  */
 export interface BulkSyncGetSourceRequest {
     refresh_schemas?: boolean;

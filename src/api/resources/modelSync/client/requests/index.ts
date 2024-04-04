@@ -1,3 +1,3 @@
-export { V2CreateSyncRequest } from "./V2CreateSyncRequest";
-export { V2UpdateSyncRequest } from "./V2UpdateSyncRequest";
-export { V2StartSyncRequest } from "./V2StartSyncRequest";
+export { CreateModelSyncRequest } from "./CreateModelSyncRequest";
+export { UpdateModelSyncRequest } from "./UpdateModelSyncRequest";
+export { StartModelSyncRequest } from "./StartModelSyncRequest";

@@ -1,2 +1,2 @@
-export { V2CreateModelRequest } from "./V2CreateModelRequest";
-export { V2UpdateModelRequest } from "./V2UpdateModelRequest";
+export { CreateModelRequest } from "./CreateModelRequest";
+export { UpdateModelRequest } from "./UpdateModelRequest";

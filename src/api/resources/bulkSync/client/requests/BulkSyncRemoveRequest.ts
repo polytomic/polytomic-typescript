@@ -4,7 +4,9 @@
 
 /**
  * @example
- *     {}
+ *     {
+ *         refresh_schemas: true
+ *     }
  */
 export interface BulkSyncRemoveRequest {
     refresh_schemas?: boolean;
