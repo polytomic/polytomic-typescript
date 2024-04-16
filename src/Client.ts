@@ -6,21 +6,21 @@ import * as environments from "./environments";
 import * as core from "./core";
 import { BulkSync } from "./api/resources/bulkSync/client/Client";
 import { Connections } from "./api/resources/connections/client/Client";
+import { ModelSync } from "./api/resources/modelSync/client/Client";
 import { Schemas } from "./api/resources/schemas/client/Client";
 import { Events } from "./api/resources/events/client/Client";
 import { Jobs } from "./api/resources/jobs/client/Client";
+import { Identity } from "./api/resources/identity/client/Client";
 import { Models } from "./api/resources/models/client/Client";
 import { Organization } from "./api/resources/organization/client/Client";
 import { Users } from "./api/resources/users/client/Client";
 import { Permissions } from "./api/resources/permissions/client/Client";
-import { ModelSync } from "./api/resources/modelSync/client/Client";
 import { Webhooks } from "./api/resources/webhooks/client/Client";
 
 export declare namespace PolytomicClient {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        token?: core.Supplier<core.BearerToken | undefined>;
-        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
+        token: core.Supplier<core.BearerToken>;
     }
 
     interface RequestOptions {
@@ -30,7 +30,7 @@ export declare namespace PolytomicClient {
 }
 
 export class PolytomicClient {
-    constructor(protected readonly _options: PolytomicClient.Options = {}) {}
+    constructor(protected readonly _options: PolytomicClient.Options) {}
 
     protected _bulkSync: BulkSync | undefined;
 
@@ -42,6 +42,12 @@ export class PolytomicClient {
 
     public get connections(): Connections {
         return (this._connections ??= new Connections(this._options));
+    }
+
+    protected _modelSync: ModelSync | undefined;
+
+    public get modelSync(): ModelSync {
+        return (this._modelSync ??= new ModelSync(this._options));
     }
 
     protected _schemas: Schemas | undefined;
@@ -60,6 +66,12 @@ export class PolytomicClient {
 
     public get jobs(): Jobs {
         return (this._jobs ??= new Jobs(this._options));
+    }
+
+    protected _identity: Identity | undefined;
+
+    public get identity(): Identity {
+        return (this._identity ??= new Identity(this._options));
     }
 
     protected _models: Models | undefined;
@@ -84,12 +96,6 @@ export class PolytomicClient {
 
     public get permissions(): Permissions {
         return (this._permissions ??= new Permissions(this._options));
-    }
-
-    protected _modelSync: ModelSync | undefined;
-
-    public get modelSync(): ModelSync {
-        return (this._modelSync ??= new ModelSync(this._options));
     }
 
     protected _webhooks: Webhooks | undefined;

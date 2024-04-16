@@ -8,7 +8,7 @@ import * as Polytomic from "../../..";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors";
 
-export declare namespace Jobs {
+export declare namespace Identity {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token: core.Supplier<core.BearerToken>;
@@ -20,27 +20,21 @@ export declare namespace Jobs {
     }
 }
 
-export class Jobs {
-    constructor(protected readonly _options: Jobs.Options) {}
+export class Identity {
+    constructor(protected readonly _options: Identity.Options) {}
 
     /**
-     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
-     * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.jobs.get("248df4b7-aa70-47b8-a036-33ac447e668d", "createmodel")
+     *     await polytomic.identity.get()
      */
-    public async get(
-        id: string,
-        type: string,
-        requestOptions?: Jobs.RequestOptions
-    ): Promise<Polytomic.JobResponseEnvelope> {
+    public async get(requestOptions?: Identity.RequestOptions): Promise<Polytomic.GetIdentityResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/jobs/${type}/${id}`
+                "api/me"
             ),
             method: "GET",
             headers: {
@@ -57,17 +51,13 @@ export class Jobs {
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.JobResponseEnvelope;
+            return _response.body as Polytomic.GetIdentityResponseEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
-                case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
-                case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 case 500:
                     throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:

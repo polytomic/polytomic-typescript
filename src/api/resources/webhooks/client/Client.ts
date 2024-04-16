@@ -11,8 +11,7 @@ import * as errors from "../../../../errors";
 export declare namespace Webhooks {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        token?: core.Supplier<core.BearerToken | undefined>;
-        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
+        token: core.Supplier<core.BearerToken>;
     }
 
     interface RequestOptions {
@@ -22,7 +21,7 @@ export declare namespace Webhooks {
 }
 
 export class Webhooks {
-    constructor(protected readonly _options: Webhooks.Options = {}) {}
+    constructor(protected readonly _options: Webhooks.Options) {}
 
     /**
      * Webooks can be set up using the webhook API endpoints. Currently, only one
@@ -31,6 +30,7 @@ export class Webhooks {
      *
      * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await polytomic.webhooks.list()
@@ -44,13 +44,10 @@ export class Webhooks {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -66,6 +63,8 @@ export class Webhooks {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -96,6 +95,8 @@ export class Webhooks {
      *
      * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await polytomic.webhooks.create({
@@ -115,13 +116,10 @@ export class Webhooks {
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -138,6 +136,10 @@ export class Webhooks {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -168,6 +170,7 @@ export class Webhooks {
      *
      * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.NotFoundError}
      *
      * @example
      *     await polytomic.webhooks.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -181,13 +184,10 @@ export class Webhooks {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -203,66 +203,8 @@ export class Webhooks {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
-                default:
-                    throw new errors.PolytomicError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                    });
-            }
-        }
-
-        switch (_response.error.reason) {
-            case "non-json":
-                throw new errors.PolytomicError({
-                    statusCode: _response.error.statusCode,
-                    body: _response.error.rawBody,
-                });
-            case "timeout":
-                throw new errors.PolytomicTimeoutError();
-            case "unknown":
-                throw new errors.PolytomicError({
-                    message: _response.error.errorMessage,
-                });
-        }
-    }
-
-    /**
-     * @throws {@link Polytomic.UnauthorizedError}
-     *
-     * @example
-     *     await polytomic.webhooks.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
-     */
-    public async delete(id: string, requestOptions?: Webhooks.RequestOptions): Promise<void> {
-        const _response = await core.fetcher({
-            url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/webhooks/${id}`
-            ),
-            method: "DELETE",
-            headers: {
-                Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
-                "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
-                "X-Fern-Runtime": core.RUNTIME.type,
-                "X-Fern-Runtime-Version": core.RUNTIME.version,
-            },
-            contentType: "application/json",
-            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
-            maxRetries: requestOptions?.maxRetries,
-        });
-        if (_response.ok) {
-            return;
-        }
-
-        if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -293,6 +235,8 @@ export class Webhooks {
      *
      * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await polytomic.webhooks.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -310,16 +254,13 @@ export class Webhooks {
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
                 `api/webhooks/${id}`
             ),
-            method: "PATCH",
+            method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -336,6 +277,73 @@ export class Webhooks {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                    });
+            }
+        }
+
+        switch (_response.error.reason) {
+            case "non-json":
+                throw new errors.PolytomicError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.rawBody,
+                });
+            case "timeout":
+                throw new errors.PolytomicTimeoutError();
+            case "unknown":
+                throw new errors.PolytomicError({
+                    message: _response.error.errorMessage,
+                });
+        }
+    }
+
+    /**
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await polytomic.webhooks.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public async remove(id: string, requestOptions?: Webhooks.RequestOptions): Promise<void> {
+        const _response = await core.fetcher({
+            url: urlJoin(
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/webhooks/${id}`
+            ),
+            method: "DELETE",
+            headers: {
+                Authorization: await this._getAuthorizationHeader(),
+                "X-Polytomic-Version": "2024-02-08",
+                "X-Fern-Language": "JavaScript",
+                "X-Fern-SDK-Name": "polytomic",
+                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
+            },
+            contentType: "application/json",
+            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+            maxRetries: requestOptions?.maxRetries,
+        });
+        if (_response.ok) {
+            return;
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -360,11 +368,6 @@ export class Webhooks {
     }
 
     protected async _getAuthorizationHeader() {
-        const bearer = await core.Supplier.get(this._options.token);
-        if (bearer != null) {
-            return `Bearer ${bearer}`;
-        }
-
-        return undefined;
+        return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

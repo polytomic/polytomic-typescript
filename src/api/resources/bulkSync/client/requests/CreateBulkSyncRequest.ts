@@ -8,9 +8,15 @@ import * as Polytomic from "../../../..";
  * @example
  *     {
  *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *         name: "name",
+ *         mode: "replicate",
+ *         name: "My Bulk Sync",
  *         schedule: {
- *             frequency: Polytomic.ScheduleFrequency.Manual
+ *             day_of_month: "1",
+ *             day_of_week: "monday",
+ *             frequency: Polytomic.ScheduleFrequency.Manual,
+ *             hour: "0",
+ *             minute: "0",
+ *             month: "1"
  *         },
  *         source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
  *     }

@@ -5,9 +5,9 @@
 /**
  * @example
  *     {
- *         name: "My Connection",
+ *         name: "My Postgres Connection",
  *         redirect_url: "https://example.com/oauth_redirect",
- *         type: "s3",
+ *         type: "postgresql",
  *         validate: true
  *     }
  */

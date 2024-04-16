@@ -11,8 +11,7 @@ import * as errors from "../../../../../../errors";
 export declare namespace Policies {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        token?: core.Supplier<core.BearerToken | undefined>;
-        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
+        token: core.Supplier<core.BearerToken>;
     }
 
     interface RequestOptions {
@@ -22,10 +21,11 @@ export declare namespace Policies {
 }
 
 export class Policies {
-    constructor(protected readonly _options: Policies.Options = {}) {}
+    constructor(protected readonly _options: Policies.Options) {}
 
     /**
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await polytomic.permissions.policies.list()
@@ -39,13 +39,10 @@ export class Policies {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -61,6 +58,8 @@ export class Policies {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -85,7 +84,11 @@ export class Policies {
     }
 
     /**
+     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await polytomic.permissions.policies.create({
@@ -108,13 +111,10 @@ export class Policies {
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -129,8 +129,16 @@ export class Policies {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -156,6 +164,8 @@ export class Policies {
 
     /**
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await polytomic.permissions.policies.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -169,13 +179,10 @@ export class Policies {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -191,6 +198,10 @@ export class Policies {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -215,67 +226,11 @@ export class Policies {
     }
 
     /**
+     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
-     *
-     * @example
-     *     await polytomic.permissions.policies.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
-     */
-    public async delete(id: string, requestOptions?: Policies.RequestOptions): Promise<void> {
-        const _response = await core.fetcher({
-            url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/permissions/policies/${id}`
-            ),
-            method: "DELETE",
-            headers: {
-                Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
-                "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
-                "X-Fern-Runtime": core.RUNTIME.type,
-                "X-Fern-Runtime-Version": core.RUNTIME.version,
-            },
-            contentType: "application/json",
-            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
-            maxRetries: requestOptions?.maxRetries,
-        });
-        if (_response.ok) {
-            return;
-        }
-
-        if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
-                default:
-                    throw new errors.PolytomicError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                    });
-            }
-        }
-
-        switch (_response.error.reason) {
-            case "non-json":
-                throw new errors.PolytomicError({
-                    statusCode: _response.error.statusCode,
-                    body: _response.error.rawBody,
-                });
-            case "timeout":
-                throw new errors.PolytomicTimeoutError();
-            case "unknown":
-                throw new errors.PolytomicError({
-                    message: _response.error.errorMessage,
-                });
-        }
-    }
-
-    /**
-     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await polytomic.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -296,16 +251,13 @@ export class Policies {
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
                 `api/permissions/policies/${id}`
             ),
-            method: "PATCH",
+            method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -320,8 +272,82 @@ export class Policies {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                    });
+            }
+        }
+
+        switch (_response.error.reason) {
+            case "non-json":
+                throw new errors.PolytomicError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.rawBody,
+                });
+            case "timeout":
+                throw new errors.PolytomicTimeoutError();
+            case "unknown":
+                throw new errors.PolytomicError({
+                    message: _response.error.errorMessage,
+                });
+        }
+    }
+
+    /**
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await polytomic.permissions.policies.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public async remove(id: string, requestOptions?: Policies.RequestOptions): Promise<void> {
+        const _response = await core.fetcher({
+            url: urlJoin(
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/permissions/policies/${id}`
+            ),
+            method: "DELETE",
+            headers: {
+                Authorization: await this._getAuthorizationHeader(),
+                "X-Polytomic-Version": "2024-02-08",
+                "X-Fern-Language": "JavaScript",
+                "X-Fern-SDK-Name": "polytomic",
+                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
+            },
+            contentType: "application/json",
+            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+            maxRetries: requestOptions?.maxRetries,
+        });
+        if (_response.ok) {
+            return;
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -346,11 +372,6 @@ export class Policies {
     }
 
     protected async _getAuthorizationHeader() {
-        const bearer = await core.Supplier.get(this._options.token);
-        if (bearer != null) {
-            return `Bearer ${bearer}`;
-        }
-
-        return undefined;
+        return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

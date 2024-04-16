@@ -4,12 +4,9 @@
 
 /**
  * @example
- *     {
- *         type: "table",
- *         search: "public.users"
- *     }
+ *     {}
  */
-export interface ConnectionsGetTargetRequest {
+export interface ModelSyncGetTargetRequest {
     type?: string;
     search?: string;
 }

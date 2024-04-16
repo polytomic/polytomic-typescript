@@ -5,9 +5,9 @@
 /**
  * @example
  *     {
- *         name: "My Connection",
+ *         name: "My Postgres Connection",
  *         reconnect: false,
- *         type: "s3",
+ *         type: "postgresql",
  *         validate: true
  *     }
  */

@@ -1,3 +1,4 @@
+export * from "./ApiError";
 export * from "./BulkDiscover";
 export * from "./BulkExecutionStatus";
 export * from "./BulkItemizedSchedule";
@@ -121,4 +122,7 @@ export * from "./PickValue";
 export * from "./Schema";
 export * from "./SchemaField";
 export * from "./SchemaRecordsResponseEnvelope";
+export * from "./GetModelSyncSourceMetaEnvelope";
+export * from "./SourceMeta";
+export * from "./ModelSyncSourceMetaResponse";
 export * from "./WorkTaskStatus";

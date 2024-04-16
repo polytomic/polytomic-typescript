@@ -1,6 +1,4 @@
 export { CreateConnectionRequestSchema } from "./CreateConnectionRequestSchema";
-export { ConnectionsRemoveRequest } from "./ConnectionsRemoveRequest";
+export { ConnectCardRequest } from "./ConnectCardRequest";
 export { UpdateConnectionRequestSchema } from "./UpdateConnectionRequestSchema";
-export { ModelFieldsRequest } from "./ModelFieldsRequest";
-export { ConnectionsGetTargetRequest } from "./ConnectionsGetTargetRequest";
-export { TargetRequest } from "./TargetRequest";
+export { ConnectionsRemoveRequest } from "./ConnectionsRemoveRequest";

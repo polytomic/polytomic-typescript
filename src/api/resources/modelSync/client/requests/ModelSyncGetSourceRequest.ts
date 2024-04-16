@@ -6,6 +6,6 @@
  * @example
  *     {}
  */
-export interface ModelFieldsRequest {
-    query?: Record<string, unknown>;
+export interface ModelSyncGetSourceRequest {
+    params?: string;
 }

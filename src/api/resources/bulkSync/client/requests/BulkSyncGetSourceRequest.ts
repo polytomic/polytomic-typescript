@@ -9,6 +9,5 @@
  *     }
  */
 export interface BulkSyncGetSourceRequest {
-    refresh_schemas?: boolean;
     include_fields?: boolean;
 }

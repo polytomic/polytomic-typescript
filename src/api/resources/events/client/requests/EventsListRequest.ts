@@ -10,7 +10,7 @@
  *         ending_before: new Date("2020-01-01T00:00:00.000Z")
  *     }
  */
-export interface EventsApiV2GetEventsRequest {
+export interface EventsListRequest {
     organization_id?: string;
     type?: string;
     starting_after?: string;

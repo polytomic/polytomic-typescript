@@ -11,8 +11,7 @@ import * as errors from "../../../../errors";
 export declare namespace Events {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        token?: core.Supplier<core.BearerToken | undefined>;
-        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
+        token: core.Supplier<core.BearerToken>;
     }
 
     interface RequestOptions {
@@ -22,20 +21,22 @@ export declare namespace Events {
 }
 
 export class Events {
-    constructor(protected readonly _options: Events.Options = {}) {}
+    constructor(protected readonly _options: Events.Options) {}
 
     /**
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.events.apiV2GetEvents({
+     *     await polytomic.events.list({
      *         organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
      *         starting_after: new Date("2020-01-01T00:00:00.000Z"),
      *         ending_before: new Date("2020-01-01T00:00:00.000Z")
      *     })
      */
-    public async apiV2GetEvents(
-        request: Polytomic.EventsApiV2GetEventsRequest = {},
+    public async list(
+        request: Polytomic.EventsListRequest = {},
         requestOptions?: Events.RequestOptions
     ): Promise<Polytomic.EventsEnvelope> {
         const {
@@ -74,13 +75,10 @@ export class Events {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -97,6 +95,10 @@ export class Events {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
@@ -124,9 +126,9 @@ export class Events {
      * @throws {@link Polytomic.UnauthorizedError}
      *
      * @example
-     *     await polytomic.events.apiV2GetEventTypes()
+     *     await polytomic.events.getTypes()
      */
-    public async apiV2GetEventTypes(requestOptions?: Events.RequestOptions): Promise<Polytomic.EventTypesEnvelope> {
+    public async getTypes(requestOptions?: Events.RequestOptions): Promise<Polytomic.EventTypesEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -135,13 +137,10 @@ export class Events {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.xPolytomicVersion)) != null
-                        ? await core.Supplier.get(this._options.xPolytomicVersion)
-                        : undefined,
+                "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.1.2",
+                "X-Fern-SDK-Version": "0.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -181,11 +180,6 @@ export class Events {
     }
 
     protected async _getAuthorizationHeader() {
-        const bearer = await core.Supplier.get(this._options.token);
-        if (bearer != null) {
-            return `Bearer ${bearer}`;
-        }
-
-        return undefined;
+        return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

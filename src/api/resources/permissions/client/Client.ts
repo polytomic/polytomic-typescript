@@ -10,8 +10,7 @@ import { Roles } from "../resources/roles/client/Client";
 export declare namespace Permissions {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        token?: core.Supplier<core.BearerToken | undefined>;
-        xPolytomicVersion?: core.Supplier<"2023-04-25" | undefined>;
+        token: core.Supplier<core.BearerToken>;
     }
 
     interface RequestOptions {
@@ -21,7 +20,7 @@ export declare namespace Permissions {
 }
 
 export class Permissions {
-    constructor(protected readonly _options: Permissions.Options = {}) {}
+    constructor(protected readonly _options: Permissions.Options) {}
 
     protected _policies: Policies | undefined;
 
