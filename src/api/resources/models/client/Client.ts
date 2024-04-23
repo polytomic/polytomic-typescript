@@ -42,7 +42,7 @@ export class Models {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -92,7 +92,6 @@ export class Models {
      * @example
      *     await polytomic.models.create({
      *         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         identifier: "id",
      *         name: "Users"
      *     })
      */
@@ -117,7 +116,7 @@ export class Models {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -184,7 +183,7 @@ export class Models {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -237,7 +236,6 @@ export class Models {
      *     await polytomic.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         async: false,
      *         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         identifier: "id",
      *         name: "Users"
      *     })
      */
@@ -263,7 +261,7 @@ export class Models {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -331,7 +329,7 @@ export class Models {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

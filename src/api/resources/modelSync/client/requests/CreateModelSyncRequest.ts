@@ -7,29 +7,9 @@ import * as Polytomic from "../../../..";
 /**
  * @example
  *     {
- *         fields: [{
- *                 source: {
- *                     field: "id",
- *                     model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
- *                 },
- *                 target: "name"
- *             }],
- *         filter_logic: "A and B or C",
- *         identity: {
- *             function: "Equality",
- *             source: {
- *                 field: "id",
- *                 model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
- *             },
- *             target: "name"
- *         },
  *         mode: "create",
  *         name: "Users Sync",
- *         schedule: {
- *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *             frequency: "daily"
- *         },
- *         sync_all_records: false,
+ *         schedule: {},
  *         target: {
  *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
  *             object: "Users"

@@ -1,8 +1,8 @@
 {
     "name": "polytomic",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "private": false,
-    "repository": "https://github.com/polytomic/polytomic-typescript-sdk",
+    "repository": "https://github.com/polytomic/polytomic-typescript",
     "license": "MIT",
     "main": "./index.js",
     "types": "./index.d.ts",

@@ -5,10 +5,8 @@
 /**
  * @example
  *     {
- *         connection: "248df4b7-aa70-47b8-a036-33ac447e668d",
  *         name: "Salesforce Connection",
- *         redirect_url: "redirect_url",
- *         type: "salesforce"
+ *         redirect_url: "redirect_url"
  *     }
  */
 export interface ConnectCardRequest {

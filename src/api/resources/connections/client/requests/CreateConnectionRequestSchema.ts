@@ -6,9 +6,7 @@
  * @example
  *     {
  *         name: "My Postgres Connection",
- *         redirect_url: "https://example.com/oauth_redirect",
- *         type: "postgresql",
- *         validate: true
+ *         type: "postgresql"
  *     }
  */
 export interface CreateConnectionRequestSchema {

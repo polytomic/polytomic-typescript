@@ -42,7 +42,7 @@ export class Policies {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -92,11 +92,7 @@ export class Policies {
      *
      * @example
      *     await polytomic.permissions.policies.create({
-     *         name: "Custom",
-     *         policy_actions: [{
-     *                 action: "read",
-     *                 role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
-     *             }]
+     *         name: "Custom"
      *     })
      */
     public async create(
@@ -114,7 +110,7 @@ export class Policies {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -182,7 +178,7 @@ export class Policies {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -234,11 +230,7 @@ export class Policies {
      *
      * @example
      *     await polytomic.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         name: "Custom",
-     *         policy_actions: [{
-     *                 action: "read",
-     *                 role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
-     *             }]
+     *         name: "Custom"
      *     })
      */
     public async update(
@@ -257,7 +249,7 @@ export class Policies {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -326,7 +318,7 @@ export class Policies {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

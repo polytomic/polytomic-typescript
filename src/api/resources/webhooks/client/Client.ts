@@ -28,7 +28,7 @@ export class Webhooks {
      * webhook may be created per organization. The webhook will be called for events
      * in that organization.
      *
-     * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
+     * Consult the [Events documentation](https://apidocs.polytomic.com/getting-started/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -47,7 +47,7 @@ export class Webhooks {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -93,7 +93,7 @@ export class Webhooks {
      * webhook may be created per organization. The webhook will be called for events
      * in that organization.
      *
-     * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
+     * Consult the [Events documentation](https://apidocs.polytomic.com/getting-started/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
@@ -119,7 +119,7 @@ export class Webhooks {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -168,7 +168,7 @@ export class Webhooks {
      * webhook may be created per organization. The webhook will be called for events
      * in that organization.
      *
-     * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
+     * Consult the [Events documentation](https://apidocs.polytomic.com/getting-started/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
@@ -187,7 +187,7 @@ export class Webhooks {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -233,7 +233,7 @@ export class Webhooks {
      * webhook may be created per organization. The webhook will be called for events
      * in that organization.
      *
-     * Consult the [Events documentation](https://docs.polytomic.com/reference/events) for more information.
+     * Consult the [Events documentation](https://apidocs.polytomic.com/getting-started/events) for more information.
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
@@ -260,7 +260,7 @@ export class Webhooks {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -324,7 +324,7 @@ export class Webhooks {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

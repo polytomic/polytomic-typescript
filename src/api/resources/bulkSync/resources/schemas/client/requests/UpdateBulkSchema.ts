@@ -6,10 +6,7 @@ import * as Polytomic from "../../../../../..";
 
 /**
  * @example
- *     {
- *         enabled: true,
- *         partition_key: "email"
- *     }
+ *     {}
  */
 export interface UpdateBulkSchema {
     enabled?: boolean;

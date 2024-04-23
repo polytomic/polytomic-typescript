@@ -56,7 +56,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -129,7 +129,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -212,7 +212,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -295,7 +295,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -361,7 +361,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -413,29 +413,9 @@ export class ModelSync {
      *
      * @example
      *     await polytomic.modelSync.create({
-     *         fields: [{
-     *                 source: {
-     *                     field: "id",
-     *                     model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
-     *                 },
-     *                 target: "name"
-     *             }],
-     *         filter_logic: "A and B or C",
-     *         identity: {
-     *             function: "Equality",
-     *             source: {
-     *                 field: "id",
-     *                 model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
-     *             },
-     *             target: "name"
-     *         },
      *         mode: "create",
      *         name: "Users Sync",
-     *         schedule: {
-     *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *             frequency: "daily"
-     *         },
-     *         sync_all_records: false,
+     *         schedule: {},
      *         target: {
      *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
      *             object: "Users"
@@ -457,7 +437,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -526,7 +506,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -590,7 +570,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -643,29 +623,9 @@ export class ModelSync {
      *
      * @example
      *     await polytomic.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         fields: [{
-     *                 source: {
-     *                     field: "id",
-     *                     model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
-     *                 },
-     *                 target: "name"
-     *             }],
-     *         filter_logic: "A and B or C",
-     *         identity: {
-     *             function: "Equality",
-     *             source: {
-     *                 field: "id",
-     *                 model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
-     *             },
-     *             target: "name"
-     *         },
      *         mode: "create",
      *         name: "Users Sync",
-     *         schedule: {
-     *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *             frequency: "daily"
-     *         },
-     *         sync_all_records: false,
+     *         schedule: {},
      *         target: {
      *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
      *             object: "Users"
@@ -688,7 +648,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -759,7 +719,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -831,7 +791,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -878,6 +838,9 @@ export class ModelSync {
     }
 
     /**
+     * > 🚧 Force full resync
+     * >
+     * > Use caution when setting the `resync` parameter to `true`. This will force a full resync of the data from the source system. This can be a time-consuming operation and may impact the performance of the source system. It is recommended to only use this option when necessary.
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -903,7 +866,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -974,7 +937,7 @@ export class ModelSync {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "0.2.0",
+                "X-Fern-SDK-Version": "1.0.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

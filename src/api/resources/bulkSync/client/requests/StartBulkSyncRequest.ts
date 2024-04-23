@@ -4,10 +4,7 @@
 
 /**
  * @example
- *     {
- *         resync: false,
- *         test: false
- *     }
+ *     {}
  */
 export interface StartBulkSyncRequest {
     resync?: boolean;

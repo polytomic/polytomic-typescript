@@ -5,10 +5,7 @@
 /**
  * @example
  *     {
- *         name: "My Postgres Connection",
- *         reconnect: false,
- *         type: "postgresql",
- *         validate: true
+ *         name: "My Postgres Connection"
  *     }
  */
 export interface UpdateConnectionRequestSchema {

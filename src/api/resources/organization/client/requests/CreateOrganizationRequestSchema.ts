@@ -5,12 +5,7 @@
 /**
  * @example
  *     {
- *         client_id: "client_id",
- *         client_secret: "client_secret",
- *         issuer: "https://example.com",
- *         name: "My Organization",
- *         sso_domain: "example.com",
- *         sso_org_id: "123456"
+ *         name: "My Organization"
  *     }
  */
 export interface CreateOrganizationRequestSchema {

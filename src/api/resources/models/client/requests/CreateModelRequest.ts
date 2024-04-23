@@ -8,7 +8,6 @@ import * as Polytomic from "../../../..";
  * @example
  *     {
  *         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *         identifier: "id",
  *         name: "Users"
  *     }
  */
