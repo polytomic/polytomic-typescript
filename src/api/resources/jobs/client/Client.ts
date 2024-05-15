@@ -48,7 +48,7 @@ export class Jobs {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.0.0",
+                "X-Fern-SDK-Version": "1.2.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

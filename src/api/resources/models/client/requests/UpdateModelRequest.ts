@@ -17,6 +17,7 @@ export interface UpdateModelRequest {
     additional_fields?: Polytomic.ModelModelFieldRequest[];
     configuration?: Record<string, unknown>;
     connection_id: string;
+    enricher?: Polytomic.Enrichment;
     fields?: string[];
     identifier?: string;
     labels?: string[];

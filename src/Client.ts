@@ -8,10 +8,10 @@ import { BulkSync } from "./api/resources/bulkSync/client/Client";
 import { Connections } from "./api/resources/connections/client/Client";
 import { ModelSync } from "./api/resources/modelSync/client/Client";
 import { Schemas } from "./api/resources/schemas/client/Client";
+import { Models } from "./api/resources/models/client/Client";
 import { Events } from "./api/resources/events/client/Client";
 import { Jobs } from "./api/resources/jobs/client/Client";
 import { Identity } from "./api/resources/identity/client/Client";
-import { Models } from "./api/resources/models/client/Client";
 import { Organization } from "./api/resources/organization/client/Client";
 import { Users } from "./api/resources/users/client/Client";
 import { Permissions } from "./api/resources/permissions/client/Client";
@@ -56,6 +56,12 @@ export class PolytomicClient {
         return (this._schemas ??= new Schemas(this._options));
     }
 
+    protected _models: Models | undefined;
+
+    public get models(): Models {
+        return (this._models ??= new Models(this._options));
+    }
+
     protected _events: Events | undefined;
 
     public get events(): Events {
@@ -72,12 +78,6 @@ export class PolytomicClient {
 
     public get identity(): Identity {
         return (this._identity ??= new Identity(this._options));
-    }
-
-    protected _models: Models | undefined;
-
-    public get models(): Models {
-        return (this._models ??= new Models(this._options));
     }
 
     protected _organization: Organization | undefined;

@@ -5,6 +5,8 @@
 import * as Polytomic from "..";
 
 export interface ConnectionResponseSchema {
+    /** API calls made to service in the last 24h (supported integrations only). */
+    api_calls_last_24_hours?: number;
     configuration?: Record<string, unknown>;
     id?: string;
     name?: string;

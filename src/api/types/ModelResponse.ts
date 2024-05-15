@@ -7,6 +7,7 @@ import * as Polytomic from "..";
 export interface ModelResponse {
     configuration?: Record<string, unknown>;
     connection_id?: string;
+    enricher?: Polytomic.Enrichment;
     fields?: Polytomic.ModelField[];
     id?: string;
     identifier?: string;

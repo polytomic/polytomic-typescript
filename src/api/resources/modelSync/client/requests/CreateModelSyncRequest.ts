@@ -18,6 +18,7 @@ import * as Polytomic from "../../../..";
  */
 export interface CreateModelSyncRequest {
     active?: boolean;
+    enricher?: Polytomic.Enrichment;
     fields?: Polytomic.ModelSyncField[];
     filter_logic?: string;
     filters?: Polytomic.Filter[];
