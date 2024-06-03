@@ -26,7 +26,9 @@ export interface UpdateModelSyncRequest {
     mode: string;
     name: string;
     organization_id?: string;
+    /** Values to set as sync target fields. */
     override_fields?: Polytomic.ModelSyncField[];
+    /** Conditional value replacement for field mappings. */
     overrides?: Polytomic.Override[];
     policies?: string[];
     schedule: Polytomic.Schedule;

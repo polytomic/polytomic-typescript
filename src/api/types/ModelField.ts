@@ -5,6 +5,7 @@
 export interface ModelField {
     description?: string;
     example?: unknown;
+    id?: string;
     label?: string;
     name?: string;
     remote_type?: string;

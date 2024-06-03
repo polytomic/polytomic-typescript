@@ -5,7 +5,7 @@
 import * as Polytomic from "..";
 
 export interface Identity {
-    function: string;
+    function: Polytomic.SchemaIdentityFunction;
     new_field?: boolean;
     remote_field_type_id?: string;
     source: Polytomic.Source;

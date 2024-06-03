@@ -8,7 +8,7 @@ export interface Schedule {
     connection_id?: string;
     day_of_month?: string;
     day_of_week?: string;
-    frequency?: string;
+    frequency?: Polytomic.ScheduleFrequency;
     hour?: string;
     job_id?: number;
     minute?: string;
