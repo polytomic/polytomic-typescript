@@ -7,6 +7,13 @@ import * as Polytomic from "../../../..";
 /**
  * @example
  *     {
+ *         fields: [{
+ *                 source: {
+ *                     field: "id",
+ *                     model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+ *                 },
+ *                 target: "name"
+ *             }],
  *         mode: "create",
  *         name: "Users Sync",
  *         schedule: {},
@@ -19,7 +26,7 @@ import * as Polytomic from "../../../..";
 export interface CreateModelSyncRequest {
     active?: boolean;
     enricher?: Polytomic.Enrichment;
-    fields?: Polytomic.ModelSyncField[];
+    fields: Polytomic.ModelSyncField[];
     filter_logic?: string;
     filters?: Polytomic.Filter[];
     identity?: Polytomic.Identity;

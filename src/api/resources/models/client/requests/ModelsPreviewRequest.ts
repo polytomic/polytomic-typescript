@@ -8,6 +8,9 @@ import * as Polytomic from "../../../..";
  * @example
  *     {
  *         body: {
+ *             configuration: {
+ *                 "table": "public.users"
+ *             },
  *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
  *             name: "Users"
  *         }

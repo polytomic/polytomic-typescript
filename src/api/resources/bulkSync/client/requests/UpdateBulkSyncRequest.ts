@@ -8,6 +8,7 @@ import * as Polytomic from "../../../..";
  * @example
  *     {
  *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+ *         mode: "replicate",
  *         name: "My Bulk Sync",
  *         schedule: {
  *             frequency: Polytomic.ScheduleFrequency.Manual
@@ -24,8 +25,8 @@ export interface UpdateBulkSyncRequest {
     disable_record_timestamps?: boolean;
     /** DEPRECATED: Use automatically_add_new_objects/automatically_add_new_fields instead */
     discover?: boolean;
-    /** */
-    mode?: string;
+    /** Either 'replicate' or 'snapshot'. */
+    mode: string;
     name: string;
     organization_id?: string;
     policies?: string[];

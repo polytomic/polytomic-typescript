@@ -6,7 +6,7 @@ import * as Polytomic from "..";
 
 export interface CreateModelRequest {
     additional_fields?: Polytomic.ModelModelFieldRequest[];
-    configuration?: Record<string, unknown>;
+    configuration: Record<string, unknown>;
     connection_id: string;
     enricher?: Polytomic.Enrichment;
     fields?: string[];

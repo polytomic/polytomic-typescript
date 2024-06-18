@@ -44,7 +44,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -104,7 +104,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -154,6 +154,13 @@ export class Connections {
      *
      * @example
      *     await polytomic.connections.create({
+     *         configuration: {
+     *             "database": "example",
+     *             "hostname": "postgres.example.com",
+     *             "password": "password",
+     *             "port": 5432,
+     *             "username": "user"
+     *         },
      *         name: "My Postgres Connection",
      *         type: "postgresql"
      *     })
@@ -173,7 +180,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -248,7 +255,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -317,7 +324,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -370,6 +377,13 @@ export class Connections {
      *
      * @example
      *     await polytomic.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         configuration: {
+     *             "database": "example",
+     *             "hostname": "postgres.example.com",
+     *             "password": "password",
+     *             "port": 5432,
+     *             "username": "user"
+     *         },
      *         name: "My Postgres Connection"
      *     })
      */
@@ -389,7 +403,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -473,7 +487,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -544,7 +558,7 @@ export class Connections {
                 "X-Polytomic-Version": "2024-02-08",
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.3.0",
+                "X-Fern-SDK-Version": "1.4.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

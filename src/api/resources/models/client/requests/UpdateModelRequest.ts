@@ -8,6 +8,9 @@ import * as Polytomic from "../../../..";
  * @example
  *     {
  *         async: false,
+ *         configuration: {
+ *             "table": "public.users"
+ *         },
  *         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
  *         name: "Users"
  *     }
@@ -15,7 +18,7 @@ import * as Polytomic from "../../../..";
 export interface UpdateModelRequest {
     async?: boolean;
     additional_fields?: Polytomic.ModelModelFieldRequest[];
-    configuration?: Record<string, unknown>;
+    configuration: Record<string, unknown>;
     connection_id: string;
     enricher?: Polytomic.Enrichment;
     fields?: string[];

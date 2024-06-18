@@ -3,6 +3,7 @@
  */
 
 export interface ExecutionCounts {
+    delete?: number;
     error?: number;
     insert?: number;
     total?: number;
