@@ -1,4 +1,5 @@
 export * as bulkSync from "./bulkSync";
+export * from "./bulkSync/types";
 export * as connections from "./connections";
 export * as modelSync from "./modelSync";
 export * as schemas from "./schemas";

@@ -31,7 +31,8 @@ export interface CreateBulkSyncRequest {
     organization_id?: string;
     policies?: string[];
     schedule: Polytomic.BulkSchedule;
-    schemas?: string[];
+    /** List of schemas to sync; if omitted, all schemas will be selected for syncing. */
+    schemas?: Polytomic.V2CreateBulkSyncRequestSchemasItem[];
     source_configuration?: Record<string, unknown>;
     source_connection_id: string;
 }
