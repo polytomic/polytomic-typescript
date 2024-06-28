@@ -11,5 +11,6 @@ import * as Polytomic from "../../../../../..";
 export interface UpdateBulkSchema {
     enabled?: boolean;
     fields?: Polytomic.BulkField[];
+    filters?: Polytomic.BulkFilter[];
     partition_key?: string;
 }

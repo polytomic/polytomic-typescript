@@ -8,7 +8,7 @@ import * as Polytomic from "../../..";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors";
 
-export declare namespace Events {
+export declare namespace QueryRunner {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token: core.Supplier<core.BearerToken>;
@@ -21,59 +21,37 @@ export declare namespace Events {
     }
 }
 
-export class Events {
-    constructor(protected readonly _options: Events.Options) {}
+export class QueryRunner {
+    constructor(protected readonly _options: QueryRunner.Options) {}
 
     /**
+     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
-     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.events.list({
-     *         organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         starting_after: new Date("2020-01-01T00:00:00.000Z"),
-     *         ending_before: new Date("2020-01-01T00:00:00.000Z")
+     *     await polytomic.queryRunner.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         query: "SELECT * FROM table"
      *     })
      */
-    public async list(
-        request: Polytomic.EventsListRequest = {},
-        requestOptions?: Events.RequestOptions
-    ): Promise<Polytomic.EventsEnvelope> {
-        const {
-            organization_id: organizationId,
-            type: type_,
-            starting_after: startingAfter,
-            ending_before: endingBefore,
-            limit,
-        } = request;
+    public async runQuery(
+        connectionId: string,
+        request: Polytomic.V4RunQueryRequest = {},
+        requestOptions?: QueryRunner.RequestOptions
+    ): Promise<Polytomic.V4RunQueryEnvelope> {
+        const { query, ..._body } = request;
         const _queryParams: Record<string, string | string[]> = {};
-        if (organizationId != null) {
-            _queryParams["organization_id"] = organizationId;
-        }
-
-        if (type_ != null) {
-            _queryParams["type"] = type_;
-        }
-
-        if (startingAfter != null) {
-            _queryParams["starting_after"] = startingAfter;
-        }
-
-        if (endingBefore != null) {
-            _queryParams["ending_before"] = endingBefore;
-        }
-
-        if (limit != null) {
-            _queryParams["limit"] = limit.toString();
+        if (query != null) {
+            _queryParams["query"] = query;
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/events"
+                `api/connections/${connectionId}/query`
             ),
-            method: "GET",
+            method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
@@ -88,19 +66,22 @@ export class Events {
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.EventsEnvelope;
+            return _response.body as Polytomic.V4RunQueryEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
-                case 422:
-                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 case 500:
                     throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
@@ -127,16 +108,29 @@ export class Events {
     }
 
     /**
+     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.events.getTypes()
+     *     await polytomic.queryRunner.getQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {})
      */
-    public async getTypes(requestOptions?: Events.RequestOptions): Promise<Polytomic.EventTypesEnvelope> {
+    public async getQuery(
+        id: string,
+        request: Polytomic.QueryRunnerGetQueryRequest = {},
+        requestOptions?: QueryRunner.RequestOptions
+    ): Promise<Polytomic.V4QueryResultsEnvelope> {
+        const { page } = request;
+        const _queryParams: Record<string, string | string[]> = {};
+        if (page != null) {
+            _queryParams["page"] = page;
+        }
+
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/events_types"
+                `api/queries/${id}`
             ),
             method: "GET",
             headers: {
@@ -152,17 +146,24 @@ export class Events {
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
+            queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.EventTypesEnvelope;
+            return _response.body as Polytomic.V4QueryResultsEnvelope;
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,

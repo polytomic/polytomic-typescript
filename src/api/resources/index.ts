@@ -1,6 +1,7 @@
 export * as bulkSync from "./bulkSync";
 export * from "./bulkSync/types";
 export * as connections from "./connections";
+export * as queryRunner from "./queryRunner";
 export * as modelSync from "./modelSync";
 export * as schemas from "./schemas";
 export * as models from "./models";
@@ -13,6 +14,7 @@ export * as permissions from "./permissions";
 export * as webhooks from "./webhooks";
 export * from "./bulkSync/client/requests";
 export * from "./connections/client/requests";
+export * from "./queryRunner/client/requests";
 export * from "./modelSync/client/requests";
 export * from "./models/client/requests";
 export * from "./events/client/requests";

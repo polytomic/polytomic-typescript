@@ -6,6 +6,7 @@ import * as environments from "./environments";
 import * as core from "./core";
 import { BulkSync } from "./api/resources/bulkSync/client/Client";
 import { Connections } from "./api/resources/connections/client/Client";
+import { QueryRunner } from "./api/resources/queryRunner/client/Client";
 import { ModelSync } from "./api/resources/modelSync/client/Client";
 import { Schemas } from "./api/resources/schemas/client/Client";
 import { Models } from "./api/resources/models/client/Client";
@@ -21,6 +22,7 @@ export declare namespace PolytomicClient {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token: core.Supplier<core.BearerToken>;
+        version?: core.Supplier<string | undefined>;
     }
 
     interface RequestOptions {
@@ -42,6 +44,12 @@ export class PolytomicClient {
 
     public get connections(): Connections {
         return (this._connections ??= new Connections(this._options));
+    }
+
+    protected _queryRunner: QueryRunner | undefined;
+
+    public get queryRunner(): QueryRunner {
+        return (this._queryRunner ??= new QueryRunner(this._options));
     }
 
     protected _modelSync: ModelSync | undefined;

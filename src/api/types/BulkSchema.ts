@@ -7,6 +7,7 @@ import * as Polytomic from "..";
 export interface BulkSchema {
     enabled?: boolean;
     fields?: Polytomic.BulkField[];
+    filters?: Polytomic.BulkFilter[];
     id?: string;
     output_name?: string;
     partition_key?: string;

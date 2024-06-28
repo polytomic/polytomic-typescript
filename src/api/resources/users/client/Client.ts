@@ -12,6 +12,7 @@ export declare namespace Users {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token: core.Supplier<core.BearerToken>;
+        version?: core.Supplier<string | undefined>;
     }
 
     interface RequestOptions {
@@ -42,10 +43,13 @@ export class Users {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version": "2024-02-08",
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.5.0",
+                "X-Fern-SDK-Version": "1.6.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -112,10 +116,13 @@ export class Users {
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version": "2024-02-08",
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.5.0",
+                "X-Fern-SDK-Version": "1.6.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -183,10 +190,13 @@ export class Users {
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version": "2024-02-08",
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.5.0",
+                "X-Fern-SDK-Version": "1.6.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -256,10 +266,13 @@ export class Users {
             method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version": "2024-02-08",
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.5.0",
+                "X-Fern-SDK-Version": "1.6.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -327,10 +340,13 @@ export class Users {
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version": "2024-02-08",
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.5.0",
+                "X-Fern-SDK-Version": "1.6.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -406,10 +422,13 @@ export class Users {
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
-                "X-Polytomic-Version": "2024-02-08",
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.5.0",
+                "X-Fern-SDK-Version": "1.6.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

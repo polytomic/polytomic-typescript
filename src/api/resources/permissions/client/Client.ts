@@ -11,6 +11,7 @@ export declare namespace Permissions {
     interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         token: core.Supplier<core.BearerToken>;
+        version?: core.Supplier<string | undefined>;
     }
 
     interface RequestOptions {
