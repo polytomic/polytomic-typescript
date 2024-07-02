@@ -8,10 +8,6 @@ import * as Polytomic from "../../../..";
  * @example
  *     {
  *         fields: [{
- *                 source: {
- *                     field: "id",
- *                     model_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
- *                 },
  *                 target: "name"
  *             }],
  *         mode: "create",
@@ -26,6 +22,7 @@ import * as Polytomic from "../../../..";
 export interface CreateModelSyncRequest {
     active?: boolean;
     enricher?: Polytomic.Enrichment;
+    /** Fields to sync from source to target. */
     fields: Polytomic.ModelSyncField[];
     filter_logic?: string;
     filters?: Polytomic.Filter[];
@@ -33,9 +30,9 @@ export interface CreateModelSyncRequest {
     mode: string;
     name: string;
     organization_id?: string;
-    /** Values to set as sync target fields. */
+    /** Values to set in the target unconditionally. */
     override_fields?: Polytomic.ModelSyncField[];
-    /** Conditional value replacement for field mappings. */
+    /** Conditional value replacement for fields. */
     overrides?: Polytomic.Override[];
     policies?: string[];
     schedule: Polytomic.Schedule;

@@ -1,6 +1,6 @@
 {
     "name": "polytomic",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "private": false,
     "repository": "https://github.com/polytomic/polytomic-typescript",
     "license": "MIT",

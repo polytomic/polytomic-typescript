@@ -29,6 +29,91 @@ export class Executions {
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
+     *     await polytomic.bulkSync.executions.listStatus({})
+     */
+    public async listStatus(
+        request: Polytomic.bulkSync.ExecutionsListStatusRequest = {},
+        requestOptions?: Executions.RequestOptions
+    ): Promise<Polytomic.ListBulkSyncExecutionStatusEnvelope> {
+        const { all, active, sync_id: syncId } = request;
+        const _queryParams: Record<string, string | string[]> = {};
+        if (all != null) {
+            _queryParams["all"] = all.toString();
+        }
+
+        if (active != null) {
+            _queryParams["active"] = active.toString();
+        }
+
+        if (syncId != null) {
+            if (Array.isArray(syncId)) {
+                _queryParams["sync_id"] = syncId.map((item) => item);
+            } else {
+                _queryParams["sync_id"] = syncId;
+            }
+        }
+
+        const _response = await core.fetcher({
+            url: urlJoin(
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/bulk/syncs/status"
+            ),
+            method: "GET",
+            headers: {
+                Authorization: await this._getAuthorizationHeader(),
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
+                "X-Fern-Language": "JavaScript",
+                "X-Fern-SDK-Name": "polytomic",
+                "X-Fern-SDK-Version": "1.7.0",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
+            },
+            contentType: "application/json",
+            queryParameters: _queryParams,
+            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+            maxRetries: requestOptions?.maxRetries,
+        });
+        if (_response.ok) {
+            return _response.body as Polytomic.ListBulkSyncExecutionStatusEnvelope;
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                    });
+            }
+        }
+
+        switch (_response.error.reason) {
+            case "non-json":
+                throw new errors.PolytomicError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.rawBody,
+                });
+            case "timeout":
+                throw new errors.PolytomicTimeoutError();
+            case "unknown":
+                throw new errors.PolytomicError({
+                    message: _response.error.errorMessage,
+                });
+        }
+    }
+
+    /**
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.NotFoundError}
+     *
+     * @example
      *     await polytomic.bulkSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async list(
@@ -49,7 +134,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.6.0",
+                "X-Fern-SDK-Version": "1.7.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -116,7 +201,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.6.0",
+                "X-Fern-SDK-Version": "1.7.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
