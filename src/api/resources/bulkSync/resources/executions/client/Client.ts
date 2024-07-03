@@ -29,7 +29,10 @@ export class Executions {
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.bulkSync.executions.listStatus({})
+     *     await polytomic.bulkSync.executions.listStatus({
+     *         all: true,
+     *         active: true
+     *     })
      */
     public async listStatus(
         request: Polytomic.bulkSync.ExecutionsListStatusRequest = {},
@@ -67,7 +70,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.7.0",
+                "X-Fern-SDK-Version": "1.8.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -134,7 +137,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.7.0",
+                "X-Fern-SDK-Version": "1.8.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -201,7 +204,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.7.0",
+                "X-Fern-SDK-Version": "1.8.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
