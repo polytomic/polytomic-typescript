@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
-import * as Polytomic from "../../..";
+import * as Polytomic from "../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../errors";
+import * as errors from "../../../../errors/index";
 
 export declare namespace Models {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Models {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -26,13 +32,18 @@ export class Models {
 
     /**
      * For a given connection and enrichment configuration, provides the valid sets of input fields.
+     *
+     * @param {string} connectionId
+     * @param {Polytomic.GetEnrichmentInputFieldsRequest} request
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.models.post("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.models.post("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async post(
         connectionId: string,
@@ -42,7 +53,7 @@ export class Models {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/enrichment/${connectionId}/inputfields`
+                `api/enrichment/${encodeURIComponent(connectionId)}/inputfields`
             ),
             method: "POST",
             headers: {
@@ -53,7 +64,7 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -61,6 +72,7 @@ export class Models {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.V2GetEnrichmentInputFieldsResponseEnvelope;
@@ -100,13 +112,16 @@ export class Models {
     }
 
     /**
+     * @param {Polytomic.ModelsPreviewRequest} request
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.models.preview({
+     *     await client.models.preview({
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -121,7 +136,7 @@ export class Models {
         requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async, body: _body } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
@@ -140,7 +155,7 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -149,6 +164,7 @@ export class Models {
             body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelResponseEnvelope;
@@ -188,11 +204,13 @@ export class Models {
     }
 
     /**
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.models.list()
+     *     await client.models.list()
      */
     public async list(requestOptions?: Models.RequestOptions): Promise<Polytomic.ModelListResponseEnvelope> {
         const _response = await core.fetcher({
@@ -209,13 +227,14 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelListResponseEnvelope;
@@ -251,13 +270,16 @@ export class Models {
     }
 
     /**
+     * @param {Polytomic.ModelsCreateRequest} request
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.models.create({
+     *     await client.models.create({
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -272,7 +294,7 @@ export class Models {
         requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async, body: _body } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
@@ -291,7 +313,7 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -300,6 +322,7 @@ export class Models {
             body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelResponseEnvelope;
@@ -339,12 +362,16 @@ export class Models {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.ModelsGetRequest} request
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.models.get("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(
         id: string,
@@ -352,7 +379,7 @@ export class Models {
         requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
@@ -360,7 +387,7 @@ export class Models {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/models/${id}`
+                `api/models/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
@@ -371,7 +398,7 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -379,6 +406,7 @@ export class Models {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelResponseEnvelope;
@@ -416,13 +444,17 @@ export class Models {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.UpdateModelRequest} request
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         async: false,
      *         configuration: {
      *             "table": "public.users"
@@ -437,7 +469,7 @@ export class Models {
         requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async, ..._body } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
@@ -445,7 +477,7 @@ export class Models {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/models/${id}`
+                `api/models/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
@@ -456,7 +488,7 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -465,6 +497,7 @@ export class Models {
             body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelResponseEnvelope;
@@ -504,13 +537,17 @@ export class Models {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.ModelsRemoveRequest} request
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async remove(
         id: string,
@@ -518,7 +555,7 @@ export class Models {
         requestOptions?: Models.RequestOptions
     ): Promise<void> {
         const { async } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
@@ -526,7 +563,7 @@ export class Models {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/models/${id}`
+                `api/models/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
@@ -537,7 +574,7 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -545,6 +582,7 @@ export class Models {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return;
@@ -585,13 +623,18 @@ export class Models {
 
     /**
      * Returns sample records from the model. The first ten records that the source provides will be returned after being enriched (if applicable). Synchronous requests must complete within 10s. If either querying or enrichment exceeds 10s, please use the async option.
+     *
+     * @param {string} id
+     * @param {Polytomic.ModelsSampleRequest} request
+     * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async sample(
         id: string,
@@ -599,7 +642,7 @@ export class Models {
         requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelSampleResponseEnvelope> {
         const { async } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
@@ -607,7 +650,7 @@ export class Models {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/models/${id}/sample`
+                `api/models/${encodeURIComponent(id)}/sample`
             ),
             method: "GET",
             headers: {
@@ -618,7 +661,7 @@ export class Models {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -626,6 +669,7 @@ export class Models {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelSampleResponseEnvelope;
@@ -664,7 +708,7 @@ export class Models {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

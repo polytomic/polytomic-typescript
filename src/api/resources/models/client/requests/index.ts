@@ -1,7 +1,7 @@
-export { GetEnrichmentInputFieldsRequest } from "./GetEnrichmentInputFieldsRequest";
-export { ModelsPreviewRequest } from "./ModelsPreviewRequest";
-export { ModelsCreateRequest } from "./ModelsCreateRequest";
-export { ModelsGetRequest } from "./ModelsGetRequest";
-export { UpdateModelRequest } from "./UpdateModelRequest";
-export { ModelsRemoveRequest } from "./ModelsRemoveRequest";
-export { ModelsSampleRequest } from "./ModelsSampleRequest";
+export { type GetEnrichmentInputFieldsRequest } from "./GetEnrichmentInputFieldsRequest";
+export { type ModelsPreviewRequest } from "./ModelsPreviewRequest";
+export { type ModelsCreateRequest } from "./ModelsCreateRequest";
+export { type ModelsGetRequest } from "./ModelsGetRequest";
+export { type UpdateModelRequest } from "./UpdateModelRequest";
+export { type ModelsRemoveRequest } from "./ModelsRemoveRequest";
+export { type ModelsSampleRequest } from "./ModelsSampleRequest";

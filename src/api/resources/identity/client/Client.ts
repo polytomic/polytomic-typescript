@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
-import * as Polytomic from "../../..";
+import * as Polytomic from "../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../errors";
+import * as errors from "../../../../errors/index";
 
 export declare namespace Identity {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Identity {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -25,11 +31,13 @@ export class Identity {
     constructor(protected readonly _options: Identity.Options) {}
 
     /**
+     * @param {Identity.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.identity.get()
+     *     await client.identity.get()
      */
     public async get(requestOptions?: Identity.RequestOptions): Promise<Polytomic.GetIdentityResponseEnvelope> {
         const _response = await core.fetcher({
@@ -46,13 +54,14 @@ export class Identity {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.GetIdentityResponseEnvelope;
@@ -87,7 +96,7 @@ export class Identity {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

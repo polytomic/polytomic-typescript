@@ -1,3 +1,3 @@
-export { SchemasListRequest } from "./SchemasListRequest";
-export { BulkSyncSchemasRequest } from "./BulkSyncSchemasRequest";
-export { UpdateBulkSchema } from "./UpdateBulkSchema";
+export { type SchemasListRequest } from "./SchemasListRequest";
+export { type BulkSyncSchemasRequest } from "./BulkSyncSchemasRequest";
+export { type UpdateBulkSchema } from "./UpdateBulkSchema";

@@ -1,2 +1,2 @@
-export { CreateWebhooksSchema } from "./CreateWebhooksSchema";
-export { UpdateWebhooksSchema } from "./UpdateWebhooksSchema";
+export { type CreateWebhooksSchema } from "./CreateWebhooksSchema";
+export { type UpdateWebhooksSchema } from "./UpdateWebhooksSchema";

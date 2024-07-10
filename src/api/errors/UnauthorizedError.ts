@@ -2,8 +2,8 @@
  * This file was auto-generated from our API Definition.
  */
 
-import * as errors from "../../errors";
-import * as Polytomic from "..";
+import * as errors from "../../errors/index";
+import * as Polytomic from "../index";
 
 export class UnauthorizedError extends errors.PolytomicError {
     constructor(body: Polytomic.RestErrResponse) {

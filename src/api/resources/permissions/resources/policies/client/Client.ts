@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
-import * as Polytomic from "../../../../..";
+import * as Polytomic from "../../../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../../../errors";
+import * as errors from "../../../../../../errors/index";
 
 export declare namespace Policies {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Policies {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -25,11 +31,13 @@ export class Policies {
     constructor(protected readonly _options: Policies.Options) {}
 
     /**
+     * @param {Policies.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.policies.list()
+     *     await client.permissions.policies.list()
      */
     public async list(requestOptions?: Policies.RequestOptions): Promise<Polytomic.ListPoliciesResponseEnvelope> {
         const _response = await core.fetcher({
@@ -46,13 +54,14 @@ export class Policies {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ListPoliciesResponseEnvelope;
@@ -88,6 +97,9 @@ export class Policies {
     }
 
     /**
+     * @param {Polytomic.permissions.CreatePolicyRequest} request
+     * @param {Policies.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -95,7 +107,7 @@ export class Policies {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.policies.create({
+     *     await client.permissions.policies.create({
      *         name: "Custom"
      *     })
      */
@@ -117,7 +129,7 @@ export class Policies {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -125,6 +137,7 @@ export class Policies {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.PolicyResponseEnvelope;
@@ -166,18 +179,21 @@ export class Policies {
     }
 
     /**
+     * @param {string} id
+     * @param {Policies.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.policies.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.policies.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(id: string, requestOptions?: Policies.RequestOptions): Promise<Polytomic.PolicyResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/permissions/policies/${id}`
+                `api/permissions/policies/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
@@ -188,13 +204,14 @@ export class Policies {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.PolicyResponseEnvelope;
@@ -232,6 +249,10 @@ export class Policies {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.permissions.UpdatePolicyRequest} request
+     * @param {Policies.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -239,7 +260,7 @@ export class Policies {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         name: "Custom"
      *     })
      */
@@ -251,7 +272,7 @@ export class Policies {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/permissions/policies/${id}`
+                `api/permissions/policies/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
@@ -262,7 +283,7 @@ export class Policies {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -270,6 +291,7 @@ export class Policies {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.PolicyResponseEnvelope;
@@ -311,19 +333,22 @@ export class Policies {
     }
 
     /**
+     * @param {string} id
+     * @param {Policies.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.policies.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.policies.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async remove(id: string, requestOptions?: Policies.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/permissions/policies/${id}`
+                `api/permissions/policies/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
@@ -334,13 +359,14 @@ export class Policies {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return;
@@ -379,7 +405,7 @@ export class Policies {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

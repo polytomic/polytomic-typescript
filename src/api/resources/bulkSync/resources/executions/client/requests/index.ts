@@ -1,1 +1,1 @@
-export { ExecutionsListStatusRequest } from "./ExecutionsListStatusRequest";
+export { type ExecutionsListStatusRequest } from "./ExecutionsListStatusRequest";

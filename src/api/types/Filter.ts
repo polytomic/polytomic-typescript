@@ -2,7 +2,7 @@
  * This file was auto-generated from our API Definition.
  */
 
-import * as Polytomic from "..";
+import * as Polytomic from "../index";
 
 /**
  * Either `field` or `field_id` must be provided. If `field` is provided, `field_id` is ignored.

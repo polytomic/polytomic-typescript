@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
-import * as Polytomic from "../../..";
+import * as Polytomic from "../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../errors";
+import * as errors from "../../../../errors/index";
 import { Executions } from "../resources/executions/client/Client";
 
 export declare namespace ModelSync {
@@ -17,8 +17,14 @@ export declare namespace ModelSync {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -26,6 +32,10 @@ export class ModelSync {
     constructor(protected readonly _options: ModelSync.Options) {}
 
     /**
+     * @param {string} id
+     * @param {Polytomic.ModelSyncGetSourceRequest} request
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -33,7 +43,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.modelSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async getSource(
         id: string,
@@ -41,15 +51,15 @@ export class ModelSync {
         requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.GetModelSyncSourceMetaEnvelope> {
         const { params } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (params != null) {
-            _queryParams["params"] = params;
+            _queryParams["params"] = JSON.stringify(params);
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}/modelsync/source`
+                `api/connections/${encodeURIComponent(id)}/modelsync/source`
             ),
             method: "GET",
             headers: {
@@ -60,7 +70,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -68,6 +78,7 @@ export class ModelSync {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.GetModelSyncSourceMetaEnvelope;
@@ -109,6 +120,9 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -116,7 +130,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.getSourceFields("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.getSourceFields("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async getSourceFields(
         id: string,
@@ -125,7 +139,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}/modelsync/source/fields`
+                `api/connections/${encodeURIComponent(id)}/modelsync/source/fields`
             ),
             method: "GET",
             headers: {
@@ -136,13 +150,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelFieldResponse;
@@ -184,6 +199,10 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.ModelSyncGetTargetRequest} request
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -191,7 +210,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.getTarget("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.modelSync.getTarget("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async getTarget(
         id: string,
@@ -199,7 +218,7 @@ export class ModelSync {
         requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.GetConnectionMetaEnvelope> {
         const { type: type_, search } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (type_ != null) {
             _queryParams["type"] = type_;
         }
@@ -211,7 +230,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}/modelsync/target`
+                `api/connections/${encodeURIComponent(id)}/modelsync/target`
             ),
             method: "GET",
             headers: {
@@ -222,7 +241,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -230,6 +249,7 @@ export class ModelSync {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.GetConnectionMetaEnvelope;
@@ -271,13 +291,17 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.ModelSyncGetTargetFieldsRequest} request
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.getTargetFields("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.modelSync.getTargetFields("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         target: "database.table",
      *         refresh: false
      *     })
@@ -288,7 +312,7 @@ export class ModelSync {
         requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.TargetResponseEnvelope> {
         const { target, refresh } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         _queryParams["target"] = target;
         if (refresh != null) {
             _queryParams["refresh"] = refresh.toString();
@@ -297,7 +321,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}/modelsync/target/fields`
+                `api/connections/${encodeURIComponent(id)}/modelsync/target/fields`
             ),
             method: "GET",
             headers: {
@@ -308,7 +332,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -316,6 +340,7 @@ export class ModelSync {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.TargetResponseEnvelope;
@@ -355,12 +380,14 @@ export class ModelSync {
     }
 
     /**
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.list()
+     *     await client.modelSync.list()
      */
     public async list(requestOptions?: ModelSync.RequestOptions): Promise<Polytomic.ListModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
@@ -377,13 +404,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ListModelSyncResponseEnvelope;
@@ -421,6 +449,9 @@ export class ModelSync {
     }
 
     /**
+     * @param {Polytomic.CreateModelSyncRequest} request
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -428,7 +459,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.create({
+     *     await client.modelSync.create({
      *         fields: [{
      *                 target: "name"
      *             }],
@@ -459,7 +490,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -467,6 +498,7 @@ export class ModelSync {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelSyncResponseEnvelope;
@@ -508,11 +540,13 @@ export class ModelSync {
     }
 
     /**
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.getScheduleOptions()
+     *     await client.modelSync.getScheduleOptions()
      */
     public async getScheduleOptions(
         requestOptions?: ModelSync.RequestOptions
@@ -531,13 +565,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ScheduleOptionResponseEnvelope;
@@ -573,12 +608,15 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(
         id: string,
@@ -587,7 +625,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${id}`
+                `api/syncs/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
@@ -598,13 +636,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelSyncResponseEnvelope;
@@ -642,6 +681,10 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.UpdateModelSyncRequest} request
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -650,7 +693,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         fields: [{
      *                 target: "name"
      *             }],
@@ -671,7 +714,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${id}`
+                `api/syncs/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
@@ -682,7 +725,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -690,6 +733,7 @@ export class ModelSync {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ModelSyncResponseEnvelope;
@@ -733,19 +777,22 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async remove(id: string, requestOptions?: ModelSync.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${id}`
+                `api/syncs/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
@@ -756,13 +803,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return;
@@ -802,13 +850,17 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.ActivateSyncInput} request
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.modelSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         active: true
      *     })
      */
@@ -820,7 +872,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${id}/activate`
+                `api/syncs/${encodeURIComponent(id)}/activate`
             ),
             method: "POST",
             headers: {
@@ -831,7 +883,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -839,6 +891,7 @@ export class ModelSync {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ActivateSyncEnvelope;
@@ -881,6 +934,11 @@ export class ModelSync {
      * > 🚧 Force full resync
      * >
      * > Use caution when setting the `resync` parameter to `true`. This will force a full resync of the data from the source system. This can be a time-consuming operation and may impact the performance of the source system. It is recommended to only use this option when necessary.
+     *
+     * @param {string} id
+     * @param {Polytomic.StartModelSyncRequest} request
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -888,7 +946,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.start("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.modelSync.start("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async start(
         id: string,
@@ -898,7 +956,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${id}/executions`
+                `api/syncs/${encodeURIComponent(id)}/executions`
             ),
             method: "POST",
             headers: {
@@ -909,7 +967,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -917,6 +975,7 @@ export class ModelSync {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.StartModelSyncResponseEnvelope;
@@ -958,12 +1017,15 @@ export class ModelSync {
     }
 
     /**
+     * @param {string} id
+     * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.modelSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async getStatus(
         id: string,
@@ -972,7 +1034,7 @@ export class ModelSync {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${id}/status`
+                `api/syncs/${encodeURIComponent(id)}/status`
             ),
             method: "GET",
             headers: {
@@ -983,13 +1045,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.SyncStatusEnvelope;
@@ -1032,7 +1095,7 @@ export class ModelSync {
         return (this._executions ??= new Executions(this._options));
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

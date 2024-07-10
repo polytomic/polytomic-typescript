@@ -2,7 +2,7 @@
  * This file was auto-generated from our API Definition.
  */
 
-import * as Polytomic from "..";
+import * as Polytomic from "../index";
 
 export interface ConnectionResponseSchema {
     /** API calls made to service in the last 24h (supported integrations only). */

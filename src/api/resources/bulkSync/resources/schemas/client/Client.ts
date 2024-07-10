@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
-import * as Polytomic from "../../../../..";
+import * as Polytomic from "../../../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../../../errors";
+import * as errors from "../../../../../../errors/index";
 
 export declare namespace Schemas {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Schemas {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -25,11 +31,15 @@ export class Schemas {
     constructor(protected readonly _options: Schemas.Options) {}
 
     /**
+     * @param {string} id
+     * @param {Polytomic.bulkSync.SchemasListRequest} request
+     * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.bulkSync.schemas.list("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.bulkSync.schemas.list("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async list(
         id: string,
@@ -37,15 +47,15 @@ export class Schemas {
         requestOptions?: Schemas.RequestOptions
     ): Promise<Polytomic.ListBulkSchema> {
         const { filters } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (filters != null) {
-            _queryParams["filters"] = filters;
+            _queryParams["filters"] = JSON.stringify(filters);
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${id}/schemas`
+                `api/bulk/syncs/${encodeURIComponent(id)}/schemas`
             ),
             method: "GET",
             headers: {
@@ -56,7 +66,7 @@ export class Schemas {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -64,6 +74,7 @@ export class Schemas {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ListBulkSchema;
@@ -99,13 +110,17 @@ export class Schemas {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.bulkSync.BulkSyncSchemasRequest} request
+     * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.bulkSync.schemas.patch("248df4b7-aa70-47b8-a036-33ac447e668d", {})
+     *     await client.bulkSync.schemas.patch("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async patch(
         id: string,
@@ -115,7 +130,7 @@ export class Schemas {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${id}/schemas`
+                `api/bulk/syncs/${encodeURIComponent(id)}/schemas`
             ),
             method: "PATCH",
             headers: {
@@ -126,7 +141,7 @@ export class Schemas {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -134,6 +149,7 @@ export class Schemas {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ListBulkSchema;
@@ -173,11 +189,15 @@ export class Schemas {
     }
 
     /**
+     * @param {string} id
+     * @param {string} schemaId
+     * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.bulkSync.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "Contact")
+     *     await client.bulkSync.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "Contact")
      */
     public async get(
         id: string,
@@ -187,7 +207,7 @@ export class Schemas {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${id}/schemas/${schemaId}`
+                `api/bulk/syncs/${encodeURIComponent(id)}/schemas/${encodeURIComponent(schemaId)}`
             ),
             method: "GET",
             headers: {
@@ -198,13 +218,14 @@ export class Schemas {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.BulkSchemaEnvelope;
@@ -240,13 +261,18 @@ export class Schemas {
     }
 
     /**
+     * @param {string} id
+     * @param {string} schemaId
+     * @param {Polytomic.bulkSync.UpdateBulkSchema} request
+     * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.bulkSync.schemas.update("248df4b7-aa70-47b8-a036-33ac447e668d", "contact", {})
+     *     await client.bulkSync.schemas.update("248df4b7-aa70-47b8-a036-33ac447e668d", "contact")
      */
     public async update(
         id: string,
@@ -257,7 +283,7 @@ export class Schemas {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${id}/schemas/${schemaId}`
+                `api/bulk/syncs/${encodeURIComponent(id)}/schemas/${encodeURIComponent(schemaId)}`
             ),
             method: "PUT",
             headers: {
@@ -268,7 +294,7 @@ export class Schemas {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -276,6 +302,7 @@ export class Schemas {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.BulkSchemaEnvelope;
@@ -314,7 +341,7 @@ export class Schemas {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

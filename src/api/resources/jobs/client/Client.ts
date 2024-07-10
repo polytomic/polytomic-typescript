@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
-import * as Polytomic from "../../..";
+import * as Polytomic from "../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../errors";
+import * as errors from "../../../../errors/index";
 
 export declare namespace Jobs {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Jobs {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -25,13 +31,17 @@ export class Jobs {
     constructor(protected readonly _options: Jobs.Options) {}
 
     /**
+     * @param {string} id
+     * @param {string} type
+     * @param {Jobs.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.jobs.get("248df4b7-aa70-47b8-a036-33ac447e668d", "createmodel")
+     *     await client.jobs.get("248df4b7-aa70-47b8-a036-33ac447e668d", "createmodel")
      */
     public async get(
         id: string,
@@ -41,7 +51,7 @@ export class Jobs {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/jobs/${type}/${id}`
+                `api/jobs/${encodeURIComponent(type)}/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
@@ -52,13 +62,14 @@ export class Jobs {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.JobResponseEnvelope;
@@ -97,7 +108,7 @@ export class Jobs {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

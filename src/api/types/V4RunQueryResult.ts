@@ -2,7 +2,7 @@
  * This file was auto-generated from our API Definition.
  */
 
-import * as Polytomic from "..";
+import * as Polytomic from "../index";
 
 export interface V4RunQueryResult {
     /** The number of rows returned by the query. This will not be returned until the query completes. */

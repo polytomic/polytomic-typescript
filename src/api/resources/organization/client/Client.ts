@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
-import * as Polytomic from "../../..";
+import * as Polytomic from "../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../errors";
+import * as errors from "../../../../errors/index";
 
 export declare namespace Organization {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Organization {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -28,11 +34,14 @@ export class Organization {
      * > 🚧 Requires partner key
      * >
      * > Organization endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/getting-started/obtaining-api-keys#partner-keys)
+     *
+     * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.organization.list()
+     *     await client.organization.list()
      */
     public async list(requestOptions?: Organization.RequestOptions): Promise<Polytomic.OrganizationsEnvelope> {
         const _response = await core.fetcher({
@@ -49,13 +58,14 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.OrganizationsEnvelope;
@@ -94,12 +104,16 @@ export class Organization {
      * > 🚧 Requires partner key
      * >
      * > Organization endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/getting-started/obtaining-api-keys#partner-keys)
+     *
+     * @param {Polytomic.CreateOrganizationRequestSchema} request
+     * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.organization.create({
+     *     await client.organization.create({
      *         name: "My Organization"
      *     })
      */
@@ -121,7 +135,7 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -129,6 +143,7 @@ export class Organization {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.OrganizationEnvelope;
@@ -169,11 +184,15 @@ export class Organization {
      * > 🚧 Requires partner key
      * >
      * > Organization endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/getting-started/obtaining-api-keys#partner-keys)
+     *
+     * @param {string} id
+     * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.organization.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.organization.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(
         id: string,
@@ -182,7 +201,7 @@ export class Organization {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/organizations/${id}`
+                `api/organizations/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
@@ -193,13 +212,14 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.OrganizationEnvelope;
@@ -238,12 +258,17 @@ export class Organization {
      * > 🚧 Requires partner key
      * >
      * > Organization endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/getting-started/obtaining-api-keys#partner-keys)
+     *
+     * @param {string} id
+     * @param {Polytomic.UpdateOrganizationRequestSchema} request
+     * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.organization.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.organization.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         name: "My Organization"
      *     })
      */
@@ -255,7 +280,7 @@ export class Organization {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/organizations/${id}`
+                `api/organizations/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
@@ -266,7 +291,7 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -274,6 +299,7 @@ export class Organization {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.OrganizationEnvelope;
@@ -314,18 +340,22 @@ export class Organization {
      * > 🚧 Requires partner key
      * >
      * > Organization endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/getting-started/obtaining-api-keys#partner-keys)
+     *
+     * @param {string} id
+     * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.organization.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.organization.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async remove(id: string, requestOptions?: Organization.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/organizations/${id}`
+                `api/organizations/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
@@ -336,13 +366,14 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return;
@@ -379,7 +410,7 @@ export class Organization {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

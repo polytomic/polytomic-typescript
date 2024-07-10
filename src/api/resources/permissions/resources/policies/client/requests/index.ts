@@ -1,2 +1,2 @@
-export { CreatePolicyRequest } from "./CreatePolicyRequest";
-export { UpdatePolicyRequest } from "./UpdatePolicyRequest";
+export { type CreatePolicyRequest } from "./CreatePolicyRequest";
+export { type UpdatePolicyRequest } from "./UpdatePolicyRequest";

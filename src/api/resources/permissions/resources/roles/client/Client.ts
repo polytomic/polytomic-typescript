@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
-import * as Polytomic from "../../../../..";
+import * as Polytomic from "../../../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../../../errors";
+import * as errors from "../../../../../../errors/index";
 
 export declare namespace Roles {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Roles {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -25,11 +31,13 @@ export class Roles {
     constructor(protected readonly _options: Roles.Options) {}
 
     /**
+     * @param {Roles.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.roles.list()
+     *     await client.permissions.roles.list()
      */
     public async list(requestOptions?: Roles.RequestOptions): Promise<Polytomic.RoleListResponseEnvelope> {
         const _response = await core.fetcher({
@@ -46,13 +54,14 @@ export class Roles {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.RoleListResponseEnvelope;
@@ -88,6 +97,9 @@ export class Roles {
     }
 
     /**
+     * @param {Polytomic.permissions.CreateRoleRequest} request
+     * @param {Roles.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -95,7 +107,7 @@ export class Roles {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.roles.create({
+     *     await client.permissions.roles.create({
      *         name: "Custom"
      *     })
      */
@@ -117,7 +129,7 @@ export class Roles {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -125,6 +137,7 @@ export class Roles {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.RoleResponseEnvelope;
@@ -166,17 +179,20 @@ export class Roles {
     }
 
     /**
+     * @param {string} id
+     * @param {Roles.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.permissions.roles.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.roles.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(id: string, requestOptions?: Roles.RequestOptions): Promise<Polytomic.RoleResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/permissions/roles/${id}`
+                `api/permissions/roles/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
@@ -187,13 +203,14 @@ export class Roles {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.RoleResponseEnvelope;
@@ -229,6 +246,10 @@ export class Roles {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.permissions.UpdateRoleRequest} request
+     * @param {Roles.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -236,7 +257,7 @@ export class Roles {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.roles.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.permissions.roles.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         name: "Custom"
      *     })
      */
@@ -248,7 +269,7 @@ export class Roles {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/permissions/roles/${id}`
+                `api/permissions/roles/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
@@ -259,7 +280,7 @@ export class Roles {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -267,6 +288,7 @@ export class Roles {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.RoleResponseEnvelope;
@@ -308,19 +330,22 @@ export class Roles {
     }
 
     /**
+     * @param {string} id
+     * @param {Roles.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.permissions.roles.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.roles.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async remove(id: string, requestOptions?: Roles.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/permissions/roles/${id}`
+                `api/permissions/roles/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
@@ -331,13 +356,14 @@ export class Roles {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return;
@@ -376,7 +402,7 @@ export class Roles {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

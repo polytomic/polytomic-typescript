@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
-import * as Polytomic from "../../../../..";
+import * as Polytomic from "../../../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../../../errors";
+import * as errors from "../../../../../../errors/index";
 
 export declare namespace Executions {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Executions {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -25,11 +31,14 @@ export class Executions {
     constructor(protected readonly _options: Executions.Options) {}
 
     /**
+     * @param {Polytomic.bulkSync.ExecutionsListStatusRequest} request
+     * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.bulkSync.executions.listStatus({
+     *     await client.bulkSync.executions.listStatus({
      *         all: true,
      *         active: true
      *     })
@@ -39,7 +48,7 @@ export class Executions {
         requestOptions?: Executions.RequestOptions
     ): Promise<Polytomic.ListBulkSyncExecutionStatusEnvelope> {
         const { all, active, sync_id: syncId } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (all != null) {
             _queryParams["all"] = all.toString();
         }
@@ -70,7 +79,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -78,6 +87,7 @@ export class Executions {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ListBulkSyncExecutionStatusEnvelope;
@@ -113,11 +123,14 @@ export class Executions {
     }
 
     /**
+     * @param {string} id
+     * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.bulkSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async list(
         id: string,
@@ -126,7 +139,7 @@ export class Executions {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${id}/executions`
+                `api/bulk/syncs/${encodeURIComponent(id)}/executions`
             ),
             method: "GET",
             headers: {
@@ -137,13 +150,14 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ListBulkSyncExecutionsEnvelope;
@@ -179,11 +193,15 @@ export class Executions {
     }
 
     /**
+     * @param {string} id
+     * @param {string} execId
+     * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await polytomic.bulkSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(
         id: string,
@@ -193,7 +211,7 @@ export class Executions {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${id}/executions/${execId}`
+                `api/bulk/syncs/${encodeURIComponent(id)}/executions/${encodeURIComponent(execId)}`
             ),
             method: "GET",
             headers: {
@@ -204,13 +222,14 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.BulkSyncExecutionEnvelope;
@@ -245,7 +264,7 @@ export class Executions {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

@@ -4,9 +4,9 @@
 
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
-import * as Polytomic from "../../..";
+import * as Polytomic from "../../../index";
 import urlJoin from "url-join";
-import * as errors from "../../../../errors";
+import * as errors from "../../../../errors/index";
 
 export declare namespace Connections {
     interface Options {
@@ -16,8 +16,14 @@ export declare namespace Connections {
     }
 
     interface RequestOptions {
+        /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
+        /** The number of times to retry the request. Defaults to 2. */
         maxRetries?: number;
+        /** A hook to abort the request. */
+        abortSignal?: AbortSignal;
+        /** Override the X-Polytomic-Version header */
+        version?: string | undefined;
     }
 }
 
@@ -25,11 +31,13 @@ export class Connections {
     constructor(protected readonly _options: Connections.Options) {}
 
     /**
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.getTypes()
+     *     await client.connections.getTypes()
      */
     public async getTypes(
         requestOptions?: Connections.RequestOptions
@@ -48,13 +56,14 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ConnectionTypeResponseEnvelope;
@@ -90,11 +99,13 @@ export class Connections {
     }
 
     /**
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.list()
+     *     await client.connections.list()
      */
     public async list(requestOptions?: Connections.RequestOptions): Promise<Polytomic.ConnectionListResponseEnvelope> {
         const _response = await core.fetcher({
@@ -111,13 +122,14 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ConnectionListResponseEnvelope;
@@ -153,6 +165,9 @@ export class Connections {
     }
 
     /**
+     * @param {Polytomic.CreateConnectionRequestSchema} request
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -160,7 +175,7 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.create({
+     *     await client.connections.create({
      *         configuration: {
      *             "database": "example",
      *             "hostname": "postgres.example.com",
@@ -190,7 +205,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -198,6 +213,7 @@ export class Connections {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.CreateConnectionResponseEnvelope;
@@ -239,13 +255,16 @@ export class Connections {
     }
 
     /**
+     * @param {Polytomic.ConnectCardRequest} request
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.connect({
+     *     await client.connections.connect({
      *         name: "Salesforce Connection",
      *         redirect_url: "redirect_url"
      *     })
@@ -268,7 +287,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -276,6 +295,7 @@ export class Connections {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ConnectCardResponseEnvelope;
@@ -315,12 +335,15 @@ export class Connections {
     }
 
     /**
+     * @param {string} id
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.connections.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(
         id: string,
@@ -329,7 +352,7 @@ export class Connections {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}`
+                `api/connections/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
@@ -340,13 +363,14 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ConnectionResponseEnvelope;
@@ -384,6 +408,10 @@ export class Connections {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.UpdateConnectionRequestSchema} request
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
@@ -392,7 +420,7 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         configuration: {
      *             "database": "example",
      *             "hostname": "postgres.example.com",
@@ -411,7 +439,7 @@ export class Connections {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}`
+                `api/connections/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
@@ -422,7 +450,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -430,6 +458,7 @@ export class Connections {
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.CreateConnectionResponseEnvelope;
@@ -473,6 +502,10 @@ export class Connections {
     }
 
     /**
+     * @param {string} id
+     * @param {Polytomic.ConnectionsRemoveRequest} request
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
@@ -480,7 +513,7 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.connections.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         force: true
      *     })
      */
@@ -490,7 +523,7 @@ export class Connections {
         requestOptions?: Connections.RequestOptions
     ): Promise<void> {
         const { force } = request;
-        const _queryParams: Record<string, string | string[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (force != null) {
             _queryParams["force"] = force.toString();
         }
@@ -498,7 +531,7 @@ export class Connections {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}`
+                `api/connections/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
@@ -509,7 +542,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -517,6 +550,7 @@ export class Connections {
             queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return;
@@ -558,12 +592,15 @@ export class Connections {
     }
 
     /**
+     * @param {string} id
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await polytomic.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async getParameterValues(
         id: string,
@@ -572,7 +609,7 @@ export class Connections {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${id}/parameter_values`
+                `api/connections/${encodeURIComponent(id)}/parameter_values`
             ),
             method: "GET",
             headers: {
@@ -583,13 +620,14 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.0",
+                "X-Fern-SDK-Version": "1.8.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
             return _response.body as Polytomic.ConnectionParameterValuesResponseEnvelope;
@@ -626,7 +664,7 @@ export class Connections {
         }
     }
 
-    protected async _getAuthorizationHeader() {
+    protected async _getAuthorizationHeader(): Promise<string> {
         return `Bearer ${await core.Supplier.get(this._options.token)}`;
     }
 }

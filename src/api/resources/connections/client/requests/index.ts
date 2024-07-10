@@ -1,4 +1,4 @@
-export { CreateConnectionRequestSchema } from "./CreateConnectionRequestSchema";
-export { ConnectCardRequest } from "./ConnectCardRequest";
-export { UpdateConnectionRequestSchema } from "./UpdateConnectionRequestSchema";
-export { ConnectionsRemoveRequest } from "./ConnectionsRemoveRequest";
+export { type CreateConnectionRequestSchema } from "./CreateConnectionRequestSchema";
+export { type ConnectCardRequest } from "./ConnectCardRequest";
+export { type UpdateConnectionRequestSchema } from "./UpdateConnectionRequestSchema";
+export { type ConnectionsRemoveRequest } from "./ConnectionsRemoveRequest";

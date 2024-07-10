@@ -1,6 +1,6 @@
-export { CreateBulkSyncRequest } from "./CreateBulkSyncRequest";
-export { BulkSyncGetRequest } from "./BulkSyncGetRequest";
-export { UpdateBulkSyncRequest } from "./UpdateBulkSyncRequest";
-export { BulkSyncRemoveRequest } from "./BulkSyncRemoveRequest";
-export { StartBulkSyncRequest } from "./StartBulkSyncRequest";
-export { BulkSyncGetSourceRequest } from "./BulkSyncGetSourceRequest";
+export { type CreateBulkSyncRequest } from "./CreateBulkSyncRequest";
+export { type BulkSyncGetRequest } from "./BulkSyncGetRequest";
+export { type UpdateBulkSyncRequest } from "./UpdateBulkSyncRequest";
+export { type BulkSyncRemoveRequest } from "./BulkSyncRemoveRequest";
+export { type StartBulkSyncRequest } from "./StartBulkSyncRequest";
+export { type BulkSyncGetSourceRequest } from "./BulkSyncGetSourceRequest";

@@ -4,6 +4,7 @@
 
 export interface SyncDestinationProperties {
     does_not_report_operation_counts?: boolean;
+    mappings_not_required?: boolean;
     new_target_label?: string;
     optional_target_mappings?: boolean;
     primary_metadata_object?: string;
