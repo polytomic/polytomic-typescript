@@ -56,7 +56,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -105,12 +105,12 @@ export class BulkSync {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await client.bulkSync.create({
      *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         mode: "replicate",
      *         name: "My Bulk Sync",
      *         schedule: {
      *             frequency: Polytomic.ScheduleFrequency.Manual
@@ -136,7 +136,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -158,6 +158,8 @@ export class BulkSync {
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
                 case 403:
                     throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
                 case 500:
                     throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
@@ -221,7 +223,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -282,7 +284,6 @@ export class BulkSync {
      * @example
      *     await client.bulkSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         mode: "replicate",
      *         name: "My Bulk Sync",
      *         schedule: {
      *             frequency: Polytomic.ScheduleFrequency.Manual
@@ -309,7 +310,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -398,7 +399,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -479,7 +480,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -556,7 +557,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -628,7 +629,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -712,7 +713,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -789,7 +790,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.8.4",
+                "X-Fern-SDK-Version": "1.9.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

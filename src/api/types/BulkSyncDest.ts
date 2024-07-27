@@ -6,5 +6,5 @@ import * as Polytomic from "../index";
 
 export interface BulkSyncDest {
     configuration?: Record<string, unknown>;
-    modes?: Polytomic.SupportedMode[];
+    modes?: Polytomic.SupportedBulkMode[];
 }
