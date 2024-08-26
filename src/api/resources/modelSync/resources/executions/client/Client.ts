@@ -58,7 +58,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.0",
+                "X-Fern-SDK-Version": "1.9.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -131,7 +131,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.0",
+                "X-Fern-SDK-Version": "1.9.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -178,7 +178,7 @@ export class Executions {
     /**
      * @param {string} syncId
      * @param {string} id
-     * @param {string} type
+     * @param {Polytomic.V2ExecutionLogType} type
      * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -187,12 +187,12 @@ export class Executions {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.executions.getLogUrls("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "records")
+     *     await client.modelSync.executions.getLogUrls("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", Polytomic.V2ExecutionLogType.Records)
      */
     public async getLogUrls(
         syncId: string,
         id: string,
-        type: string,
+        type: Polytomic.V2ExecutionLogType,
         requestOptions?: Executions.RequestOptions
     ): Promise<Polytomic.ExecutionLogsResponseEnvelope> {
         const _response = await core.fetcher({
@@ -211,7 +211,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.0",
+                "X-Fern-SDK-Version": "1.9.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -260,7 +260,7 @@ export class Executions {
     /**
      * @param {string} syncId
      * @param {string} id
-     * @param {string} type
+     * @param {Polytomic.V2ExecutionLogType} type
      * @param {string} filename
      * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -270,12 +270,12 @@ export class Executions {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "records", "path/to/file.json")
+     *     await client.modelSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d", "0ecd09c1-b901-4d27-9053-f0367c427254", Polytomic.V2ExecutionLogType.Records, "path/to/file.json")
      */
     public async getLogs(
         syncId: string,
         id: string,
-        type: string,
+        type: Polytomic.V2ExecutionLogType,
         filename: string,
         requestOptions?: Executions.RequestOptions
     ): Promise<void> {
@@ -295,7 +295,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.0",
+                "X-Fern-SDK-Version": "1.9.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

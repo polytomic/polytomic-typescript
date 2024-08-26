@@ -1,3 +1,4 @@
+export { type ModelsGetEnrichmentSourceRequest } from "./ModelsGetEnrichmentSourceRequest";
 export { type GetEnrichmentInputFieldsRequest } from "./GetEnrichmentInputFieldsRequest";
 export { type ModelsPreviewRequest } from "./ModelsPreviewRequest";
 export { type ModelsCreateRequest } from "./ModelsCreateRequest";

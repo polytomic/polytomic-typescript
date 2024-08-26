@@ -14,4 +14,5 @@ export interface BulkSyncSchemaExecutionStatus {
     started_at?: string;
     status?: Polytomic.BulkSchemaExecutionStatus;
     status_message?: string;
+    warning_count?: number;
 }

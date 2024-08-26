@@ -1,3 +1,4 @@
+export { type BulkSyncListRequest } from "./BulkSyncListRequest";
 export { type CreateBulkSyncRequest } from "./CreateBulkSyncRequest";
 export { type BulkSyncGetRequest } from "./BulkSyncGetRequest";
 export { type UpdateBulkSyncRequest } from "./UpdateBulkSyncRequest";
