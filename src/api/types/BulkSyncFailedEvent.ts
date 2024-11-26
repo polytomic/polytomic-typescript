@@ -10,4 +10,5 @@ export interface BulkSyncFailedEvent {
     organization_id?: string;
     source_connection_id?: string;
     sync_id?: string;
+    trigger_source?: string;
 }

@@ -6,6 +6,7 @@ export * from "./BulkMultiScheduleConfiguration";
 export * from "./BulkSchedule";
 export * from "./BulkSchemaExecutionStatus";
 export * from "./BulkSelectiveMode";
+export * from "./CommonOutputActor";
 export * from "./BulkSyncCanceledEvent";
 export * from "./BulkSyncCompletedEvent";
 export * from "./BulkSyncCompletedWithErrorEvent";

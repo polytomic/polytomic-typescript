@@ -25,6 +25,8 @@ export type FilterFunction =
     | "ArrayContains"
     | "ArrayDoesNotContain"
     | "InTheLast"
+    | "RelativeOnOrBefore"
+    | "RelativeOnOrAfter"
     | "StringLike"
     | "StringNotLike"
     | "StringMatchesTrimmed";
@@ -52,6 +54,8 @@ export const FilterFunction = {
     ArrayContains: "ArrayContains",
     ArrayDoesNotContain: "ArrayDoesNotContain",
     InTheLast: "InTheLast",
+    RelativeOnOrBefore: "RelativeOnOrBefore",
+    RelativeOnOrAfter: "RelativeOnOrAfter",
     StringLike: "StringLike",
     StringNotLike: "StringNotLike",
     StringMatchesTrimmed: "StringMatchesTrimmed",

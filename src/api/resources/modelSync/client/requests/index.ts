@@ -1,4 +1,5 @@
 export { type ModelSyncGetSourceRequest } from "./ModelSyncGetSourceRequest";
+export { type ModelSyncGetSourceFieldsRequest } from "./ModelSyncGetSourceFieldsRequest";
 export { type ModelSyncGetTargetRequest } from "./ModelSyncGetTargetRequest";
 export { type ModelSyncGetTargetFieldsRequest } from "./ModelSyncGetTargetFieldsRequest";
 export { type ModelSyncListRequest } from "./ModelSyncListRequest";

@@ -14,4 +14,6 @@ export interface Schedule {
     minute?: string;
     month?: string;
     run_after?: Polytomic.RunAfter;
+    /** If true, the sync will only run if the dependent syncs completed successfully. */
+    run_after_success_only?: boolean;
 }

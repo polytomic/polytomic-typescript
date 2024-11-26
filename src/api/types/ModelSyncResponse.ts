@@ -6,6 +6,8 @@ import * as Polytomic from "../index";
 
 export interface ModelSyncResponse {
     active?: boolean;
+    created_at?: string;
+    created_by?: Polytomic.CommonOutputActor;
     fields?: Polytomic.ModelSyncField[];
     filter_logic?: string;
     filters?: Polytomic.Filter[];
@@ -20,4 +22,6 @@ export interface ModelSyncResponse {
     schedule?: Polytomic.Schedule;
     sync_all_records?: boolean;
     target?: Polytomic.Target;
+    updated_at?: string;
+    updated_by?: Polytomic.CommonOutputActor;
 }

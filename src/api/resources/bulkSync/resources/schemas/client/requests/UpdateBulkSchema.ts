@@ -9,6 +9,8 @@ import * as Polytomic from "../../../../../../index";
  *     {}
  */
 export interface UpdateBulkSchema {
+    data_cutoff_timestamp?: string;
+    disable_data_cutoff?: boolean;
     enabled?: boolean;
     fields?: Polytomic.BulkField[];
     filters?: Polytomic.BulkFilter[];

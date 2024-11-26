@@ -70,7 +70,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -121,6 +121,7 @@ export class ModelSync {
 
     /**
      * @param {string} id
+     * @param {Polytomic.ModelSyncGetSourceFieldsRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -134,8 +135,15 @@ export class ModelSync {
      */
     public async getSourceFields(
         id: string,
+        request: Polytomic.ModelSyncGetSourceFieldsRequest = {},
         requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ModelFieldResponse> {
+        const { params } = request;
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        if (params != null) {
+            _queryParams["params"] = JSON.stringify(params);
+        }
+
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -150,11 +158,12 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
+            queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -241,7 +250,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -332,7 +341,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -410,7 +419,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -505,7 +514,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -594,7 +603,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -669,7 +678,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -740,7 +749,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -829,7 +838,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -907,7 +916,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -987,7 +996,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -1047,6 +1056,7 @@ export class ModelSync {
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
@@ -1071,7 +1081,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -1095,6 +1105,8 @@ export class ModelSync {
                     throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
                 case 404:
                     throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 409:
+                    throw new Polytomic.ConflictError(_response.error.body as Polytomic.ApiError);
                 case 500:
                     throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
@@ -1149,7 +1161,7 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.9.3",
+                "X-Fern-SDK-Version": "1.10.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

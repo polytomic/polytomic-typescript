@@ -3,7 +3,8 @@
  */
 
 export interface ApiError {
+    key?: string;
     message?: string;
-    metadata?: unknown;
+    metadata?: Record<string, unknown>;
     status?: number;
 }

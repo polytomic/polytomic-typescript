@@ -19,6 +19,7 @@ export interface CreateBulkSyncRequest {
     active?: boolean;
     automatically_add_new_fields?: Polytomic.BulkDiscover;
     automatically_add_new_objects?: Polytomic.BulkDiscover;
+    data_cutoff_timestamp?: string;
     destination_configuration?: Record<string, unknown>;
     destination_connection_id: string;
     disable_record_timestamps?: boolean;
