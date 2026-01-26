@@ -10,10 +10,17 @@
  *     }
  */
 export interface ConnectCardRequest {
+    /** The id of an existing connection to update. */
     connection?: string;
+    /** Whether to use the dark theme for the Connect modal. */
+    dark?: boolean;
+    /** Name of the new connection. Must be unique per organization. */
     name: string;
     organization_id?: string;
+    /** URL to redirect to after connection is created. */
     redirect_url: string;
+    /** Connection type to create. */
     type?: string;
+    /** List of connection types which are allowed to be created. Ignored if type is set. */
     whitelist?: string[];
 }

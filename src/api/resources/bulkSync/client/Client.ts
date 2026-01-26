@@ -9,6 +9,7 @@ import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 import { Executions } from "../resources/executions/client/Client";
 import { Schemas } from "../resources/schemas/client/Client";
+import { Schedules } from "../resources/schedules/client/Client";
 
 export declare namespace BulkSync {
     interface Options {
@@ -68,7 +69,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -112,6 +113,33 @@ export class BulkSync {
     }
 
     /**
+     * Create a new Bulk Sync from a source to a destination (data warehouse, database, or cloud storage bucket like S3).
+     *
+     * Bulk Syncs are used for the ELT pattern (Extract, Load, and Transform), where you want to sync un-transformed data to your data warehouses, databases, or cloud storage buckets like S3.
+     *
+     * All of the functionality described in [the product
+     * documentation](https://docs.polytomic.com/docs/bulk-syncs) is configurable via
+     * the API.
+     *
+     * Sample code examples:
+     *
+     * - [Bulk sync (ELT) from Salesforce to S3](https://apidocs.polytomic.com/guides/code-examples/bulk-sync-elt-from-salesforce-to-s-3)
+     * - [Bulk sync (ELT) from Salesforce to Snowflake](https://apidocs.polytomic.com/guides/code-examples/bulk-sync-elt-from-salesforce-to-snowflake)
+     * - [Bulk sync (ELT) from HubSpot to PostgreSQL](https://apidocs.polytomic.com/guides/code-examples/bulk-sync-elt-from-hub-spot-to-postgre-sql)
+     *
+     * ## Connection specific configuration
+     *
+     * The `destination_configuration` is integration-specific configuration for the
+     * selected bulk sync destination. This includes settings such as the output schema
+     * and is required when creating a new sync.
+     *
+     * The `source_configuration` is optional. It allows configuration for how
+     * Polytomic reads data from the source connection. This will not be available for
+     * integrations that do not support additional configuration.
+     *
+     * Consult the [connection configurations](https://apidocs.polytomic.com/2024-02-08/guides/configuring-your-connections/overview)
+     * to see configurations for particular integrations (for example, [here](https://apidocs.polytomic.com/2024-02-08/guides/configuring-your-connections/connections/postgre-sql#source-1) is the available source configuration for the PostgreSQL bulk sync source).
+     *
      * @param {Polytomic.CreateBulkSyncRequest} request
      * @param {BulkSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -123,6 +151,9 @@ export class BulkSync {
      *
      * @example
      *     await client.bulkSync.create({
+     *         destination_configuration: {
+     *             "schema": "my_schema"
+     *         },
      *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
      *         name: "My Bulk Sync",
      *         schedule: {
@@ -149,7 +180,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -236,7 +267,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -296,6 +327,9 @@ export class BulkSync {
      *
      * @example
      *     await client.bulkSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         destination_configuration: {
+     *             "schema": "my_schema"
+     *         },
      *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
      *         name: "My Bulk Sync",
      *         schedule: {
@@ -323,7 +357,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -412,7 +446,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -493,7 +527,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -571,7 +605,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -645,7 +679,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -729,7 +763,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -806,7 +840,7 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -862,6 +896,12 @@ export class BulkSync {
 
     public get schemas(): Schemas {
         return (this._schemas ??= new Schemas(this._options));
+    }
+
+    protected _schedules: Schedules | undefined;
+
+    public get schedules(): Schedules {
+        return (this._schedules ??= new Schedules(this._options));
     }
 
     protected async _getAuthorizationHeader(): Promise<string> {

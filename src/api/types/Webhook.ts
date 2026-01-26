@@ -4,6 +4,7 @@
 
 export interface Webhook {
     created_at?: string;
+    disabled?: boolean;
     endpoint?: string;
     id?: string;
     organization_id?: string;

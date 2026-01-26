@@ -8,4 +8,6 @@ export interface ExecutionCounts {
     insert?: number;
     total?: number;
     update?: number;
+    upserts?: number;
+    warnings?: number;
 }

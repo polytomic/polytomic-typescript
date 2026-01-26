@@ -56,7 +56,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -127,7 +127,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -195,7 +195,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -252,7 +252,7 @@ export class Connections {
      *         configuration: {
      *             "database": "example",
      *             "hostname": "postgres.example.com",
-     *             "password": "password",
+     *             "password": "********",
      *             "port": 5432,
      *             "username": "user"
      *         },
@@ -278,7 +278,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -328,6 +328,16 @@ export class Connections {
     }
 
     /**
+     * Creates a new request for [Polytomic Connect](https://www.polytomic.com/connect).
+     *
+     * This endpoint configures a Polytomic Connect request and returns the URL to
+     * redirect users to. This allows embedding Polytomic connection authorization in
+     * other applications.
+     *
+     * See also:
+     *
+     * - [Embedding authentication](https://apidocs.polytomic.com/2024-02-08/guides/embedding-authentication), a guide to using Polytomic Connect.
+     *
      * @param {Polytomic.ConnectCardRequest} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -360,7 +370,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -382,6 +392,94 @@ export class Connections {
                     throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
                 case 422:
                     throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                    });
+            }
+        }
+
+        switch (_response.error.reason) {
+            case "non-json":
+                throw new errors.PolytomicError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.rawBody,
+                });
+            case "timeout":
+                throw new errors.PolytomicTimeoutError();
+            case "unknown":
+                throw new errors.PolytomicError({
+                    message: _response.error.errorMessage,
+                });
+        }
+    }
+
+    /**
+     * Tests a connection configuration.
+     *
+     * @param {Polytomic.TestConnectionRequest} request
+     * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await client.connections.testConnection({
+     *         configuration: {
+     *             "database": "example",
+     *             "hostname": "postgres.example.com",
+     *             "password": "password",
+     *             "port": 5432,
+     *             "username": "user"
+     *         },
+     *         type: "postgresql"
+     *     })
+     */
+    public async testConnection(
+        request: Polytomic.TestConnectionRequest,
+        requestOptions?: Connections.RequestOptions
+    ): Promise<void> {
+        const _response = await core.fetcher({
+            url: urlJoin(
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/connections/test"
+            ),
+            method: "POST",
+            headers: {
+                Authorization: await this._getAuthorizationHeader(),
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
+                "X-Fern-Language": "JavaScript",
+                "X-Fern-SDK-Name": "polytomic",
+                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
+            },
+            contentType: "application/json",
+            body: request,
+            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+            maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+        });
+        if (_response.ok) {
+            return;
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                case 401:
+                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 case 500:
                     throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
@@ -436,7 +534,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -497,7 +595,7 @@ export class Connections {
      *         configuration: {
      *             "database": "example",
      *             "hostname": "postgres.example.com",
-     *             "password": "password",
+     *             "password": "********",
      *             "port": 5432,
      *             "username": "user"
      *         },
@@ -523,7 +621,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -615,7 +713,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -693,7 +791,7 @@ export class Connections {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

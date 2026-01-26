@@ -9,7 +9,7 @@
  *         refresh: false
  *     }
  */
-export interface ModelSyncGetTargetFieldsRequest {
+export interface TargetsGetTargetFieldsRequest {
     target: string;
     refresh?: boolean;
 }

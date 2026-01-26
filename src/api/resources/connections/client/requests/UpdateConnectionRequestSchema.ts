@@ -8,7 +8,7 @@
  *         configuration: {
  *             "database": "example",
  *             "hostname": "postgres.example.com",
- *             "password": "password",
+ *             "password": "********",
  *             "port": 5432,
  *             "username": "user"
  *         },
@@ -17,6 +17,8 @@
  */
 export interface UpdateConnectionRequestSchema {
     configuration: Record<string, unknown>;
+    /** Override interval for connection health checking. */
+    healthcheck_interval?: string;
     name: string;
     organization_id?: string;
     policies?: string[];

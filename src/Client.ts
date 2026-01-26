@@ -7,9 +7,9 @@ import * as core from "./core";
 import { BulkSync } from "./api/resources/bulkSync/client/Client";
 import { Connections } from "./api/resources/connections/client/Client";
 import { QueryRunner } from "./api/resources/queryRunner/client/Client";
+import { Schemas } from "./api/resources/schemas/client/Client";
 import { Models } from "./api/resources/models/client/Client";
 import { ModelSync } from "./api/resources/modelSync/client/Client";
-import { Schemas } from "./api/resources/schemas/client/Client";
 import { Events } from "./api/resources/events/client/Client";
 import { Jobs } from "./api/resources/jobs/client/Client";
 import { Identity } from "./api/resources/identity/client/Client";
@@ -58,6 +58,12 @@ export class PolytomicClient {
         return (this._queryRunner ??= new QueryRunner(this._options));
     }
 
+    protected _schemas: Schemas | undefined;
+
+    public get schemas(): Schemas {
+        return (this._schemas ??= new Schemas(this._options));
+    }
+
     protected _models: Models | undefined;
 
     public get models(): Models {
@@ -68,12 +74,6 @@ export class PolytomicClient {
 
     public get modelSync(): ModelSync {
         return (this._modelSync ??= new ModelSync(this._options));
-    }
-
-    protected _schemas: Schemas | undefined;
-
-    public get schemas(): Schemas {
-        return (this._schemas ??= new Schemas(this._options));
     }
 
     protected _events: Events | undefined;

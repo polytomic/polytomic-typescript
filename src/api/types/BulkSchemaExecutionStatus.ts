@@ -9,7 +9,8 @@ export type BulkSchemaExecutionStatus =
     | "exporting"
     | "canceled"
     | "completed"
-    | "failed";
+    | "failed"
+    | "interrupted";
 
 export const BulkSchemaExecutionStatus = {
     Created: "created",
@@ -19,4 +20,5 @@ export const BulkSchemaExecutionStatus = {
     Canceled: "canceled",
     Completed: "completed",
     Failed: "failed",
+    Interrupted: "interrupted",
 } as const;

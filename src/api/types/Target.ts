@@ -5,8 +5,11 @@
 export interface Target {
     configuration?: Record<string, unknown>;
     connection_id: string;
+    /** Create a new target object with these properties. */
+    create?: Record<string, string>;
     filter_logic?: string;
+    /** Name for a new target object. */
     new_name?: string;
-    object: string;
+    object?: string;
     search_values?: Record<string, unknown>;
 }

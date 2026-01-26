@@ -7,12 +7,18 @@ import * as Polytomic from "../index";
 export interface BulkSyncExecution {
     completed_at?: string;
     created_at?: string;
+    error_count?: number;
     fetch_mode?: Polytomic.BulkFetchMode;
     id?: string;
+    is_partial?: boolean;
     is_resync?: boolean;
     is_test?: boolean;
+    record_count?: number;
     schemas?: Polytomic.BulkSyncSchemaExecution[];
     started_at?: string;
     status?: Polytomic.BulkExecutionStatus;
+    status_message?: string;
     type?: string;
+    updated_at?: string;
+    warning_count?: number;
 }

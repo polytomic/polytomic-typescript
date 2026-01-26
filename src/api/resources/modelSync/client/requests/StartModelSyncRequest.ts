@@ -9,4 +9,5 @@
 export interface StartModelSyncRequest {
     identities?: string[];
     resync?: boolean;
+    test?: boolean;
 }

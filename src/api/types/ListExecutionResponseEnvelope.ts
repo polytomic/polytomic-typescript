@@ -6,4 +6,5 @@ import * as Polytomic from "../index";
 
 export interface ListExecutionResponseEnvelope {
     data?: Polytomic.GetExecutionResponseSchema[];
+    pagination?: Polytomic.PaginationDetails;
 }

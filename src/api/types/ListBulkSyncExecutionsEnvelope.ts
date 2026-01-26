@@ -6,4 +6,5 @@ import * as Polytomic from "../index";
 
 export interface ListBulkSyncExecutionsEnvelope {
     data?: Polytomic.BulkSyncExecution[];
+    pagination?: Polytomic.PaginationDetails;
 }

@@ -8,18 +8,23 @@ export interface ModelSyncResponse {
     active?: boolean;
     created_at?: string;
     created_by?: Polytomic.CommonOutputActor;
+    encryption_passphrase?: string;
     fields?: Polytomic.ModelSyncField[];
     filter_logic?: string;
     filters?: Polytomic.Filter[];
     id?: string;
     identity?: Polytomic.Identity;
-    mode?: string;
+    mode?: Polytomic.ModelSyncMode;
+    /** Model IDs used in the sync. */
+    model_ids?: string[];
     name?: string;
+    only_enrich_updates?: boolean;
     organization_id?: string;
     override_fields?: Polytomic.ModelSyncField[];
     overrides?: Polytomic.Override[];
     policies?: string[];
     schedule?: Polytomic.Schedule;
+    skip_initial_backfill?: boolean;
     sync_all_records?: boolean;
     target?: Polytomic.Target;
     updated_at?: string;

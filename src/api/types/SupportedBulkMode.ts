@@ -6,7 +6,7 @@ import * as Polytomic from "../index";
 
 export interface SupportedBulkMode {
     description?: string;
-    id?: Polytomic.SyncMode;
+    id?: Polytomic.BulkSyncMode;
     label?: string;
     requires_identity?: boolean;
     supports_field_sync_mode?: boolean;

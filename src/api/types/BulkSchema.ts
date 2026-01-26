@@ -14,4 +14,5 @@ export interface BulkSchema {
     output_name?: string;
     partition_key?: string;
     tracking_field?: string;
+    user_output_name?: string;
 }

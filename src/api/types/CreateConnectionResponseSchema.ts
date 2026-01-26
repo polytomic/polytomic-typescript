@@ -10,10 +10,13 @@ export interface CreateConnectionResponseSchema {
     /** URL to visit to complete connection authentication. */
     auth_url?: string;
     configuration?: Record<string, unknown>;
+    /** Interval for connection health checking. */
+    healthcheck_interval?: string;
     id?: string;
     name?: string;
     organization_id?: string;
     policies?: string[];
+    saved?: boolean;
     status?: string;
     status_error?: string;
     type?: Polytomic.ConnectionTypeSchema;

@@ -6,7 +6,7 @@
  * @example
  *     {}
  */
-export interface ModelSyncGetTargetRequest {
+export interface TargetsGetTargetRequest {
     type?: string;
     search?: string;
 }

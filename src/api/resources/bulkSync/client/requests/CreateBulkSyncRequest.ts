@@ -7,6 +7,9 @@ import * as Polytomic from "../../../../index";
 /**
  * @example
  *     {
+ *         destination_configuration: {
+ *             "schema": "my_schema"
+ *         },
  *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
  *         name: "My Bulk Sync",
  *         schedule: {
@@ -19,16 +22,21 @@ export interface CreateBulkSyncRequest {
     active?: boolean;
     automatically_add_new_fields?: Polytomic.BulkDiscover;
     automatically_add_new_objects?: Polytomic.BulkDiscover;
+    /** Override the default concurrency limit for this sync. */
+    concurrency_limit?: number;
     data_cutoff_timestamp?: string;
-    destination_configuration?: Record<string, unknown>;
+    destination_configuration: Record<string, unknown>;
     destination_connection_id: string;
     disable_record_timestamps?: boolean;
     /** DEPRECATED: Use automatically_add_new_objects/automatically_add_new_fields instead */
     discover?: boolean;
-    mode?: Polytomic.SyncMode;
+    mode?: Polytomic.BulkSyncMode;
     name: string;
+    normalize_names?: Polytomic.BulkNormalizeNames;
     organization_id?: string;
     policies?: string[];
+    /** Override the default resync concurrency limit for this sync. */
+    resync_concurrency_limit?: number;
     schedule: Polytomic.BulkSchedule;
     /** List of schemas to sync; if omitted, all schemas will be selected for syncing. */
     schemas?: Polytomic.V2CreateBulkSyncRequestSchemasItem[];

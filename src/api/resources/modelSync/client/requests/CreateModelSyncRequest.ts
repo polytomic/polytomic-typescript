@@ -10,25 +10,31 @@ import * as Polytomic from "../../../../index";
  *         fields: [{
  *                 target: "name"
  *             }],
- *         mode: "create",
+ *         mode: Polytomic.ModelSyncMode.Create,
  *         name: "Users Sync",
  *         schedule: {},
  *         target: {
- *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *             object: "Users"
+ *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
  *         }
  *     }
  */
 export interface CreateModelSyncRequest {
+    /** Whether the sync is enabled and scheduled. */
     active?: boolean;
-    enricher?: Polytomic.Enrichment;
-    /** Fields to sync from source to target. */
+    /** Passphrase for encrypting the sync data. */
+    encryption_passphrase?: string;
+    /** Fields to sync from source to destination. */
     fields: Polytomic.ModelSyncField[];
+    /** Logical expression to combine filters. */
     filter_logic?: string;
+    /** Filters to apply to the source data. */
     filters?: Polytomic.Filter[];
     identity?: Polytomic.Identity;
-    mode: string;
+    mode: Polytomic.ModelSyncMode;
     name: string;
+    /** Whether to use enrichment models as a source of possible changes to sync. If true, only changes to the base models will cause a record to sync. */
+    only_enrich_updates?: boolean;
+    /** Organization ID for the sync; read-only with a partner key. */
     organization_id?: string;
     /** Values to set in the target unconditionally. */
     override_fields?: Polytomic.ModelSyncField[];
@@ -36,6 +42,9 @@ export interface CreateModelSyncRequest {
     overrides?: Polytomic.Override[];
     policies?: string[];
     schedule: Polytomic.Schedule;
+    /** Whether to skip the initial backfill of records; if true only records seen after the sync is enabled will be synced. */
+    skip_initial_backfill?: boolean;
+    /** Whether to sync all records from the source, regardless of whether they've changed since the previous execution. */
     sync_all_records?: boolean;
     target: Polytomic.Target;
 }

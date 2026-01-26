@@ -16,8 +16,10 @@ export type FilterFunction =
     | "LessThan"
     | "LessThanEqual"
     | "StringContains"
+    | "StringStartsWith"
     | "StringEndsWith"
     | "StringDoesNotContain"
+    | "StringDoesNotStartWith"
     | "StringDoesNotEndWith"
     | "StringOneOf"
     | "StringNotOneOf"
@@ -45,8 +47,10 @@ export const FilterFunction = {
     LessThan: "LessThan",
     LessThanEqual: "LessThanEqual",
     StringContains: "StringContains",
+    StringStartsWith: "StringStartsWith",
     StringEndsWith: "StringEndsWith",
     StringDoesNotContain: "StringDoesNotContain",
+    StringDoesNotStartWith: "StringDoesNotStartWith",
     StringDoesNotEndWith: "StringDoesNotEndWith",
     StringOneOf: "StringOneOf",
     StringNotOneOf: "StringNotOneOf",

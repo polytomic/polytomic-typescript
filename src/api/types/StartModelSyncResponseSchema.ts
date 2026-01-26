@@ -6,6 +6,7 @@ import * as Polytomic from "../index";
 
 export interface StartModelSyncResponseSchema {
     created_at?: string;
+    /** Execution ID */
     id?: string;
     status?: Polytomic.ExecutionStatus;
 }

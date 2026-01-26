@@ -8,6 +8,7 @@ export interface TargetField {
     association?: boolean;
     createable?: boolean;
     description?: string;
+    encryptable?: boolean;
     filterable?: boolean;
     id?: string;
     identity_functions?: Polytomic.IdentityFunction[];

@@ -10,6 +10,7 @@ export interface SyncDestinationProperties {
     primary_metadata_object?: string;
     requires_configuration?: boolean;
     supports_field_creation?: boolean;
+    supports_field_encryption?: boolean;
     supports_field_type_selection?: boolean;
     supports_identity_field_creation?: boolean;
     supports_target_filters?: boolean;

@@ -6,4 +6,6 @@ export interface BulkField {
     enabled?: boolean;
     id?: string;
     obfuscated?: boolean;
+    output_name?: string;
+    user_output_name?: string;
 }

@@ -31,6 +31,8 @@ export class Identity {
     constructor(protected readonly _options: Identity.Options) {}
 
     /**
+     * Returns information about the caller's identity.
+     *
      * @param {Identity.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -54,7 +56,7 @@ export class Identity {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

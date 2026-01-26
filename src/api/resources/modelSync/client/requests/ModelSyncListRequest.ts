@@ -13,6 +13,6 @@ import * as Polytomic from "../../../../index";
  */
 export interface ModelSyncListRequest {
     active?: boolean;
-    mode?: Polytomic.SyncMode;
+    mode?: Polytomic.ModelSyncMode;
     target_connection_id?: string;
 }

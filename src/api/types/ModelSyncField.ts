@@ -5,6 +5,8 @@
 import * as Polytomic from "../index";
 
 export interface ModelSyncField {
+    /** Whether the field should be encrypted. */
+    encryption_enabled?: boolean;
     /** New is set to true if the target field should be created by Polytomic. This is not supported by all backends. */
     new?: boolean;
     /** Value to set in the target field; if provided, 'source' is ignored. */

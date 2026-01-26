@@ -12,7 +12,9 @@ export interface UpdateBulkSchema {
     data_cutoff_timestamp?: string;
     disable_data_cutoff?: boolean;
     enabled?: boolean;
-    fields?: Polytomic.BulkField[];
+    fields?: Polytomic.UpdateBulkField[];
     filters?: Polytomic.BulkFilter[];
     partition_key?: string;
+    tracking_field?: string;
+    user_output_name?: string;
 }

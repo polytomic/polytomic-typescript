@@ -79,7 +79,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -124,18 +124,43 @@ export class Executions {
 
     /**
      * @param {string} id
+     * @param {Polytomic.bulkSync.ExecutionsListRequest} request
      * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.bulkSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==",
+     *         only_terminal: true,
+     *         ascending: true,
+     *         limit: 100
+     *     })
      */
     public async list(
         id: string,
+        request: Polytomic.bulkSync.ExecutionsListRequest = {},
         requestOptions?: Executions.RequestOptions
     ): Promise<Polytomic.ListBulkSyncExecutionsEnvelope> {
+        const { page_token: pageToken, only_terminal: onlyTerminal, ascending, limit } = request;
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        if (pageToken != null) {
+            _queryParams["page_token"] = pageToken;
+        }
+
+        if (onlyTerminal != null) {
+            _queryParams["only_terminal"] = onlyTerminal.toString();
+        }
+
+        if (ascending != null) {
+            _queryParams["ascending"] = ascending.toString();
+        }
+
+        if (limit != null) {
+            _queryParams["limit"] = limit.toString();
+        }
+
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
@@ -150,11 +175,12 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
             contentType: "application/json",
+            queryParameters: _queryParams,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -222,7 +248,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -294,7 +320,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -376,7 +402,7 @@ export class Executions {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

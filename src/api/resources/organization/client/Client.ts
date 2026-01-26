@@ -58,7 +58,7 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -109,6 +109,7 @@ export class Organization {
      * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -135,7 +136,7 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -153,6 +154,8 @@ export class Organization {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 409:
+                    throw new Polytomic.ConflictError(_response.error.body as Polytomic.ApiError);
                 case 422:
                     throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
                 case 500:
@@ -212,7 +215,7 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -264,6 +267,7 @@ export class Organization {
      * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -291,7 +295,7 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },
@@ -309,6 +313,8 @@ export class Organization {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 409:
+                    throw new Polytomic.ConflictError(_response.error.body as Polytomic.ApiError);
                 case 422:
                     throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
                 case 500:
@@ -366,7 +372,7 @@ export class Organization {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.11.2",
+                "X-Fern-SDK-Version": "1.13.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
             },

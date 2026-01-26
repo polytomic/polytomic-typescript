@@ -12,7 +12,8 @@ export type BulkExecutionStatus =
     | "completed"
     | "failed"
     | "processing"
-    | "errors";
+    | "errors"
+    | "interrupted";
 
 export const BulkExecutionStatus = {
     Created: "created",
@@ -25,4 +26,5 @@ export const BulkExecutionStatus = {
     Failed: "failed",
     Processing: "processing",
     Errors: "errors",
+    Interrupted: "interrupted",
 } as const;

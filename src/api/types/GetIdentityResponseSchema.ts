@@ -3,13 +3,20 @@
  */
 
 export interface GetIdentityResponseSchema {
+    /** The email of the caller. */
     email?: string;
+    /** The ID of the caller; this will be omitted for non-user callers. */
     id?: string;
+    /** Whether the caller is using an organization key. */
     is_organization?: boolean;
+    /** Whether the caller is using a partner key. */
     is_partner?: boolean;
     is_system?: boolean;
+    /** Whether the caller is a user. */
     is_user?: boolean;
+    /** The ID of the organization the caller belongs to. */
     organization_id?: string;
+    /** The name of the organization the caller belongs to. */
     organization_name?: string;
     role?: string;
 }

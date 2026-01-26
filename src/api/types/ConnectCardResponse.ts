@@ -3,6 +3,7 @@
  */
 
 export interface ConnectCardResponse {
+    /** URL to redirect the user to in order to create the new connection. */
     redirect_url?: string;
     token?: string;
 }

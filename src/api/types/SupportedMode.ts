@@ -5,7 +5,7 @@
 import * as Polytomic from "../index";
 
 export interface SupportedMode {
-    id?: Polytomic.SyncMode;
+    id?: Polytomic.ModelSyncMode;
     /** True if the sync mode requires an identity field mapping. */
     requires_identity?: boolean;
     /** True if the target supports per-field sync modes. */
