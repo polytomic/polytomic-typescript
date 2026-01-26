@@ -54,4 +54,4 @@ jobs:
             npm publish --access public
           fi
         env:
-          NPM_TOKEN: ${{ secrets.<USE_OIDC> }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
