@@ -11,7 +11,6 @@ export type BulkSchemaExecutionStatus =
     | "completed"
     | "failed"
     | "interrupted";
-
 export const BulkSchemaExecutionStatus = {
     Created: "created",
     Scheduled: "scheduled",

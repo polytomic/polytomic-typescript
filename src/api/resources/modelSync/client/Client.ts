@@ -5,19 +5,23 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 import { Targets } from "../resources/targets/client/Client";
 import { Executions } from "../resources/executions/client/Client";
 
 export declare namespace ModelSync {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
+        /** Override the X-Polytomic-Version header */
         version?: core.Supplier<string | undefined>;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -26,11 +30,24 @@ export declare namespace ModelSync {
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
         version?: string | undefined;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
 export class ModelSync {
+    protected _targets: Targets | undefined;
+    protected _executions: Executions | undefined;
+
     constructor(protected readonly _options: ModelSync.Options) {}
+
+    public get targets(): Targets {
+        return (this._targets ??= new Targets(this._options));
+    }
+
+    public get executions(): Executions {
+        return (this._executions ??= new Executions(this._options));
+    }
 
     /**
      * @param {string} id
@@ -49,18 +66,20 @@ export class ModelSync {
     public async getSource(
         id: string,
         request: Polytomic.ModelSyncGetSourceRequest = {},
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.GetModelSyncSourceMetaEnvelope> {
         const { params } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (params != null) {
-            _queryParams["params"] = JSON.stringify(params);
+            _queryParams["params"] = toJson(params);
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/source`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/source`,
             ),
             method: "GET",
             headers: {
@@ -71,12 +90,15 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -112,7 +134,9 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/source.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -137,18 +161,20 @@ export class ModelSync {
     public async getSourceFields(
         id: string,
         request: Polytomic.ModelSyncGetSourceFieldsRequest = {},
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ModelFieldResponse> {
         const { params } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (params != null) {
-            _queryParams["params"] = JSON.stringify(params);
+            _queryParams["params"] = toJson(params);
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/source/fields`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/source/fields`,
             ),
             method: "GET",
             headers: {
@@ -159,12 +185,15 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -200,7 +229,9 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/source/fields.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -225,10 +256,10 @@ export class ModelSync {
      */
     public async list(
         request: Polytomic.ModelSyncListRequest = {},
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ListModelSyncResponseEnvelope> {
         const { active, mode, target_connection_id: targetConnectionId } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (active != null) {
             _queryParams["active"] = active.toString();
         }
@@ -243,8 +274,10 @@ export class ModelSync {
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/syncs"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/syncs",
             ),
             method: "GET",
             headers: {
@@ -255,12 +288,15 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -294,7 +330,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -374,7 +410,7 @@ export class ModelSync {
      *         fields: [{
      *                 target: "name"
      *             }],
-     *         mode: Polytomic.ModelSyncMode.Create,
+     *         mode: "create",
      *         name: "Users Sync",
      *         schedule: {},
      *         target: {
@@ -384,12 +420,14 @@ export class ModelSync {
      */
     public async create(
         request: Polytomic.CreateModelSyncRequest,
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/syncs"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/syncs",
             ),
             method: "POST",
             headers: {
@@ -400,11 +438,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -441,7 +482,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/syncs.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -459,12 +500,14 @@ export class ModelSync {
      *     await client.modelSync.getScheduleOptions()
      */
     public async getScheduleOptions(
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ScheduleOptionResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/syncs/schedules"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/syncs/schedules",
             ),
             method: "GET",
             headers: {
@@ -475,11 +518,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -509,7 +555,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs/schedules.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -530,12 +576,14 @@ export class ModelSync {
      */
     public async get(
         id: string,
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
@@ -546,11 +594,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -582,7 +633,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -607,7 +658,7 @@ export class ModelSync {
      *         fields: [{
      *                 target: "name"
      *             }],
-     *         mode: Polytomic.ModelSyncMode.Create,
+     *         mode: "create",
      *         name: "Users Sync",
      *         schedule: {},
      *         target: {
@@ -618,12 +669,14 @@ export class ModelSync {
     public async update(
         id: string,
         request: Polytomic.UpdateModelSyncRequest,
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}`,
             ),
             method: "PUT",
             headers: {
@@ -634,11 +687,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -677,7 +733,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -701,8 +757,10 @@ export class ModelSync {
     public async remove(id: string, requestOptions?: ModelSync.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}`,
             ),
             method: "DELETE",
             headers: {
@@ -713,11 +771,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -753,7 +814,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -779,12 +840,14 @@ export class ModelSync {
     public async activate(
         id: string,
         request: Polytomic.ActivateSyncInput,
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ActivateSyncEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/activate`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/activate`,
             ),
             method: "POST",
             headers: {
@@ -795,11 +858,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -834,7 +900,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/syncs/{id}/activate.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -856,12 +922,14 @@ export class ModelSync {
      */
     public async cancel(
         id: string,
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.CancelModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/cancel`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/cancel`,
             ),
             method: "POST",
             headers: {
@@ -872,11 +940,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -910,7 +981,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/syncs/{id}/cancel.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -940,12 +1011,14 @@ export class ModelSync {
     public async start(
         id: string,
         request: Polytomic.StartModelSyncRequest = {},
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.StartModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/executions`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/executions`,
             ),
             method: "POST",
             headers: {
@@ -956,11 +1029,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -999,7 +1075,9 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling POST /api/syncs/{id}/executions.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -1020,12 +1098,14 @@ export class ModelSync {
      */
     public async getStatus(
         id: string,
-        requestOptions?: ModelSync.RequestOptions
+        requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.SyncStatusEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/status`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/status`,
             ),
             method: "GET",
             headers: {
@@ -1036,11 +1116,14 @@ export class ModelSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1072,24 +1155,12 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs/{id}/status.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
                 });
         }
-    }
-
-    protected _targets: Targets | undefined;
-
-    public get targets(): Targets {
-        return (this._targets ??= new Targets(this._options));
-    }
-
-    protected _executions: Executions | undefined;
-
-    public get executions(): Executions {
-        return (this._executions ??= new Executions(this._options));
     }
 
     protected async _getAuthorizationHeader(): Promise<string> {

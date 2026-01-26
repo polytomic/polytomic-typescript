@@ -6,7 +6,6 @@
  *
  */
 export type ModelSyncMode = "create" | "update" | "updateOrCreate" | "replace" | "append" | "remove";
-
 export const ModelSyncMode = {
     Create: "create",
     Update: "update",

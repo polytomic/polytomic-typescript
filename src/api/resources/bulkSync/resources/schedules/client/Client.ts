@@ -9,13 +9,16 @@ import urlJoin from "url-join";
 import * as errors from "../../../../../../errors/index";
 
 export declare namespace Schedules {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
+        /** Override the X-Polytomic-Version header */
         version?: core.Supplier<string | undefined>;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -24,6 +27,8 @@ export declare namespace Schedules {
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
         version?: string | undefined;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -45,8 +50,10 @@ export class Schedules {
     public async list(syncId: string, requestOptions?: Schedules.RequestOptions): Promise<Polytomic.SchedulesEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules`,
             ),
             method: "GET",
             headers: {
@@ -57,11 +64,14 @@ export class Schedules {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -95,7 +105,9 @@ export class Schedules {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling GET /api/bulk/syncs/{sync_id}/schedules.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -117,19 +129,21 @@ export class Schedules {
      * @example
      *     await client.bulkSync.schedules.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         schedule: {
-     *             frequency: Polytomic.ScheduleFrequency.Manual
+     *             frequency: "manual"
      *         }
      *     })
      */
     public async create(
         syncId: string,
         request: Polytomic.bulkSync.CreateScheduleRequest,
-        requestOptions?: Schedules.RequestOptions
+        requestOptions?: Schedules.RequestOptions,
     ): Promise<Polytomic.ScheduleEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules`,
             ),
             method: "POST",
             headers: {
@@ -140,11 +154,14 @@ export class Schedules {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -181,7 +198,9 @@ export class Schedules {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling POST /api/bulk/syncs/{sync_id}/schedules.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -205,12 +224,14 @@ export class Schedules {
     public async get(
         syncId: string,
         scheduleId: string,
-        requestOptions?: Schedules.RequestOptions
+        requestOptions?: Schedules.RequestOptions,
     ): Promise<Polytomic.ScheduleEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules/${encodeURIComponent(scheduleId)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules/${encodeURIComponent(scheduleId)}`,
             ),
             method: "GET",
             headers: {
@@ -221,11 +242,14 @@ export class Schedules {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -259,7 +283,9 @@ export class Schedules {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling GET /api/bulk/syncs/{sync_id}/schedules/{schedule_id}.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -282,7 +308,7 @@ export class Schedules {
      * @example
      *     await client.bulkSync.schedules.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         schedule: {
-     *             frequency: Polytomic.ScheduleFrequency.Manual
+     *             frequency: "manual"
      *         }
      *     })
      */
@@ -290,12 +316,14 @@ export class Schedules {
         syncId: string,
         scheduleId: string,
         request: Polytomic.bulkSync.UpdateScheduleRequest,
-        requestOptions?: Schedules.RequestOptions
+        requestOptions?: Schedules.RequestOptions,
     ): Promise<Polytomic.ScheduleEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules/${encodeURIComponent(scheduleId)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules/${encodeURIComponent(scheduleId)}`,
             ),
             method: "PUT",
             headers: {
@@ -306,11 +334,14 @@ export class Schedules {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -347,7 +378,9 @@ export class Schedules {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling PUT /api/bulk/syncs/{sync_id}/schedules/{schedule_id}.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -371,8 +404,10 @@ export class Schedules {
     public async delete(syncId: string, scheduleId: string, requestOptions?: Schedules.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules/${encodeURIComponent(scheduleId)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(syncId)}/schedules/${encodeURIComponent(scheduleId)}`,
             ),
             method: "DELETE",
             headers: {
@@ -383,11 +418,14 @@ export class Schedules {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.13.0",
+                "X-Fern-SDK-Version": "1.14.1",
+                "User-Agent": "polytomic/1.14.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -421,7 +459,9 @@ export class Schedules {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling DELETE /api/bulk/syncs/{sync_id}/schedules/{schedule_id}.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

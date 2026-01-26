@@ -13,7 +13,7 @@ import * as Polytomic from "../../../../index";
  *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
  *         name: "My Bulk Sync",
  *         schedule: {
- *             frequency: Polytomic.ScheduleFrequency.Manual
+ *             frequency: "manual"
  *         },
  *         source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
  *     }

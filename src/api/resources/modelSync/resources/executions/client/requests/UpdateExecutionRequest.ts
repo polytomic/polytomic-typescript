@@ -7,7 +7,7 @@ import * as Polytomic from "../../../../../../index";
 /**
  * @example
  *     {
- *         status: Polytomic.ExecutionStatus.Created
+ *         status: "created"
  *     }
  */
 export interface UpdateExecutionRequest {

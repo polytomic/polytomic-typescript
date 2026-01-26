@@ -7,6 +7,8 @@ import * as Polytomic from "../index";
 export interface SchemaField {
     association?: Polytomic.SchemaAssociation;
     id?: string;
+    /** Whether this field is part of the schema's primary key. */
+    is_primary_key?: boolean;
     name?: string;
     /** The type of the field from the remote system. */
     remote_type?: string;

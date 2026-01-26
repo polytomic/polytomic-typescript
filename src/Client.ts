@@ -19,13 +19,16 @@ import { Webhooks } from "./api/resources/webhooks/client/Client";
 import { Permissions } from "./api/resources/permissions/client/Client";
 
 export declare namespace PolytomicClient {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
+        /** Override the X-Polytomic-Version header */
         version?: core.Supplier<string | undefined>;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -34,85 +37,75 @@ export declare namespace PolytomicClient {
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
         version?: string | undefined;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
 export class PolytomicClient {
-    constructor(protected readonly _options: PolytomicClient.Options) {}
-
     protected _bulkSync: BulkSync | undefined;
+    protected _connections: Connections | undefined;
+    protected _queryRunner: QueryRunner | undefined;
+    protected _schemas: Schemas | undefined;
+    protected _models: Models | undefined;
+    protected _modelSync: ModelSync | undefined;
+    protected _events: Events | undefined;
+    protected _jobs: Jobs | undefined;
+    protected _identity: Identity | undefined;
+    protected _organization: Organization | undefined;
+    protected _users: Users | undefined;
+    protected _webhooks: Webhooks | undefined;
+    protected _permissions: Permissions | undefined;
+
+    constructor(protected readonly _options: PolytomicClient.Options) {}
 
     public get bulkSync(): BulkSync {
         return (this._bulkSync ??= new BulkSync(this._options));
     }
 
-    protected _connections: Connections | undefined;
-
     public get connections(): Connections {
         return (this._connections ??= new Connections(this._options));
     }
-
-    protected _queryRunner: QueryRunner | undefined;
 
     public get queryRunner(): QueryRunner {
         return (this._queryRunner ??= new QueryRunner(this._options));
     }
 
-    protected _schemas: Schemas | undefined;
-
     public get schemas(): Schemas {
         return (this._schemas ??= new Schemas(this._options));
     }
-
-    protected _models: Models | undefined;
 
     public get models(): Models {
         return (this._models ??= new Models(this._options));
     }
 
-    protected _modelSync: ModelSync | undefined;
-
     public get modelSync(): ModelSync {
         return (this._modelSync ??= new ModelSync(this._options));
     }
-
-    protected _events: Events | undefined;
 
     public get events(): Events {
         return (this._events ??= new Events(this._options));
     }
 
-    protected _jobs: Jobs | undefined;
-
     public get jobs(): Jobs {
         return (this._jobs ??= new Jobs(this._options));
     }
-
-    protected _identity: Identity | undefined;
 
     public get identity(): Identity {
         return (this._identity ??= new Identity(this._options));
     }
 
-    protected _organization: Organization | undefined;
-
     public get organization(): Organization {
         return (this._organization ??= new Organization(this._options));
     }
-
-    protected _users: Users | undefined;
 
     public get users(): Users {
         return (this._users ??= new Users(this._options));
     }
 
-    protected _webhooks: Webhooks | undefined;
-
     public get webhooks(): Webhooks {
         return (this._webhooks ??= new Webhooks(this._options));
     }
-
-    protected _permissions: Permissions | undefined;
 
     public get permissions(): Permissions {
         return (this._permissions ??= new Permissions(this._options));
