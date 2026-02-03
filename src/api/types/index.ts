@@ -1,4 +1,5 @@
 export * from "./ApiError";
+export * from "./BackendConnectionCapabilities";
 export * from "./BackendOAuthPrompt";
 export * from "./BulkBulkSyncSchedule";
 export * from "./BulkDiscover";
