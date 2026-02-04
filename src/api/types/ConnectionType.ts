@@ -5,7 +5,7 @@
 import * as Polytomic from "../index";
 
 export interface ConnectionType {
-    capabilities?: Polytomic.BackendConnectionCapabilities;
+    capabilities: Polytomic.BackendConnectionCapabilities;
     configurationForm?: Polytomic.V2ConnectionForm;
     envConfig?: Record<string, unknown>;
     id?: string;

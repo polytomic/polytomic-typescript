@@ -178,6 +178,7 @@ export * from "./BulkSyncSchemaExecutionStatus";
 export * from "./V4ExportSyncLogsEnvelope";
 export * from "./V4ExportSyncLogsResponse";
 export * from "./GetModelSyncSourceMetaEnvelope";
+export * from "./V4GlobalErrorSubscribersResponse";
 export * from "./ListBulkSyncExecutionStatusEnvelope";
 export * from "./V4QueryResultsEnvelope";
 export * from "./V4RunQueryEnvelope";

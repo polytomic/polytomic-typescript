@@ -3235,6 +3235,96 @@ await client.identity.get();
 </dl>
 </details>
 
+## Notifications
+
+<details><summary><code>client.notifications.<a href="/src/api/resources/notifications/client/Client.ts">getGlobalErrorSubscribers</a>() -> Polytomic.V4GlobalErrorSubscribersResponse</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.notifications.getGlobalErrorSubscribers();
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**requestOptions:** `Notifications.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.notifications.<a href="/src/api/resources/notifications/client/Client.ts">setGlobalErrorSubscribers</a>({ ...params }) -> Polytomic.V4GlobalErrorSubscribersResponse</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.notifications.setGlobalErrorSubscribers();
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.V4GlobalErrorSubscribersRequest`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `Notifications.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
 ## Organization
 
 <details><summary><code>client.organization.<a href="/src/api/resources/organization/client/Client.ts">list</a>() -> Polytomic.OrganizationsEnvelope</code></summary>

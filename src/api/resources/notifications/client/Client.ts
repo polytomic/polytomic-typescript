@@ -8,7 +8,7 @@ import * as Polytomic from "../../../index";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
-export declare namespace QueryRunner {
+export declare namespace Notifications {
     export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
         /** Specify a custom URL to connect the client to. */
@@ -32,43 +32,29 @@ export declare namespace QueryRunner {
     }
 }
 
-export class QueryRunner {
-    constructor(protected readonly _options: QueryRunner.Options) {}
+export class Notifications {
+    constructor(protected readonly _options: Notifications.Options) {}
 
     /**
-     * @param {string} connectionId
-     * @param {Polytomic.V4RunQueryRequest} request
-     * @param {QueryRunner.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Notifications.RequestOptions} requestOptions - Request-specific configuration.
      *
-     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
-     * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.queryRunner.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         query: "SELECT * FROM table"
-     *     })
+     *     await client.notifications.getGlobalErrorSubscribers()
      */
-    public async runQuery(
-        connectionId: string,
-        request: Polytomic.V4RunQueryRequest = {},
-        requestOptions?: QueryRunner.RequestOptions,
-    ): Promise<Polytomic.V4RunQueryEnvelope> {
-        const { query, ..._body } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (query != null) {
-            _queryParams["query"] = query;
-        }
-
+    public async getGlobalErrorSubscribers(
+        requestOptions?: Notifications.RequestOptions,
+    ): Promise<Polytomic.V4GlobalErrorSubscribersResponse> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(connectionId)}/query`,
+                "api/notifications/global-error-subscribers",
             ),
-            method: "POST",
+            method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
@@ -84,25 +70,19 @@ export class QueryRunner {
                 ...requestOptions?.headers,
             },
             contentType: "application/json",
-            queryParameters: _queryParams,
             requestType: "json",
-            body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V4RunQueryEnvelope;
+            return _response.body as Polytomic.V4GlobalErrorSubscribersResponse;
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
-                case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
-                case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 case 500:
                     throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
@@ -121,7 +101,7 @@ export class QueryRunner {
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/connections/{connection_id}/query.",
+                    "Timeout exceeded when calling GET /api/notifications/global-error-subscribers.",
                 );
             case "unknown":
                 throw new errors.PolytomicError({
@@ -131,37 +111,28 @@ export class QueryRunner {
     }
 
     /**
-     * @param {string} id
-     * @param {Polytomic.QueryRunnerGetQueryRequest} request
-     * @param {QueryRunner.RequestOptions} requestOptions - Request-specific configuration.
+     * @param {Polytomic.V4GlobalErrorSubscribersRequest} request
+     * @param {Notifications.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
-     * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.queryRunner.getQuery("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.notifications.setGlobalErrorSubscribers()
      */
-    public async getQuery(
-        id: string,
-        request: Polytomic.QueryRunnerGetQueryRequest = {},
-        requestOptions?: QueryRunner.RequestOptions,
-    ): Promise<Polytomic.V4QueryResultsEnvelope> {
-        const { page } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (page != null) {
-            _queryParams["page"] = page;
-        }
-
+    public async setGlobalErrorSubscribers(
+        request: Polytomic.V4GlobalErrorSubscribersRequest = {},
+        requestOptions?: Notifications.RequestOptions,
+    ): Promise<Polytomic.V4GlobalErrorSubscribersResponse> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.PolytomicEnvironment.Default,
-                `api/queries/${encodeURIComponent(id)}`,
+                "api/notifications/global-error-subscribers",
             ),
-            method: "GET",
+            method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
@@ -177,14 +148,14 @@ export class QueryRunner {
                 ...requestOptions?.headers,
             },
             contentType: "application/json",
-            queryParameters: _queryParams,
             requestType: "json",
+            body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V4QueryResultsEnvelope;
+            return _response.body as Polytomic.V4GlobalErrorSubscribersResponse;
         }
 
         if (_response.error.reason === "status-code") {
@@ -193,8 +164,6 @@ export class QueryRunner {
                     throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
-                case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 case 500:
                     throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
                 default:
@@ -212,7 +181,9 @@ export class QueryRunner {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/queries/{id}.");
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling PUT /api/notifications/global-error-subscribers.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

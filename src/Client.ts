@@ -13,6 +13,7 @@ import { ModelSync } from "./api/resources/modelSync/client/Client";
 import { Events } from "./api/resources/events/client/Client";
 import { Jobs } from "./api/resources/jobs/client/Client";
 import { Identity } from "./api/resources/identity/client/Client";
+import { Notifications } from "./api/resources/notifications/client/Client";
 import { Organization } from "./api/resources/organization/client/Client";
 import { Users } from "./api/resources/users/client/Client";
 import { Webhooks } from "./api/resources/webhooks/client/Client";
@@ -52,6 +53,7 @@ export class PolytomicClient {
     protected _events: Events | undefined;
     protected _jobs: Jobs | undefined;
     protected _identity: Identity | undefined;
+    protected _notifications: Notifications | undefined;
     protected _organization: Organization | undefined;
     protected _users: Users | undefined;
     protected _webhooks: Webhooks | undefined;
@@ -93,6 +95,10 @@ export class PolytomicClient {
 
     public get identity(): Identity {
         return (this._identity ??= new Identity(this._options));
+    }
+
+    public get notifications(): Notifications {
+        return (this._notifications ??= new Notifications(this._options));
     }
 
     public get organization(): Organization {

@@ -3,8 +3,8 @@
  */
 
 export interface BackendConnectionCapabilities {
-    destination?: boolean;
-    enrichment?: boolean;
-    orchestration?: boolean;
-    source?: boolean;
+    destination: boolean;
+    enrichment: boolean;
+    orchestration: boolean;
+    source: boolean;
 }
