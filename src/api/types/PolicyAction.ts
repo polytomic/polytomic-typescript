@@ -4,5 +4,5 @@
 
 export interface PolicyAction {
     action: string;
-    role_ids?: string[];
+    role_ids: string[] | null;
 }

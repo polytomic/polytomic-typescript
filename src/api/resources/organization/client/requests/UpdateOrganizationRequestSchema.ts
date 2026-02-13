@@ -5,7 +5,12 @@
 /**
  * @example
  *     {
- *         name: "My Organization"
+ *         client_id: undefined,
+ *         client_secret: undefined,
+ *         issuer: undefined,
+ *         name: "name",
+ *         sso_domain: undefined,
+ *         sso_org_id: undefined
  *     }
  */
 export interface UpdateOrganizationRequestSchema {

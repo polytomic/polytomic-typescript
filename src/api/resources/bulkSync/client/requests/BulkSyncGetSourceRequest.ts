@@ -4,9 +4,7 @@
 
 /**
  * @example
- *     {
- *         include_fields: true
- *     }
+ *     {}
  */
 export interface BulkSyncGetSourceRequest {
     include_fields?: boolean;

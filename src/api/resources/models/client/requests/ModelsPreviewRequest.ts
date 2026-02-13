@@ -8,11 +8,22 @@ import * as Polytomic from "../../../../index";
  * @example
  *     {
  *         body: {
+ *             additional_fields: undefined,
  *             configuration: {
- *                 "table": "public.users"
+ *                 "configuration": {
+ *                     "key": "value"
+ *                 }
  *             },
- *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *             name: "Users"
+ *             connection_id: "connection_id",
+ *             enricher: undefined,
+ *             fields: undefined,
+ *             identifier: undefined,
+ *             labels: undefined,
+ *             name: "name",
+ *             organization_id: undefined,
+ *             policies: undefined,
+ *             relations: undefined,
+ *             tracking_columns: undefined
  *         }
  *     }
  */

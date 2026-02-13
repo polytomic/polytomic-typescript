@@ -7,5 +7,5 @@
  *     {}
  */
 export interface SchemasListRequest {
-    filters?: Record<string, string | undefined>;
+    filters?: Record<string, string>;
 }

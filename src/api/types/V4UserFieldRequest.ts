@@ -6,6 +6,6 @@ export interface V4UserFieldRequest {
     example?: unknown;
     field_id: string;
     label: string;
-    path?: string;
+    path?: string | null;
     type: string;
 }

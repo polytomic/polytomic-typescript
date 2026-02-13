@@ -4,10 +4,8 @@
 
 /**
  * @example
- *     {
- *         active: true
- *     }
+ *     {}
  */
 export interface BulkSyncListRequest {
-    active?: boolean;
+    active?: boolean | null;
 }

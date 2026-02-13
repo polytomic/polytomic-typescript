@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ListBulkSchema {
-    data?: Polytomic.BulkSchema[];
+    data?: Polytomic.BulkSchema[] | null;
 }

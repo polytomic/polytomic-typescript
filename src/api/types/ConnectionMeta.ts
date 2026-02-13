@@ -4,6 +4,6 @@
 
 export interface ConnectionMeta {
     has_items?: boolean;
-    items?: unknown[];
-    requires_one_of?: string[];
+    items?: unknown[] | null;
+    requires_one_of?: string[] | null;
 }

@@ -5,7 +5,8 @@
 /**
  * @example
  *     {
- *         email: "mail@example.com"
+ *         email: "email",
+ *         role: undefined
  *     }
  */
 export interface UpdateUserRequestSchema {

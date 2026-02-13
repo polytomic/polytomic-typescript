@@ -5,10 +5,11 @@
 /**
  * @example
  *     {
- *         name: "Custom"
+ *         name: "name",
+ *         organization_id: undefined
  *     }
  */
 export interface CreateRoleRequest {
     name: string;
-    organization_id?: string;
+    organization_id?: string | null;
 }

@@ -7,11 +7,13 @@ import * as Polytomic from "../../../../../../index";
 /**
  * @example
  *     {
- *         name: "Custom"
+ *         name: "name",
+ *         organization_id: undefined,
+ *         policy_actions: null
  *     }
  */
 export interface CreatePolicyRequest {
     name: string;
-    organization_id?: string;
-    policy_actions?: Polytomic.PolicyAction[];
+    organization_id?: string | null;
+    policy_actions: Polytomic.PolicyAction[] | null;
 }

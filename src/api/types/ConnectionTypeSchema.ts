@@ -6,5 +6,5 @@ export interface ConnectionTypeSchema {
     id?: string;
     logo_url?: string;
     name?: string;
-    operations?: string[];
+    operations?: string[] | null;
 }

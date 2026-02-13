@@ -6,13 +6,17 @@
  * @example
  *     {
  *         configuration: {
- *             "database": "example",
- *             "hostname": "postgres.example.com",
- *             "password": "********",
- *             "port": 5432,
- *             "username": "user"
+ *             "configuration": {
+ *                 "key": "value"
+ *             }
  *         },
- *         name: "My Postgres Connection"
+ *         healthcheck_interval: undefined,
+ *         name: "name",
+ *         organization_id: undefined,
+ *         policies: undefined,
+ *         reconnect: undefined,
+ *         type: undefined,
+ *         validate: undefined
  *     }
  */
 export interface UpdateConnectionRequestSchema {
@@ -20,8 +24,8 @@ export interface UpdateConnectionRequestSchema {
     /** Override interval for connection health checking. */
     healthcheck_interval?: string;
     name: string;
-    organization_id?: string;
-    policies?: string[];
+    organization_id?: string | null;
+    policies?: string[] | null;
     reconnect?: boolean;
     type?: string;
     /** Validate connection configuration. */

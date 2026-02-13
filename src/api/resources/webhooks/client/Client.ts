@@ -5,6 +5,7 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Webhooks {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Webhooks {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -62,13 +63,12 @@ export class Webhooks {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -128,8 +128,9 @@ export class Webhooks {
      *
      * @example
      *     await client.webhooks.create({
-     *         endpoint: "https://example.com/webhook",
-     *         secret: "secret"
+     *         endpoint: "endpoint",
+     *         organization_id: undefined,
+     *         secret: "banana"
      *     })
      */
     public async create(
@@ -147,13 +148,12 @@ export class Webhooks {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -208,15 +208,20 @@ export class Webhooks {
      * Consult the [Events documentation](https://apidocs.polytomic.com/guides/events) for more information.
      *
      * @param {string} id
+     * @param {Polytomic.WebhooksGetRequest} request
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.webhooks.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.webhooks.get("id")
      */
-    public async get(id: string, requestOptions?: Webhooks.RequestOptions): Promise<Polytomic.WebhookEnvelope> {
+    public async get(
+        id: string,
+        request: Polytomic.WebhooksGetRequest = {},
+        requestOptions?: Webhooks.RequestOptions,
+    ): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -228,13 +233,12 @@ export class Webhooks {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -294,9 +298,10 @@ export class Webhooks {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.webhooks.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         endpoint: "https://example.com/webhook",
-     *         secret: "secret"
+     *     await client.webhooks.update("id", {
+     *         endpoint: "endpoint",
+     *         organization_id: undefined,
+     *         secret: "banana"
      *     })
      */
     public async update(
@@ -315,13 +320,12 @@ export class Webhooks {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -370,6 +374,7 @@ export class Webhooks {
 
     /**
      * @param {string} id
+     * @param {Polytomic.WebhooksRemoveRequest} request
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -377,9 +382,13 @@ export class Webhooks {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.webhooks.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.webhooks.remove("id")
      */
-    public async remove(id: string, requestOptions?: Webhooks.RequestOptions): Promise<void> {
+    public async remove(
+        id: string,
+        request: Polytomic.WebhooksRemoveRequest = {},
+        requestOptions?: Webhooks.RequestOptions,
+    ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -391,13 +400,12 @@ export class Webhooks {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -445,6 +453,7 @@ export class Webhooks {
 
     /**
      * @param {string} id
+     * @param {Polytomic.WebhooksDisableRequest} request
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -452,9 +461,13 @@ export class Webhooks {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.webhooks.disable("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.webhooks.disable("id")
      */
-    public async disable(id: string, requestOptions?: Webhooks.RequestOptions): Promise<Polytomic.WebhookEnvelope> {
+    public async disable(
+        id: string,
+        request: Polytomic.WebhooksDisableRequest = {},
+        requestOptions?: Webhooks.RequestOptions,
+    ): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -466,13 +479,12 @@ export class Webhooks {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -522,6 +534,7 @@ export class Webhooks {
 
     /**
      * @param {string} id
+     * @param {Polytomic.WebhooksEnableRequest} request
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -529,9 +542,13 @@ export class Webhooks {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.webhooks.enable("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.webhooks.enable("id")
      */
-    public async enable(id: string, requestOptions?: Webhooks.RequestOptions): Promise<Polytomic.WebhookEnvelope> {
+    public async enable(
+        id: string,
+        request: Polytomic.WebhooksEnableRequest = {},
+        requestOptions?: Webhooks.RequestOptions,
+    ): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -543,13 +560,12 @@ export class Webhooks {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

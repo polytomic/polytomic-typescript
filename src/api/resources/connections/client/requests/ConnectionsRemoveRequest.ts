@@ -4,9 +4,7 @@
 
 /**
  * @example
- *     {
- *         force: true
- *     }
+ *     {}
  */
 export interface ConnectionsRemoveRequest {
     force?: boolean;

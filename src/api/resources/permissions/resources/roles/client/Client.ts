@@ -5,6 +5,7 @@
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
 import * as Polytomic from "../../../../../index";
+import { toJson } from "../../../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Roles {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Roles {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -56,13 +57,12 @@ export class Roles {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -118,7 +118,8 @@ export class Roles {
      *
      * @example
      *     await client.permissions.roles.create({
-     *         name: "Custom"
+     *         name: "name",
+     *         organization_id: undefined
      *     })
      */
     public async create(
@@ -136,13 +137,12 @@ export class Roles {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -195,15 +195,20 @@ export class Roles {
 
     /**
      * @param {string} id
+     * @param {Polytomic.permissions.RolesGetRequest} request
      * @param {Roles.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.permissions.roles.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.roles.get("id")
      */
-    public async get(id: string, requestOptions?: Roles.RequestOptions): Promise<Polytomic.RoleResponseEnvelope> {
+    public async get(
+        id: string,
+        request: Polytomic.permissions.RolesGetRequest = {},
+        requestOptions?: Roles.RequestOptions,
+    ): Promise<Polytomic.RoleResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -215,13 +220,12 @@ export class Roles {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -279,8 +283,9 @@ export class Roles {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.permissions.roles.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         name: "Custom"
+     *     await client.permissions.roles.update("id", {
+     *         name: "name",
+     *         organization_id: undefined
      *     })
      */
     public async update(
@@ -299,13 +304,12 @@ export class Roles {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -360,6 +364,7 @@ export class Roles {
 
     /**
      * @param {string} id
+     * @param {Polytomic.permissions.RolesRemoveRequest} request
      * @param {Roles.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -368,9 +373,13 @@ export class Roles {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.permissions.roles.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.roles.remove("id")
      */
-    public async remove(id: string, requestOptions?: Roles.RequestOptions): Promise<void> {
+    public async remove(
+        id: string,
+        request: Polytomic.permissions.RolesRemoveRequest = {},
+        requestOptions?: Roles.RequestOptions,
+    ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -382,13 +391,12 @@ export class Roles {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

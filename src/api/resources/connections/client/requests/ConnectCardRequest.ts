@@ -5,8 +5,13 @@
 /**
  * @example
  *     {
- *         name: "Salesforce Connection",
- *         redirect_url: "redirect_url"
+ *         connection: undefined,
+ *         dark: undefined,
+ *         name: "name",
+ *         organization_id: undefined,
+ *         redirect_url: "redirect_url",
+ *         type: undefined,
+ *         whitelist: undefined
  *     }
  */
 export interface ConnectCardRequest {
@@ -16,11 +21,11 @@ export interface ConnectCardRequest {
     dark?: boolean;
     /** Name of the new connection. Must be unique per organization. */
     name: string;
-    organization_id?: string;
+    organization_id?: string | null;
     /** URL to redirect to after connection is created. */
     redirect_url: string;
     /** Connection type to create. */
     type?: string;
     /** List of connection types which are allowed to be created. Ignored if type is set. */
-    whitelist?: string[];
+    whitelist?: string[] | null;
 }

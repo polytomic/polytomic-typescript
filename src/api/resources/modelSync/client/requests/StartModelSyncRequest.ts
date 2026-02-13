@@ -4,10 +4,14 @@
 
 /**
  * @example
- *     {}
+ *     {
+ *         identities: undefined,
+ *         resync: undefined,
+ *         test: undefined
+ *     }
  */
 export interface StartModelSyncRequest {
-    identities?: string[];
+    identities?: string[] | null;
     resync?: boolean;
     test?: boolean;
 }

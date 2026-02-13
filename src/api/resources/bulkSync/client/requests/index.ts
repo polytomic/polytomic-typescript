@@ -3,5 +3,8 @@ export { type CreateBulkSyncRequest } from "./CreateBulkSyncRequest";
 export { type BulkSyncGetRequest } from "./BulkSyncGetRequest";
 export { type UpdateBulkSyncRequest } from "./UpdateBulkSyncRequest";
 export { type BulkSyncRemoveRequest } from "./BulkSyncRemoveRequest";
+export { type BulkSyncActivateRequest } from "./BulkSyncActivateRequest";
 export { type StartBulkSyncRequest } from "./StartBulkSyncRequest";
+export { type BulkSyncGetStatusRequest } from "./BulkSyncGetStatusRequest";
 export { type BulkSyncGetSourceRequest } from "./BulkSyncGetSourceRequest";
+export { type BulkSyncGetDestinationRequest } from "./BulkSyncGetDestinationRequest";

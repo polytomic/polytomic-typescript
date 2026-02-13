@@ -4,9 +4,7 @@
 
 /**
  * @example
- *     {
- *         query: "SELECT * FROM table"
- *     }
+ *     {}
  */
 export interface V4RunQueryRequest {
     /**

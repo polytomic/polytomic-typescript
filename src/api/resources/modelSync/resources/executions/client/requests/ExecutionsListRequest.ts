@@ -4,11 +4,7 @@
 
 /**
  * @example
- *     {
- *         page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==",
- *         only_completed: true,
- *         ascending: true
- *     }
+ *     {}
  */
 export interface ExecutionsListRequest {
     page_token?: string;

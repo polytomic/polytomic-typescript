@@ -5,6 +5,7 @@
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
 import * as Polytomic from "../../../../../index";
+import { toJson } from "../../../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Executions {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Executions {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -43,10 +44,7 @@ export class Executions {
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.bulkSync.executions.listStatus({
-     *         all: true,
-     *         active: true
-     *     })
+     *     await client.bulkSync.executions.listStatus()
      */
     public async listStatus(
         request: Polytomic.bulkSync.ExecutionsListStatusRequest = {},
@@ -81,13 +79,12 @@ export class Executions {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -141,12 +138,7 @@ export class Executions {
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.bulkSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==",
-     *         only_terminal: true,
-     *         ascending: true,
-     *         limit: 100
-     *     })
+     *     await client.bulkSync.executions.list("id")
      */
     public async list(
         id: string,
@@ -182,13 +174,12 @@ export class Executions {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -238,17 +229,19 @@ export class Executions {
     /**
      * @param {string} id
      * @param {string} execId
+     * @param {Polytomic.bulkSync.ExecutionsGetRequest} request
      * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.bulkSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.executions.get("id", "exec_id")
      */
     public async get(
         id: string,
         execId: string,
+        request: Polytomic.bulkSync.ExecutionsGetRequest = {},
         requestOptions?: Executions.RequestOptions,
     ): Promise<Polytomic.BulkSyncExecutionEnvelope> {
         const _response = await core.fetcher({
@@ -262,13 +255,12 @@ export class Executions {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -317,17 +309,19 @@ export class Executions {
     /**
      * @param {string} syncId
      * @param {string} executionId
+     * @param {Polytomic.bulkSync.ExecutionsGetLogsRequest} request
      * @param {Executions.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.bulkSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.executions.getLogs("sync_id", "execution_id")
      */
     public async getLogs(
         syncId: string,
         executionId: string,
+        request: Polytomic.bulkSync.ExecutionsGetLogsRequest = {},
         requestOptions?: Executions.RequestOptions,
     ): Promise<Polytomic.V4BulkSyncExecutionLogsEnvelope> {
         const _response = await core.fetcher({
@@ -341,13 +335,12 @@ export class Executions {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -405,7 +398,7 @@ export class Executions {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.executions.exportLogs("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.executions.exportLogs("sync_id", "execution_id")
      */
     public async exportLogs(
         syncId: string,
@@ -430,13 +423,12 @@ export class Executions {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

@@ -5,11 +5,11 @@
 import * as Polytomic from "../index";
 
 export interface BulkSchema {
-    data_cutoff_timestamp?: string;
+    data_cutoff_timestamp?: string | null;
     disable_data_cutoff?: boolean;
     enabled?: boolean;
     fields?: Polytomic.BulkField[];
-    filters?: Polytomic.BulkFilter[];
+    filters?: Polytomic.BulkFilter2[];
     id?: string;
     output_name?: string;
     partition_key?: string;

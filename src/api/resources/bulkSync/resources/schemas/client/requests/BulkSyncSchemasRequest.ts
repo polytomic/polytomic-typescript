@@ -6,8 +6,10 @@ import * as Polytomic from "../../../../../../index";
 
 /**
  * @example
- *     {}
+ *     {
+ *         schemas: undefined
+ *     }
  */
 export interface BulkSyncSchemasRequest {
-    schemas?: Polytomic.BulkSchema[];
+    schemas?: Polytomic.BulkSchema[] | null;
 }

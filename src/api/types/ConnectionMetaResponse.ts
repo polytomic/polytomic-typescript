@@ -6,6 +6,6 @@ import * as Polytomic from "../index";
 
 export interface ConnectionMetaResponse {
     configuration?: Record<string, Polytomic.ConfigurationValue>;
-    items?: Record<string, Polytomic.ConnectionMeta | undefined>;
-    requires_one_of?: string[];
+    items?: Record<string, Polytomic.ConnectionMeta | null> | null;
+    requires_one_of?: string[] | null;
 }

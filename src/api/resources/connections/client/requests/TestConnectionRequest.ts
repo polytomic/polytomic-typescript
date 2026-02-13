@@ -6,13 +6,12 @@
  * @example
  *     {
  *         configuration: {
- *             "database": "example",
- *             "hostname": "postgres.example.com",
- *             "password": "password",
- *             "port": 5432,
- *             "username": "user"
+ *             "configuration": {
+ *                 "key": "value"
+ *             }
  *         },
- *         type: "postgresql"
+ *         connection_id: undefined,
+ *         type: "type"
  *     }
  */
 export interface TestConnectionRequest {

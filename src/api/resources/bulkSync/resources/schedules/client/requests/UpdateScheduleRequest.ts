@@ -8,7 +8,13 @@ import * as Polytomic from "../../../../../../index";
  * @example
  *     {
  *         schedule: {
- *             frequency: "manual"
+ *             dayOfMonth: undefined,
+ *             dayOfWeek: undefined,
+ *             frequency: "manual",
+ *             hour: undefined,
+ *             minute: undefined,
+ *             month: undefined,
+ *             selectiveMode: undefined
  *         }
  *     }
  */

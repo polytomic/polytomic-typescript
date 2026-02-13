@@ -5,12 +5,13 @@
 /**
  * @example
  *     {
- *         endpoint: "https://example.com/webhook",
- *         secret: "secret"
+ *         endpoint: "endpoint",
+ *         organization_id: undefined,
+ *         secret: "banana"
  *     }
  */
 export interface CreateWebhooksSchema {
     endpoint: string;
-    organization_id?: string;
+    organization_id?: string | null;
     secret: string;
 }

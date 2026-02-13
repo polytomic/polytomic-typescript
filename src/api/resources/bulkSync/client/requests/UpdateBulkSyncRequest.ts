@@ -7,39 +7,61 @@ import * as Polytomic from "../../../../index";
 /**
  * @example
  *     {
+ *         active: undefined,
+ *         automatically_add_new_fields: undefined,
+ *         automatically_add_new_objects: undefined,
+ *         concurrency_limit: undefined,
+ *         data_cutoff_timestamp: undefined,
  *         destination_configuration: {
- *             "schema": "my_schema"
+ *             "destination_configuration": {
+ *                 "key": "value"
+ *             }
  *         },
- *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *         name: "My Bulk Sync",
+ *         destination_connection_id: "destination_connection_id",
+ *         disable_record_timestamps: undefined,
+ *         discover: undefined,
+ *         mode: null,
+ *         name: "name",
+ *         normalize_names: undefined,
+ *         organization_id: undefined,
+ *         policies: undefined,
+ *         resync_concurrency_limit: undefined,
  *         schedule: {
- *             frequency: "manual"
+ *             day_of_month: undefined,
+ *             day_of_week: undefined,
+ *             frequency: "manual",
+ *             hour: undefined,
+ *             minute: undefined,
+ *             month: undefined,
+ *             multi: undefined
  *         },
- *         source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+ *         schemas: undefined,
+ *         source_configuration: undefined,
+ *         source_connection_id: "source_connection_id"
  *     }
  */
 export interface UpdateBulkSyncRequest {
-    active?: boolean;
-    automatically_add_new_fields?: Polytomic.BulkDiscover;
-    automatically_add_new_objects?: Polytomic.BulkDiscover;
+    active?: boolean | null;
+    automatically_add_new_fields?: Polytomic.BulkDiscover | null;
+    automatically_add_new_objects?: Polytomic.BulkDiscover | null;
     /** Override the default concurrency limit for this sync. */
-    concurrency_limit?: number;
-    data_cutoff_timestamp?: string;
+    concurrency_limit?: number | null;
+    data_cutoff_timestamp?: string | null;
     destination_configuration: Record<string, unknown>;
     destination_connection_id: string;
-    disable_record_timestamps?: boolean;
+    disable_record_timestamps?: boolean | null;
     /** DEPRECATED: Use automatically_add_new_objects/automatically_add_new_fields instead */
-    discover?: boolean;
-    mode?: Polytomic.BulkSyncMode;
+    discover?: boolean | null;
+    mode: Polytomic.BulkSyncMode | null;
     name: string;
-    normalize_names?: Polytomic.BulkNormalizeNames;
-    organization_id?: string;
-    policies?: string[];
+    normalize_names?: Polytomic.BulkNormalizeNames | null;
+    organization_id?: string | null;
+    policies?: string[] | null;
     /** Override the default resync concurrency limit for this sync. */
-    resync_concurrency_limit?: number;
+    resync_concurrency_limit?: number | null;
     schedule: Polytomic.BulkSchedule;
     /** List of schemas to sync; if omitted, all schemas will be selected for syncing. */
-    schemas?: Polytomic.V2UpdateBulkSyncRequestSchemasItem[];
-    source_configuration?: Record<string, unknown>;
+    schemas?: Polytomic.V2UpdateBulkSyncRequestSchemasItem[] | null;
+    source_configuration?: Record<string, unknown> | null;
     source_connection_id: string;
 }

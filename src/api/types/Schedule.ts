@@ -6,14 +6,14 @@ import * as Polytomic from "../index";
 
 export interface Schedule {
     connection_id?: string;
-    day_of_month?: string;
-    day_of_week?: string;
+    day_of_month?: string | null;
+    day_of_week?: string | null;
     frequency?: Polytomic.ScheduleFrequency;
-    hour?: string;
-    job_id?: number;
-    minute?: string;
-    month?: string;
+    hour?: string | null;
+    job_id?: number | null;
+    minute?: string | null;
+    month?: string | null;
     run_after?: Polytomic.RunAfter;
     /** If true, the sync will only run if the dependent syncs completed successfully. */
-    run_after_success_only?: boolean;
+    run_after_success_only?: boolean | null;
 }

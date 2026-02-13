@@ -5,8 +5,8 @@
 import * as Polytomic from "../index";
 
 export interface BulkSyncExecutionStatus {
-    nextExecutionTime?: string;
-    schemas?: Polytomic.BulkSyncSchemaExecutionStatus[];
+    nextExecutionTime?: string | null;
+    schemas?: Polytomic.BulkSyncSchemaExecutionStatus[] | null;
     status?: Polytomic.BulkExecutionStatus;
     sync_id?: string;
 }

@@ -5,6 +5,7 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Users {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Users {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -41,15 +42,20 @@ export class Users {
      * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
      *
      * @param {string} orgId
+     * @param {Polytomic.UsersListRequest} request
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.users.list("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.users.list("org_id")
      */
-    public async list(orgId: string, requestOptions?: Users.RequestOptions): Promise<Polytomic.ListUsersEnvelope> {
+    public async list(
+        orgId: string,
+        request: Polytomic.UsersListRequest = {},
+        requestOptions?: Users.RequestOptions,
+    ): Promise<Polytomic.ListUsersEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -61,13 +67,12 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -127,8 +132,9 @@ export class Users {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.users.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         email: "mail@example.com"
+     *     await client.users.create("org_id", {
+     *         email: "email",
+     *         role: undefined
      *     })
      */
     public async create(
@@ -147,13 +153,12 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -207,8 +212,9 @@ export class Users {
      * >
      * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
      *
-     * @param {string} id
      * @param {string} orgId
+     * @param {string} id
+     * @param {Polytomic.UsersGetRequest} request
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -216,11 +222,12 @@ export class Users {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.users.get("org_id", "id")
      */
     public async get(
-        id: string,
         orgId: string,
+        id: string,
+        request: Polytomic.UsersGetRequest = {},
         requestOptions?: Users.RequestOptions,
     ): Promise<Polytomic.UserEnvelope> {
         const _response = await core.fetcher({
@@ -234,13 +241,12 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -293,8 +299,8 @@ export class Users {
      * >
      * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
      *
-     * @param {string} id
      * @param {string} orgId
+     * @param {string} id
      * @param {Polytomic.UpdateUserRequestSchema} request
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -303,13 +309,14 @@ export class Users {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         email: "mail@example.com"
+     *     await client.users.update("org_id", "id", {
+     *         email: "email",
+     *         role: undefined
      *     })
      */
     public async update(
-        id: string,
         orgId: string,
+        id: string,
         request: Polytomic.UpdateUserRequestSchema,
         requestOptions?: Users.RequestOptions,
     ): Promise<Polytomic.UserEnvelope> {
@@ -324,13 +331,12 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -384,8 +390,9 @@ export class Users {
      * >
      * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
      *
-     * @param {string} id
      * @param {string} orgId
+     * @param {string} id
+     * @param {Polytomic.UsersRemoveRequest} request
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -393,11 +400,12 @@ export class Users {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.users.remove("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.users.remove("org_id", "id")
      */
     public async remove(
-        id: string,
         orgId: string,
+        id: string,
+        request: Polytomic.UsersRemoveRequest = {},
         requestOptions?: Users.RequestOptions,
     ): Promise<Polytomic.UserEnvelope> {
         const _response = await core.fetcher({
@@ -411,13 +419,12 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -480,9 +487,7 @@ export class Users {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.users.createApiKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         force: true
-     *     })
+     *     await client.users.createApiKey("org_id", "id")
      */
     public async createApiKey(
         orgId: string,
@@ -507,13 +512,12 @@ export class Users {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

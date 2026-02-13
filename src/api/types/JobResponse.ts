@@ -5,7 +5,7 @@
 import * as Polytomic from "../index";
 
 export interface JobResponse {
-    error?: string;
+    error?: string | null;
     job_id?: string;
     result?: unknown;
     status?: Polytomic.WorkTaskStatus;

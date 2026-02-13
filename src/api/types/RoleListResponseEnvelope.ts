@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface RoleListResponseEnvelope {
-    data?: Polytomic.RoleResponse[];
+    data?: Polytomic.RoleResponse[] | null;
 }

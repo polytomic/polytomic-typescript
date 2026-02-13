@@ -5,6 +5,7 @@
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
 import * as Polytomic from "../../../../../index";
+import { toJson } from "../../../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Schedules {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Schedules {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -37,6 +38,7 @@ export class Schedules {
 
     /**
      * @param {string} syncId
+     * @param {Polytomic.bulkSync.SchedulesListRequest} request
      * @param {Schedules.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -45,9 +47,13 @@ export class Schedules {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.schedules.list("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.schedules.list("sync_id")
      */
-    public async list(syncId: string, requestOptions?: Schedules.RequestOptions): Promise<Polytomic.SchedulesEnvelope> {
+    public async list(
+        syncId: string,
+        request: Polytomic.bulkSync.SchedulesListRequest = {},
+        requestOptions?: Schedules.RequestOptions,
+    ): Promise<Polytomic.SchedulesEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -59,13 +65,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -127,9 +132,15 @@ export class Schedules {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.schedules.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.bulkSync.schedules.create("sync_id", {
      *         schedule: {
-     *             frequency: "manual"
+     *             dayOfMonth: undefined,
+     *             dayOfWeek: undefined,
+     *             frequency: "manual",
+     *             hour: undefined,
+     *             minute: undefined,
+     *             month: undefined,
+     *             selectiveMode: undefined
      *         }
      *     })
      */
@@ -149,13 +160,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -211,6 +221,7 @@ export class Schedules {
     /**
      * @param {string} syncId
      * @param {string} scheduleId
+     * @param {Polytomic.bulkSync.SchedulesGetRequest} request
      * @param {Schedules.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -219,11 +230,12 @@ export class Schedules {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.schedules.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.schedules.get("sync_id", "schedule_id")
      */
     public async get(
         syncId: string,
         scheduleId: string,
+        request: Polytomic.bulkSync.SchedulesGetRequest = {},
         requestOptions?: Schedules.RequestOptions,
     ): Promise<Polytomic.ScheduleEnvelope> {
         const _response = await core.fetcher({
@@ -237,13 +249,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -306,9 +317,15 @@ export class Schedules {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.schedules.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.bulkSync.schedules.update("sync_id", "schedule_id", {
      *         schedule: {
-     *             frequency: "manual"
+     *             dayOfMonth: undefined,
+     *             dayOfWeek: undefined,
+     *             frequency: "manual",
+     *             hour: undefined,
+     *             minute: undefined,
+     *             month: undefined,
+     *             selectiveMode: undefined
      *         }
      *     })
      */
@@ -329,13 +346,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -391,6 +407,7 @@ export class Schedules {
     /**
      * @param {string} syncId
      * @param {string} scheduleId
+     * @param {Polytomic.bulkSync.SchedulesDeleteRequest} request
      * @param {Schedules.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -399,9 +416,14 @@ export class Schedules {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.schedules.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.schedules.delete("sync_id", "schedule_id")
      */
-    public async delete(syncId: string, scheduleId: string, requestOptions?: Schedules.RequestOptions): Promise<void> {
+    public async delete(
+        syncId: string,
+        scheduleId: string,
+        request: Polytomic.bulkSync.SchedulesDeleteRequest = {},
+        requestOptions?: Schedules.RequestOptions,
+    ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -413,13 +435,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

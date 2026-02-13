@@ -5,14 +5,14 @@
 import * as Polytomic from "../index";
 
 export interface SchemaConfiguration {
-    data_cutoff_timestamp?: string;
+    data_cutoff_timestamp?: string | null;
     /** Whether data cutoff is disabled for this schema. */
-    disable_data_cutoff?: boolean;
+    disable_data_cutoff?: boolean | null;
     /** Whether the schema is enabled for syncing. */
-    enabled?: boolean;
+    enabled?: boolean | null;
     fields?: Polytomic.V2SchemaConfigurationFieldsItem[];
     filters?: Polytomic.BulkFilter[];
     id?: string;
-    partition_key?: string;
-    tracking_field?: string;
+    partition_key?: string | null;
+    tracking_field?: string | null;
 }

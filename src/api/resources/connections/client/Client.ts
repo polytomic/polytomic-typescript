@@ -5,6 +5,7 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Connections {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Connections {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -58,13 +59,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -110,6 +110,7 @@ export class Connections {
 
     /**
      * @param {string} id
+     * @param {Polytomic.ConnectionsGetConnectionTypeSchemaRequest} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -117,10 +118,11 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.connections.getConnectionTypeSchema("postgresql")
+     *     await client.connections.getConnectionTypeSchema("id")
      */
     public async getConnectionTypeSchema(
         id: string,
+        request: Polytomic.ConnectionsGetConnectionTypeSchemaRequest = {},
         requestOptions?: Connections.RequestOptions,
     ): Promise<Polytomic.JsonschemaSchema> {
         const _response = await core.fetcher({
@@ -134,13 +136,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -207,13 +208,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -270,14 +270,17 @@ export class Connections {
      * @example
      *     await client.connections.create({
      *         configuration: {
-     *             "database": "example",
-     *             "hostname": "postgres.example.com",
-     *             "password": "********",
-     *             "port": 5432,
-     *             "username": "user"
+     *             "configuration": {
+     *                 "key": "value"
+     *             }
      *         },
-     *         name: "My Postgres Connection",
-     *         type: "postgresql"
+     *         healthcheck_interval: undefined,
+     *         name: "name",
+     *         organization_id: undefined,
+     *         policies: undefined,
+     *         redirect_url: undefined,
+     *         type: "type",
+     *         validate: undefined
      *     })
      */
     public async create(
@@ -295,13 +298,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -373,8 +375,13 @@ export class Connections {
      *
      * @example
      *     await client.connections.connect({
-     *         name: "Salesforce Connection",
-     *         redirect_url: "redirect_url"
+     *         connection: undefined,
+     *         dark: undefined,
+     *         name: "name",
+     *         organization_id: undefined,
+     *         redirect_url: "redirect_url",
+     *         type: undefined,
+     *         whitelist: undefined
      *     })
      */
     public async connect(
@@ -392,13 +399,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -461,13 +467,12 @@ export class Connections {
      * @example
      *     await client.connections.testConnection({
      *         configuration: {
-     *             "database": "example",
-     *             "hostname": "postgres.example.com",
-     *             "password": "password",
-     *             "port": 5432,
-     *             "username": "user"
+     *             "configuration": {
+     *                 "key": "value"
+     *             }
      *         },
-     *         type: "postgresql"
+     *         connection_id: undefined,
+     *         type: "type"
      *     })
      */
     public async testConnection(
@@ -485,13 +490,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -542,6 +546,7 @@ export class Connections {
 
     /**
      * @param {string} id
+     * @param {Polytomic.ConnectionsGetRequest} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -549,10 +554,11 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.connections.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.connections.get("id")
      */
     public async get(
         id: string,
+        request: Polytomic.ConnectionsGetRequest = {},
         requestOptions?: Connections.RequestOptions,
     ): Promise<Polytomic.ConnectionResponseEnvelope> {
         const _response = await core.fetcher({
@@ -566,13 +572,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -631,15 +636,19 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.connections.update("id", {
      *         configuration: {
-     *             "database": "example",
-     *             "hostname": "postgres.example.com",
-     *             "password": "********",
-     *             "port": 5432,
-     *             "username": "user"
+     *             "configuration": {
+     *                 "key": "value"
+     *             }
      *         },
-     *         name: "My Postgres Connection"
+     *         healthcheck_interval: undefined,
+     *         name: "name",
+     *         organization_id: undefined,
+     *         policies: undefined,
+     *         reconnect: undefined,
+     *         type: undefined,
+     *         validate: undefined
      *     })
      */
     public async update(
@@ -658,13 +667,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -729,9 +737,7 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.connections.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         force: true
-     *     })
+     *     await client.connections.remove("id")
      */
     public async remove(
         id: string,
@@ -755,13 +761,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -814,6 +819,7 @@ export class Connections {
 
     /**
      * @param {string} id
+     * @param {Polytomic.ConnectionsGetParameterValuesRequest} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -821,10 +827,11 @@ export class Connections {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.connections.getParameterValues("id")
      */
     public async getParameterValues(
         id: string,
+        request: Polytomic.ConnectionsGetParameterValuesRequest = {},
         requestOptions?: Connections.RequestOptions,
     ): Promise<Polytomic.ConnectionParameterValuesResponseEnvelope> {
         const _response = await core.fetcher({
@@ -838,13 +845,12 @@ export class Connections {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

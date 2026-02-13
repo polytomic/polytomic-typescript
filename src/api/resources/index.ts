@@ -20,6 +20,7 @@ export * from "./schemas/client/requests";
 export * from "./models/client/requests";
 export * from "./modelSync/client/requests";
 export * from "./events/client/requests";
+export * from "./jobs/client/requests";
 export * from "./notifications/client/requests";
 export * from "./organization/client/requests";
 export * from "./users/client/requests";

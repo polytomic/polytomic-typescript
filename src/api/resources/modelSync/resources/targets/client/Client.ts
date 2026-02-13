@@ -5,6 +5,7 @@
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
 import * as Polytomic from "../../../../../index";
+import { toJson } from "../../../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Targets {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Targets {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -47,7 +48,7 @@ export class Targets {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.targets.getTarget("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.targets.getTarget("id")
      */
     public async getTarget(
         id: string,
@@ -75,13 +76,12 @@ export class Targets {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -145,9 +145,8 @@ export class Targets {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.targets.getTargetFields("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         target: "database.table",
-     *         refresh: false
+     *     await client.modelSync.targets.getTargetFields("id", {
+     *         target: "target"
      *     })
      */
     public async getTargetFields(
@@ -173,13 +172,12 @@ export class Targets {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -250,6 +248,7 @@ export class Targets {
      * what operations the mode supports.
      *
      * @param {string} id
+     * @param {Polytomic.modelSync.TargetsListRequest} request
      * @param {Targets.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -259,10 +258,11 @@ export class Targets {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.targets.list("id")
      */
     public async list(
         id: string,
+        request: Polytomic.modelSync.TargetsListRequest = {},
         requestOptions?: Targets.RequestOptions,
     ): Promise<Polytomic.V4TargetObjectsResponseEnvelope> {
         const _response = await core.fetcher({
@@ -276,13 +276,12 @@ export class Targets {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -368,6 +367,7 @@ export class Targets {
      *
      * @param {string} id
      * @param {string} property
+     * @param {Polytomic.modelSync.TargetsGetCreatePropertyRequest} request
      * @param {Targets.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -377,11 +377,12 @@ export class Targets {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.targets.getCreateProperty("248df4b7-aa70-47b8-a036-33ac447e668d", "property")
+     *     await client.modelSync.targets.getCreateProperty("id", "property")
      */
     public async getCreateProperty(
         id: string,
         property: string,
+        request: Polytomic.modelSync.TargetsGetCreatePropertyRequest = {},
         requestOptions?: Targets.RequestOptions,
     ): Promise<Polytomic.V4TargetPropertyValuesEnvelope> {
         const _response = await core.fetcher({
@@ -395,13 +396,12 @@ export class Targets {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

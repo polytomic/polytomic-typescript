@@ -6,11 +6,16 @@ import * as Polytomic from "../../../../index";
 
 /**
  * @example
- *     {}
+ *     {
+ *         fetch_mode: undefined,
+ *         resync: undefined,
+ *         schemas: undefined,
+ *         test: undefined
+ *     }
  */
 export interface StartBulkSyncRequest {
     fetch_mode?: Polytomic.BulkFetchMode;
     resync?: boolean;
-    schemas?: string[];
+    schemas?: string[] | null;
     test?: boolean;
 }

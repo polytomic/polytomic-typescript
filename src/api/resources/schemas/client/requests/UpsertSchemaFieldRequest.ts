@@ -6,8 +6,10 @@ import * as Polytomic from "../../../../index";
 
 /**
  * @example
- *     {}
+ *     {
+ *         fields: undefined
+ *     }
  */
 export interface UpsertSchemaFieldRequest {
-    fields?: Polytomic.V4UserFieldRequest[];
+    fields?: Polytomic.V4UserFieldRequest[] | null;
 }

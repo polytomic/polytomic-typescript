@@ -7,14 +7,55 @@ import * as Polytomic from "../../../../index";
 /**
  * @example
  *     {
+ *         active: undefined,
+ *         encryption_passphrase: undefined,
  *         fields: [{
- *                 target: "name"
+ *                 encryption_enabled: undefined,
+ *                 new: undefined,
+ *                 override_value: undefined,
+ *                 source: undefined,
+ *                 sync_mode: undefined,
+ *                 target: "target"
+ *             }, {
+ *                 encryption_enabled: undefined,
+ *                 new: undefined,
+ *                 override_value: undefined,
+ *                 source: undefined,
+ *                 sync_mode: undefined,
+ *                 target: "target"
  *             }],
+ *         filter_logic: undefined,
+ *         filters: undefined,
+ *         identity: undefined,
  *         mode: "create",
- *         name: "Users Sync",
- *         schedule: {},
+ *         name: "name",
+ *         only_enrich_updates: undefined,
+ *         organization_id: undefined,
+ *         override_fields: undefined,
+ *         overrides: undefined,
+ *         policies: undefined,
+ *         schedule: {
+ *             connection_id: undefined,
+ *             day_of_month: undefined,
+ *             day_of_week: undefined,
+ *             frequency: undefined,
+ *             hour: undefined,
+ *             job_id: undefined,
+ *             minute: undefined,
+ *             month: undefined,
+ *             run_after: undefined,
+ *             run_after_success_only: undefined
+ *         },
+ *         skip_initial_backfill: undefined,
+ *         sync_all_records: undefined,
  *         target: {
- *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+ *             configuration: undefined,
+ *             connection_id: "connection_id",
+ *             create: undefined,
+ *             filter_logic: undefined,
+ *             new_name: undefined,
+ *             object: undefined,
+ *             search_values: undefined
  *         }
  *     }
  */
@@ -28,19 +69,19 @@ export interface CreateModelSyncRequest {
     /** Logical expression to combine filters. */
     filter_logic?: string;
     /** Filters to apply to the source data. */
-    filters?: Polytomic.Filter[];
+    filters?: Polytomic.Filter[] | null;
     identity?: Polytomic.Identity;
     mode: Polytomic.ModelSyncMode;
     name: string;
     /** Whether to use enrichment models as a source of possible changes to sync. If true, only changes to the base models will cause a record to sync. */
     only_enrich_updates?: boolean;
     /** Organization ID for the sync; read-only with a partner key. */
-    organization_id?: string;
+    organization_id?: string | null;
     /** Values to set in the target unconditionally. */
-    override_fields?: Polytomic.ModelSyncField[];
+    override_fields?: Polytomic.ModelSyncField[] | null;
     /** Conditional value replacement for fields. */
-    overrides?: Polytomic.Override[];
-    policies?: string[];
+    overrides?: Polytomic.Override[] | null;
+    policies?: string[] | null;
     schedule: Polytomic.Schedule;
     /** Whether to skip the initial backfill of records; if true only records seen after the sync is enabled will be synced. */
     skip_initial_backfill?: boolean;

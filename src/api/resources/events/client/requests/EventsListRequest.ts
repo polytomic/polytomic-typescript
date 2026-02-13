@@ -4,14 +4,10 @@
 
 /**
  * @example
- *     {
- *         organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *         starting_after: "2020-01-01T00:00:00Z",
- *         ending_before: "2020-01-01T00:00:00Z"
- *     }
+ *     {}
  */
 export interface EventsListRequest {
-    organization_id?: string;
+    organization_id?: string | null;
     type?: string;
     starting_after?: string;
     ending_before?: string;

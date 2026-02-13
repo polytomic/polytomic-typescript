@@ -4,9 +4,7 @@
 
 /**
  * @example
- *     {
- *         force: true
- *     }
+ *     {}
  */
 export interface UsersCreateApiKeyRequest {
     force?: boolean;

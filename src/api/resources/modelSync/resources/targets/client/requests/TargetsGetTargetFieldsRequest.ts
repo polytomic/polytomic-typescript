@@ -5,8 +5,7 @@
 /**
  * @example
  *     {
- *         target: "database.table",
- *         refresh: false
+ *         target: "target"
  *     }
  */
 export interface TargetsGetTargetFieldsRequest {

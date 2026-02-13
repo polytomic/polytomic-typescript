@@ -6,14 +6,17 @@
  * @example
  *     {
  *         configuration: {
- *             "database": "example",
- *             "hostname": "postgres.example.com",
- *             "password": "********",
- *             "port": 5432,
- *             "username": "user"
+ *             "configuration": {
+ *                 "key": "value"
+ *             }
  *         },
- *         name: "My Postgres Connection",
- *         type: "postgresql"
+ *         healthcheck_interval: undefined,
+ *         name: "name",
+ *         organization_id: undefined,
+ *         policies: undefined,
+ *         redirect_url: undefined,
+ *         type: "type",
+ *         validate: undefined
  *     }
  */
 export interface CreateConnectionRequestSchema {
@@ -21,8 +24,8 @@ export interface CreateConnectionRequestSchema {
     /** Override interval for connection health checking. */
     healthcheck_interval?: string;
     name: string;
-    organization_id?: string;
-    policies?: string[];
+    organization_id?: string | null;
+    policies?: string[] | null;
     /** URL to redirect to after completing OAuth flow. */
     redirect_url?: string;
     type: string;

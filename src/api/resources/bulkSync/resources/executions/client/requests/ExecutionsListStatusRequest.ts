@@ -4,10 +4,7 @@
 
 /**
  * @example
- *     {
- *         all: true,
- *         active: true
- *     }
+ *     {}
  */
 export interface ExecutionsListStatusRequest {
     /**

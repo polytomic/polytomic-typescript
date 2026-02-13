@@ -3,5 +3,5 @@
  */
 
 export interface V4GlobalErrorSubscribersResponse {
-    emails?: string[];
+    emails?: string[] | null;
 }

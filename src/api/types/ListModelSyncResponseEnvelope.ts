@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ListModelSyncResponseEnvelope {
-    data?: Polytomic.ModelSyncResponse[];
+    data?: Polytomic.ModelSyncResponse[] | null;
 }

@@ -16,7 +16,7 @@ export declare namespace Schemas {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -27,7 +27,7 @@ export declare namespace Schemas {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -45,7 +45,7 @@ export class Schemas {
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.bulkSync.schemas.list("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.schemas.list("id")
      */
     public async list(
         id: string,
@@ -69,13 +69,12 @@ export class Schemas {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -134,7 +133,9 @@ export class Schemas {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.schemas.patch("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.bulkSync.schemas.patch("id", {
+     *         schemas: undefined
+     *     })
      */
     public async patch(
         id: string,
@@ -152,13 +153,12 @@ export class Schemas {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -214,17 +214,19 @@ export class Schemas {
     /**
      * @param {string} id
      * @param {string} schemaId
+     * @param {Polytomic.bulkSync.SchemasGetRequest} request
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
-     *     await client.bulkSync.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "Contact")
+     *     await client.bulkSync.schemas.get("id", "schema_id")
      */
     public async get(
         id: string,
         schemaId: string,
+        request: Polytomic.bulkSync.SchemasGetRequest = {},
         requestOptions?: Schemas.RequestOptions,
     ): Promise<Polytomic.BulkSchemaEnvelope> {
         const _response = await core.fetcher({
@@ -238,13 +240,12 @@ export class Schemas {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -302,7 +303,16 @@ export class Schemas {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.schemas.update("248df4b7-aa70-47b8-a036-33ac447e668d", "contact")
+     *     await client.bulkSync.schemas.update("id", "schema_id", {
+     *         data_cutoff_timestamp: undefined,
+     *         disable_data_cutoff: undefined,
+     *         enabled: undefined,
+     *         fields: undefined,
+     *         filters: undefined,
+     *         partition_key: undefined,
+     *         tracking_field: undefined,
+     *         user_output_name: undefined
+     *     })
      */
     public async update(
         id: string,
@@ -321,13 +331,12 @@ export class Schemas {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

@@ -6,7 +6,9 @@ import * as Polytomic from "../../../../index";
 
 /**
  * @example
- *     {}
+ *     {
+ *         configuration: undefined
+ *     }
  */
 export interface GetEnrichmentInputFieldsRequest {
     configuration?: Polytomic.V2EnricherConfiguration;

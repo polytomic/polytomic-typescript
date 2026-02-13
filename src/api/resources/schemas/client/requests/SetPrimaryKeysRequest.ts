@@ -6,8 +6,10 @@ import * as Polytomic from "../../../../index";
 
 /**
  * @example
- *     {}
+ *     {
+ *         fields: undefined
+ *     }
  */
 export interface SetPrimaryKeysRequest {
-    fields?: Polytomic.SchemaPrimaryKeyOverrideInput[];
+    fields?: Polytomic.SchemaPrimaryKeyOverrideInput[] | null;
 }

@@ -6,14 +6,23 @@ import * as Polytomic from "../../../../../../index";
 
 /**
  * @example
- *     {}
+ *     {
+ *         data_cutoff_timestamp: undefined,
+ *         disable_data_cutoff: undefined,
+ *         enabled: undefined,
+ *         fields: undefined,
+ *         filters: undefined,
+ *         partition_key: undefined,
+ *         tracking_field: undefined,
+ *         user_output_name: undefined
+ *     }
  */
 export interface UpdateBulkSchema {
-    data_cutoff_timestamp?: string;
+    data_cutoff_timestamp?: string | null;
     disable_data_cutoff?: boolean;
     enabled?: boolean;
-    fields?: Polytomic.UpdateBulkField[];
-    filters?: Polytomic.BulkFilter[];
+    fields?: Polytomic.UpdateBulkField[] | null;
+    filters?: Polytomic.BulkFilter2[] | null;
     partition_key?: string;
     tracking_field?: string;
     user_output_name?: string;

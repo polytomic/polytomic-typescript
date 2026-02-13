@@ -5,16 +5,16 @@
 import * as Polytomic from "../index";
 
 export interface CreateModelRequest {
-    additional_fields?: Polytomic.ModelModelFieldRequest[];
+    additional_fields?: Polytomic.ModelModelFieldRequest[] | null;
     configuration: Record<string, unknown>;
     connection_id: string;
     enricher?: Polytomic.Enrichment;
-    fields?: string[];
+    fields?: string[] | null;
     identifier?: string;
-    labels?: string[];
+    labels?: string[] | null;
     name: string;
-    organization_id?: string;
-    policies?: string[];
-    relations?: Polytomic.ModelRelation[];
-    tracking_columns?: string[];
+    organization_id?: string | null;
+    policies?: string[] | null;
+    relations?: Polytomic.ModelRelation[] | null;
+    tracking_columns?: string[] | null;
 }

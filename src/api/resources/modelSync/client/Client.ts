@@ -18,7 +18,7 @@ export declare namespace ModelSync {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -29,7 +29,7 @@ export declare namespace ModelSync {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -61,7 +61,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.getSource("id")
      */
     public async getSource(
         id: string,
@@ -85,13 +85,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -156,7 +155,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.getSourceFields("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.getSourceFields("id")
      */
     public async getSourceFields(
         id: string,
@@ -180,13 +179,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -249,10 +247,7 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.list({
-     *         active: true,
-     *         target_connection_id: "0b155265-c537-44c9-9359-a3ceb468a4da"
-     *     })
+     *     await client.modelSync.list()
      */
     public async list(
         request: Polytomic.ModelSyncListRequest = {},
@@ -260,8 +255,8 @@ export class ModelSync {
     ): Promise<Polytomic.ListModelSyncResponseEnvelope> {
         const { active, mode, target_connection_id: targetConnectionId } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (active != null) {
-            _queryParams["active"] = active.toString();
+        if (active !== undefined) {
+            _queryParams["active"] = active?.toString() ?? null;
         }
 
         if (mode != null) {
@@ -283,13 +278,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -407,14 +401,55 @@ export class ModelSync {
      *
      * @example
      *     await client.modelSync.create({
+     *         active: undefined,
+     *         encryption_passphrase: undefined,
      *         fields: [{
-     *                 target: "name"
+     *                 encryption_enabled: undefined,
+     *                 new: undefined,
+     *                 override_value: undefined,
+     *                 source: undefined,
+     *                 sync_mode: undefined,
+     *                 target: "target"
+     *             }, {
+     *                 encryption_enabled: undefined,
+     *                 new: undefined,
+     *                 override_value: undefined,
+     *                 source: undefined,
+     *                 sync_mode: undefined,
+     *                 target: "target"
      *             }],
+     *         filter_logic: undefined,
+     *         filters: undefined,
+     *         identity: undefined,
      *         mode: "create",
-     *         name: "Users Sync",
-     *         schedule: {},
+     *         name: "name",
+     *         only_enrich_updates: undefined,
+     *         organization_id: undefined,
+     *         override_fields: undefined,
+     *         overrides: undefined,
+     *         policies: undefined,
+     *         schedule: {
+     *             connection_id: undefined,
+     *             day_of_month: undefined,
+     *             day_of_week: undefined,
+     *             frequency: undefined,
+     *             hour: undefined,
+     *             job_id: undefined,
+     *             minute: undefined,
+     *             month: undefined,
+     *             run_after: undefined,
+     *             run_after_success_only: undefined
+     *         },
+     *         skip_initial_backfill: undefined,
+     *         sync_all_records: undefined,
      *         target: {
-     *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+     *             configuration: undefined,
+     *             connection_id: "connection_id",
+     *             create: undefined,
+     *             filter_logic: undefined,
+     *             new_name: undefined,
+     *             object: undefined,
+     *             search_values: undefined
      *         }
      *     })
      */
@@ -433,13 +468,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -513,13 +547,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -565,6 +598,7 @@ export class ModelSync {
 
     /**
      * @param {string} id
+     * @param {Polytomic.ModelSyncGetRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -572,10 +606,11 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.get("id")
      */
     public async get(
         id: string,
+        request: Polytomic.ModelSyncGetRequest = {},
         requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
@@ -589,13 +624,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -654,15 +688,56 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.modelSync.update("id", {
+     *         active: undefined,
+     *         encryption_passphrase: undefined,
      *         fields: [{
-     *                 target: "name"
+     *                 encryption_enabled: undefined,
+     *                 new: undefined,
+     *                 override_value: undefined,
+     *                 source: undefined,
+     *                 sync_mode: undefined,
+     *                 target: "target"
+     *             }, {
+     *                 encryption_enabled: undefined,
+     *                 new: undefined,
+     *                 override_value: undefined,
+     *                 source: undefined,
+     *                 sync_mode: undefined,
+     *                 target: "target"
      *             }],
+     *         filter_logic: undefined,
+     *         filters: undefined,
+     *         identity: undefined,
      *         mode: "create",
-     *         name: "Users Sync",
-     *         schedule: {},
+     *         name: "name",
+     *         only_enrich_updates: undefined,
+     *         organization_id: undefined,
+     *         override_fields: undefined,
+     *         overrides: undefined,
+     *         policies: undefined,
+     *         schedule: {
+     *             connection_id: undefined,
+     *             day_of_month: undefined,
+     *             day_of_week: undefined,
+     *             frequency: undefined,
+     *             hour: undefined,
+     *             job_id: undefined,
+     *             minute: undefined,
+     *             month: undefined,
+     *             run_after: undefined,
+     *             run_after_success_only: undefined
+     *         },
+     *         skip_initial_backfill: undefined,
+     *         sync_all_records: undefined,
      *         target: {
-     *             connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+     *             configuration: undefined,
+     *             connection_id: "connection_id",
+     *             create: undefined,
+     *             filter_logic: undefined,
+     *             new_name: undefined,
+     *             object: undefined,
+     *             search_values: undefined
      *         }
      *     })
      */
@@ -682,13 +757,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -743,6 +817,7 @@ export class ModelSync {
 
     /**
      * @param {string} id
+     * @param {Polytomic.ModelSyncRemoveRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -752,9 +827,13 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.remove("id")
      */
-    public async remove(id: string, requestOptions?: ModelSync.RequestOptions): Promise<void> {
+    public async remove(
+        id: string,
+        request: Polytomic.ModelSyncRemoveRequest = {},
+        requestOptions?: ModelSync.RequestOptions,
+    ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -766,13 +845,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -824,7 +902,7 @@ export class ModelSync {
 
     /**
      * @param {string} id
-     * @param {Polytomic.ActivateSyncInput} request
+     * @param {Polytomic.ModelSyncActivateRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -833,13 +911,15 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         active: true
+     *     await client.modelSync.activate("id", {
+     *         body: {
+     *             active: true
+     *         }
      *     })
      */
     public async activate(
         id: string,
-        request: Polytomic.ActivateSyncInput,
+        request: Polytomic.ModelSyncActivateRequest,
         requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.ActivateSyncEnvelope> {
         const _response = await core.fetcher({
@@ -853,13 +933,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -910,6 +989,7 @@ export class ModelSync {
 
     /**
      * @param {string} id - The active execution of this sync ID will be cancelled.
+     * @param {Polytomic.ModelSyncCancelRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -918,10 +998,11 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.cancel("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.cancel("id")
      */
     public async cancel(
         id: string,
+        request: Polytomic.ModelSyncCancelRequest = {},
         requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.CancelModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
@@ -935,13 +1016,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -1006,7 +1086,11 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.start("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.start("id", {
+     *         identities: undefined,
+     *         resync: undefined,
+     *         test: undefined
+     *     })
      */
     public async start(
         id: string,
@@ -1024,13 +1108,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -1087,6 +1170,7 @@ export class ModelSync {
 
     /**
      * @param {string} id
+     * @param {Polytomic.ModelSyncGetStatusRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -1094,10 +1178,11 @@ export class ModelSync {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.getStatus("id")
      */
     public async getStatus(
         id: string,
+        request: Polytomic.ModelSyncGetStatusRequest = {},
         requestOptions?: ModelSync.RequestOptions,
     ): Promise<Polytomic.SyncStatusEnvelope> {
         const _response = await core.fetcher({
@@ -1111,13 +1196,12 @@ export class ModelSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "0.0.135",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

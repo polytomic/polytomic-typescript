@@ -5,23 +5,23 @@
 import * as Polytomic from "../index";
 
 export interface SyncCompletedEvent {
-    deleted_records?: string[];
+    deleted_records?: string[] | null;
     error_count?: number;
-    errored_records?: string[];
+    errored_records?: string[] | null;
     execution_id?: string;
     inserted_count?: number;
-    inserted_records?: string[];
+    inserted_records?: string[] | null;
     organization_id?: string;
     record_count?: number;
     status?: Polytomic.ExecutionStatus;
     sync_id?: string;
     sync_name?: string;
     target_connection_id?: string;
-    total_records?: string[];
+    total_records?: string[] | null;
     trigger?: string;
     updated_count?: number;
-    updated_records?: string[];
+    updated_records?: string[] | null;
     upserted_count?: number;
     warning_count?: number;
-    warnings?: string[];
+    warnings?: string[] | null;
 }

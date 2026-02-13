@@ -7,27 +7,38 @@ import * as Polytomic from "../../../../index";
 /**
  * @example
  *     {
- *         async: false,
+ *         additional_fields: undefined,
  *         configuration: {
- *             "table": "public.users"
+ *             "configuration": {
+ *                 "key": "value"
+ *             }
  *         },
- *         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *         name: "Users"
+ *         connection_id: "connection_id",
+ *         enricher: undefined,
+ *         fields: undefined,
+ *         identifier: undefined,
+ *         labels: undefined,
+ *         name: "name",
+ *         organization_id: undefined,
+ *         policies: undefined,
+ *         refresh: undefined,
+ *         relations: undefined,
+ *         tracking_columns: undefined
  *     }
  */
 export interface UpdateModelRequest {
     async?: boolean;
-    additional_fields?: Polytomic.ModelModelFieldRequest[];
+    additional_fields?: Polytomic.ModelModelFieldRequest[] | null;
     configuration: Record<string, unknown>;
     connection_id: string;
     enricher?: Polytomic.Enrichment;
-    fields?: string[];
+    fields?: string[] | null;
     identifier?: string;
-    labels?: string[];
+    labels?: string[] | null;
     name: string;
-    organization_id?: string;
-    policies?: string[];
+    organization_id?: string | null;
+    policies?: string[] | null;
     refresh?: boolean;
-    relations?: Polytomic.ModelRelation[];
-    tracking_columns?: string[];
+    relations?: Polytomic.ModelRelation[] | null;
+    tracking_columns?: string[] | null;
 }

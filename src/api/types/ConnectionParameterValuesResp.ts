@@ -6,5 +6,5 @@ import * as Polytomic from "../index";
 
 export interface ConnectionParameterValuesResp {
     allows_creation?: boolean;
-    values?: Polytomic.ConnectionParameterValue[];
+    values?: Polytomic.ConnectionParameterValue[] | null;
 }
