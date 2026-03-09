@@ -36,14 +36,11 @@ export class Users {
     constructor(protected readonly _options: Users.Options) {}
 
     /**
-     * > 🚧 Requires partner key
-     * >
-     * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-     *
      * @param {string} orgId
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
@@ -66,8 +63,8 @@ export class Users {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -86,6 +83,8 @@ export class Users {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
                 case 404:
                     throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 default:
@@ -114,15 +113,12 @@ export class Users {
     }
 
     /**
-     * > 🚧 Requires partner key
-     * >
-     * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-     *
      * @param {string} orgId
      * @param {Polytomic.CreateUserRequestSchema} request
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -152,8 +148,8 @@ export class Users {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -173,6 +169,8 @@ export class Users {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
                 case 422:
                     throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
                 case 500:
@@ -203,15 +201,12 @@ export class Users {
     }
 
     /**
-     * > 🚧 Requires partner key
-     * >
-     * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-     *
      * @param {string} id
      * @param {string} orgId
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -239,8 +234,8 @@ export class Users {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -259,6 +254,8 @@ export class Users {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
                 case 404:
                     throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 case 500:
@@ -289,16 +286,13 @@ export class Users {
     }
 
     /**
-     * > 🚧 Requires partner key
-     * >
-     * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-     *
      * @param {string} id
      * @param {string} orgId
      * @param {Polytomic.UpdateUserRequestSchema} request
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -329,8 +323,8 @@ export class Users {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -350,6 +344,8 @@ export class Users {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
                 case 422:
                     throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
                 case 500:
@@ -380,15 +376,12 @@ export class Users {
     }
 
     /**
-     * > 🚧 Requires partner key
-     * >
-     * > User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-     *
      * @param {string} id
      * @param {string} orgId
      * @param {Users.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -416,8 +409,8 @@ export class Users {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -436,6 +429,8 @@ export class Users {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
                 case 404:
                     throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
                 case 500:
@@ -512,8 +507,8 @@ export class Users {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

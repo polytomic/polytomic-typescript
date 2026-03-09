@@ -92,8 +92,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -208,8 +208,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -300,8 +300,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -395,8 +395,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -489,8 +489,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -575,8 +575,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -628,6 +628,89 @@ export class BulkSync {
     }
 
     /**
+     * @param {string} id - The active execution of this bulk sync ID will be cancelled.
+     * @param {BulkSync.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await client.bulkSync.cancel("248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public async cancel(
+        id: string,
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<Polytomic.CancelBulkSyncResponseEnvelope> {
+        const _response = await core.fetcher({
+            url: urlJoin(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}/cancel`,
+            ),
+            method: "POST",
+            headers: {
+                Authorization: await this._getAuthorizationHeader(),
+                "X-Polytomic-Version":
+                    (await core.Supplier.get(this._options.version)) != null
+                        ? await core.Supplier.get(this._options.version)
+                        : undefined,
+                "X-Fern-Language": "JavaScript",
+                "X-Fern-SDK-Name": "polytomic",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
+                "X-Fern-Runtime": core.RUNTIME.type,
+                "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
+            },
+            contentType: "application/json",
+            requestType: "json",
+            timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
+            maxRetries: requestOptions?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+        });
+        if (_response.ok) {
+            return _response.body as Polytomic.CancelBulkSyncResponseEnvelope;
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                case 403:
+                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                case 404:
+                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                case 500:
+                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                    });
+            }
+        }
+
+        switch (_response.error.reason) {
+            case "non-json":
+                throw new errors.PolytomicError({
+                    statusCode: _response.error.statusCode,
+                    body: _response.error.rawBody,
+                });
+            case "timeout":
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling POST /api/bulk/syncs/{id}/cancel.",
+                );
+            case "unknown":
+                throw new errors.PolytomicError({
+                    message: _response.error.errorMessage,
+                });
+        }
+    }
+
+    /**
      * @param {string} id
      * @param {Polytomic.StartBulkSyncRequest} request
      * @param {BulkSync.RequestOptions} requestOptions - Request-specific configuration.
@@ -660,8 +743,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -741,8 +824,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -832,8 +915,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -916,8 +999,8 @@ export class BulkSync {
                         : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.15.2",
-                "User-Agent": "polytomic/1.15.2",
+                "X-Fern-SDK-Version": "1.16.0",
+                "User-Agent": "polytomic/1.16.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

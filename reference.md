@@ -407,6 +407,54 @@ await client.bulkSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
+<details><summary><code>client.bulkSync.<a href="/src/api/resources/bulkSync/client/Client.ts">cancel</a>(id) -> Polytomic.CancelBulkSyncResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.bulkSync.cancel("248df4b7-aa70-47b8-a036-33ac447e668d");
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — The active execution of this bulk sync ID will be cancelled.
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `BulkSync.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.bulkSync.<a href="/src/api/resources/bulkSync/client/Client.ts">start</a>(id, { ...params }) -> Polytomic.BulkSyncExecutionEnvelope</code></summary>
 <dl>
 <dd>
@@ -3662,23 +3710,6 @@ await client.organization.remove("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-
-</dd>
-</dl>
-</dd>
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -3726,23 +3757,6 @@ await client.users.list("248df4b7-aa70-47b8-a036-33ac447e668d");
 <details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">create</a>(orgId, { ...params }) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-
-</dd>
-</dl>
-</dd>
-</dl>
 
 #### 🔌 Usage
 
@@ -3802,23 +3816,6 @@ await client.users.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-
-</dd>
-</dl>
-</dd>
-</dl>
-
 #### 🔌 Usage
 
 <dl>
@@ -3874,23 +3871,6 @@ await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47
 <details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">update</a>(id, orgId, { ...params }) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-
-</dd>
-</dl>
-</dd>
-</dl>
 
 #### 🔌 Usage
 
@@ -3957,23 +3937,6 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">remove</a>(id, orgId) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
-
-</dd>
-</dl>
-</dd>
-</dl>
 
 #### 🔌 Usage
 
@@ -4700,6 +4663,62 @@ await client.bulkSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "24
 </dl>
 </details>
 
+<details><summary><code>client.bulkSync.executions.<a href="/src/api/resources/bulkSync/resources/executions/client/Client.ts">cancel</a>(id, execId) -> Polytomic.CancelBulkSyncResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.bulkSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — The bulk sync ID.
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**execId:** `string` — The execution ID to cancel.
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `Executions.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.bulkSync.executions.<a href="/src/api/resources/bulkSync/resources/executions/client/Client.ts">getLogs</a>(syncId, executionId) -> Polytomic.V4BulkSyncExecutionLogsEnvelope</code></summary>
 <dl>
 <dd>
@@ -5042,6 +5061,62 @@ await client.bulkSync.schemas.update("248df4b7-aa70-47b8-a036-33ac447e668d", "co
 <dd>
 
 **request:** `Polytomic.bulkSync.UpdateBulkSchema`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `Schemas.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.bulkSync.schemas.<a href="/src/api/resources/bulkSync/resources/schemas/client/Client.ts">cancel</a>(id, schemaId) -> Polytomic.CancelBulkSyncResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.bulkSync.schemas.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id");
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — The bulk sync ID.
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**schemaId:** `string` — The schema ID to cancel for the bulk sync.
 
 </dd>
 </dl>

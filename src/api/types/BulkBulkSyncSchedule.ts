@@ -15,8 +15,10 @@ export interface BulkBulkSyncSchedule {
     hour?: string;
     minute?: string;
     month?: string;
+    schemas?: string[];
     selectiveMode?: Polytomic.BulkSelectiveMode;
     syncId?: string;
+    syncMode?: Polytomic.BulkScheduleSyncMode;
     updatedAt?: string;
     updatedBy?: string;
 }
