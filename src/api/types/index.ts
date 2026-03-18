@@ -76,6 +76,8 @@ export * from "./ConnectionTypeSchema";
 export * from "./CreateConnectionResponseEnvelope";
 export * from "./CreateConnectionResponseSchema";
 export * from "./CreateModelRequest";
+export * from "./V2CreateSharedConnectionResponseEnvelope";
+export * from "./CreateSharedConnectionResponseSchema";
 export * from "./V2EnricherConfiguration";
 export * from "./V2EnricherMapping";
 export * from "./Enrichment";

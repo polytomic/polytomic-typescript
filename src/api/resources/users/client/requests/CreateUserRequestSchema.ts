@@ -11,4 +11,5 @@
 export interface CreateUserRequestSchema {
     email: string;
     role?: string;
+    role_ids?: string[];
 }

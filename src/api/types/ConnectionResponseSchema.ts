@@ -13,6 +13,8 @@ export interface ConnectionResponseSchema {
     id?: string;
     name?: string;
     organization_id?: string;
+    /** For shared connections, the ID of the parent connection. */
+    parent_connection_id?: string;
     policies?: string[];
     saved?: boolean;
     status?: string;

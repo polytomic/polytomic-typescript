@@ -755,6 +755,64 @@ await client.connections.getConnectionTypeSchema("postgresql");
 </dl>
 </details>
 
+<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">getTypeParameterValues</a>(type_, { ...params }) -> Polytomic.ConnectionParameterValuesResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.getTypeParameterValues("type", {
+    field: "field",
+});
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**type\_:** `string`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.GetConnectionTypeParameterValuesRequestSchema`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `Connections.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">list</a>() -> Polytomic.ConnectionListResponseEnvelope</code></summary>
 <dl>
 <dd>
@@ -1199,6 +1257,64 @@ await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668
 <dd>
 
 **id:** `string`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `Connections.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">apiV2CreateSharedConnection</a>(id, { ...params }) -> Polytomic.V2CreateSharedConnectionResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.apiV2CreateSharedConnection("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+});
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.ApiRequest`
 
 </dd>
 </dl>

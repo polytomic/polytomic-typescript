@@ -7,4 +7,5 @@ export interface User {
     id?: string;
     organization_id?: string;
     role?: string;
+    role_ids?: string[];
 }

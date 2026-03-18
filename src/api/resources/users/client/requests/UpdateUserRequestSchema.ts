@@ -11,4 +11,5 @@
 export interface UpdateUserRequestSchema {
     email: string;
     role?: string;
+    role_ids?: string[];
 }
