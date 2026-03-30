@@ -10,5 +10,5 @@
  */
 export interface UpdateRoleRequest {
     name: string;
-    organization_id?: string;
+    organization_id?: string | null;
 }

@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ListBulkSyncExecutionStatusEnvelope {
-    data?: Polytomic.BulkSyncExecutionStatus[];
+    data?: Polytomic.BulkSyncExecutionStatus[] | null;
 }

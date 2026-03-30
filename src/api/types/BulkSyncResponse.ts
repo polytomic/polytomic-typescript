@@ -6,32 +6,32 @@ import * as Polytomic from "../index";
 
 export interface BulkSyncResponse {
     active?: boolean;
-    automatically_add_new_fields?: Polytomic.BulkDiscover;
-    automatically_add_new_objects?: Polytomic.BulkDiscover;
+    automatically_add_new_fields?: Polytomic.BulkDiscover | null;
+    automatically_add_new_objects?: Polytomic.BulkDiscover | null;
     /** Per-sync concurrency limit override. */
-    concurrency_limit?: number;
+    concurrency_limit?: number | null;
     created_at?: string;
     created_by?: Polytomic.CommonOutputActor;
-    data_cutoff_timestamp?: string;
+    data_cutoff_timestamp?: string | null;
     /** Destination-specific bulk sync configuration. e.g. output schema name, s3 file format, etc. */
-    destination_configuration?: Record<string, unknown>;
+    destination_configuration?: Record<string, unknown> | null;
     destination_connection_id?: string;
     disable_record_timestamps?: boolean;
     /** DEPRECATED: Use automatically_add_new_objects/automatically_add_new_fields instead */
     discover?: boolean;
     id?: string;
-    mode?: Polytomic.BulkSyncMode;
+    mode?: Polytomic.BulkSyncMode | null;
     /** Name of the bulk sync */
     name?: string;
-    normalize_names?: Polytomic.BulkNormalizeNames;
+    normalize_names?: Polytomic.BulkNormalizeNames | null;
     organization_id?: string;
     /** List of permissions policies applied to the bulk sync. */
     policies?: string[];
     /** Per-sync resync concurrency limit override. */
-    resync_concurrency_limit?: number;
+    resync_concurrency_limit?: number | null;
     schedule?: Polytomic.BulkSchedule;
     /** Source-specific bulk sync configuration. e.g. replication slot name, sync lookback, etc. */
-    source_configuration?: Record<string, unknown>;
+    source_configuration?: Record<string, unknown> | null;
     source_connection_id?: string;
     updated_at?: string;
     updated_by?: Polytomic.CommonOutputActor;

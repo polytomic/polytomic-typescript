@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ModelFieldResponse {
-    data?: Polytomic.ModelField[];
+    data?: Polytomic.ModelField[] | null;
 }

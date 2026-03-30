@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface WebhookListEnvelope {
-    data?: Polytomic.Webhook[];
+    data?: Polytomic.Webhook[] | null;
 }

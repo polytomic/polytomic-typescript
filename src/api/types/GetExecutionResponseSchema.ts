@@ -5,12 +5,12 @@
 import * as Polytomic from "../index";
 
 export interface GetExecutionResponseSchema {
-    completed_at?: string;
+    completed_at?: string | null;
     counts?: Polytomic.ExecutionCounts;
     created_at?: string;
     errors?: string[];
     id?: string;
-    started_at?: string;
+    started_at?: string | null;
     status?: Polytomic.ExecutionStatus;
     type?: string;
 }

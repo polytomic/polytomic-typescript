@@ -7,5 +7,5 @@
  *     {}
  */
 export interface V4GlobalErrorSubscribersRequest {
-    emails?: string[];
+    emails?: string[] | null;
 }

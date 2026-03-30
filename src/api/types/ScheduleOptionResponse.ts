@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ScheduleOptionResponse {
-    schedule_options?: Polytomic.ScheduleScheduleOption[];
+    schedule_options?: Polytomic.ScheduleScheduleOption[] | null;
 }

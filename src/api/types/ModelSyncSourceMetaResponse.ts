@@ -5,7 +5,7 @@
 import * as Polytomic from "../index";
 
 export interface ModelSyncSourceMetaResponse {
-    configuration?: Record<string, Polytomic.ConfigurationValue>;
-    items?: Record<string, Polytomic.SourceMeta | undefined>;
-    requires_one_of?: string[];
+    configuration?: Record<string, Polytomic.ConfigurationValue2>;
+    items?: Record<string, Polytomic.SourceMeta | null> | null;
+    requires_one_of?: string[] | null;
 }

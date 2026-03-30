@@ -4,8 +4,8 @@
 
 export interface FieldConfiguration {
     /** Whether the field is enabled for syncing. */
-    enabled?: boolean;
+    enabled?: boolean | null;
     id?: string;
     /** Whether the field should be obfuscated. */
-    obfuscate?: boolean;
+    obfuscate?: boolean | null;
 }

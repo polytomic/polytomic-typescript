@@ -6,6 +6,7 @@ import * as Polytomic from "../index";
 
 export interface BulkSyncStatusResponse {
     current_execution?: Polytomic.BulkSyncExecution;
+    ingestion_status?: Polytomic.BulkSyncIngestionStatus;
     last_execution?: Polytomic.BulkSyncExecution;
-    next_execution_time?: string;
+    next_execution_time?: string | null;
 }

@@ -3,5 +3,5 @@
  */
 
 export interface SchemaRecordsResponseEnvelope {
-    data?: Record<string, unknown>[];
+    data?: Record<string, unknown>[] | null;
 }

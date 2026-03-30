@@ -9,5 +9,5 @@ import * as Polytomic from "../../../../../../index";
  *     {}
  */
 export interface BulkSyncSchemasRequest {
-    schemas?: Polytomic.BulkSchema[];
+    schemas?: Polytomic.BulkSchema[] | null;
 }

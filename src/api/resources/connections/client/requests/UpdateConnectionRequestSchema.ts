@@ -20,8 +20,8 @@ export interface UpdateConnectionRequestSchema {
     /** Override interval for connection health checking. */
     healthcheck_interval?: string;
     name: string;
-    organization_id?: string;
-    policies?: string[];
+    organization_id?: string | null;
+    policies?: string[] | null;
     reconnect?: boolean;
     type?: string;
     /** Validate connection configuration. */

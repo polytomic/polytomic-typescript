@@ -14,20 +14,7 @@ export declare namespace Permissions {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
-    }
-
-    export interface RequestOptions {
-        /** The maximum time to wait for a response in seconds. */
-        timeoutInSeconds?: number;
-        /** The number of times to retry the request. Defaults to 2. */
-        maxRetries?: number;
-        /** A hook to abort the request. */
-        abortSignal?: AbortSignal;
-        /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: core.Supplier<unknown>;
     }
 }
 

@@ -9,7 +9,7 @@ export interface CreateConnectionResponseSchema {
     auth_code?: string;
     /** URL to visit to complete connection authentication. */
     auth_url?: string;
-    configuration?: Record<string, unknown>;
+    configuration?: Record<string, unknown> | null;
     /** Interval for connection health checking. */
     healthcheck_interval?: string;
     id?: string;

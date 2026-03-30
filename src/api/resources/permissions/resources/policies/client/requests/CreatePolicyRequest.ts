@@ -12,6 +12,6 @@ import * as Polytomic from "../../../../../../index";
  */
 export interface CreatePolicyRequest {
     name: string;
-    organization_id?: string;
-    policy_actions?: Polytomic.PolicyAction[];
+    organization_id?: string | null;
+    policy_actions: Polytomic.PolicyAction[] | null;
 }

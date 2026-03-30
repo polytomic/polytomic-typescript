@@ -5,10 +5,10 @@
 /**
  * @example
  *     {
- *         organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+ *         child_organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
  *     }
  */
 export interface ApiRequest {
+    child_organization_id: string;
     name?: string;
-    organization_id: string;
 }

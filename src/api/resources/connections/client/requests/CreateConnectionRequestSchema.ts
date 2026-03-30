@@ -21,8 +21,8 @@ export interface CreateConnectionRequestSchema {
     /** Override interval for connection health checking. */
     healthcheck_interval?: string;
     name: string;
-    organization_id?: string;
-    policies?: string[];
+    organization_id?: string | null;
+    policies?: string[] | null;
     /** URL to redirect to after completing OAuth flow. */
     redirect_url?: string;
     type: string;

@@ -3,5 +3,5 @@
  */
 
 export interface V2GetEnrichmentInputFieldsResponseEnvelope {
-    data?: string[][];
+    data?: string[][] | null;
 }

@@ -11,7 +11,7 @@
  *     }
  */
 export interface EventsListRequest {
-    organization_id?: string;
+    organization_id?: string | null;
     type?: string;
     starting_after?: string;
     ending_before?: string;

@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ConnectionTypeResponseEnvelope {
-    data?: Polytomic.ConnectionType[];
+    data?: Polytomic.ConnectionType[] | null;
 }

@@ -5,6 +5,7 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 import { Executions } from "../resources/executions/client/Client";
@@ -18,7 +19,7 @@ export declare namespace BulkSync {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -29,7 +30,7 @@ export declare namespace BulkSync {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -66,14 +67,21 @@ export class BulkSync {
      *         active: true
      *     })
      */
-    public async list(
+    public list(
         request: Polytomic.BulkSyncListRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncListEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncListEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__list(request, requestOptions));
+    }
+
+    private async __list(
+        request: Polytomic.BulkSyncListRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncListEnvelope>> {
         const { active } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
-        if (active != null) {
-            _queryParams["active"] = active.toString();
+        if (active !== undefined) {
+            _queryParams["active"] = active?.toString() ?? null;
         }
 
         const _response = await core.fetcher({
@@ -87,13 +95,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -106,19 +113,26 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncListEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncListEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -128,12 +142,14 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/bulk/syncs.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -188,10 +204,17 @@ export class BulkSync {
      *         source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
      *     })
      */
-    public async create(
+    public create(
         request: Polytomic.CreateBulkSyncRequest,
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__create(request, requestOptions));
+    }
+
+    private async __create(
+        request: Polytomic.CreateBulkSyncRequest,
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncResponseEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -203,13 +226,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -222,25 +244,41 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncResponseEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 422:
-                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -250,12 +288,14 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/bulk/syncs.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -273,11 +313,19 @@ export class BulkSync {
      *         refresh_schemas: true
      *     })
      */
-    public async get(
+    public get(
         id: string,
         request: Polytomic.BulkSyncGetRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__get(id, request, requestOptions));
+    }
+
+    private async __get(
+        id: string,
+        request: Polytomic.BulkSyncGetRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncResponseEnvelope>> {
         const { refresh_schemas: refreshSchemas } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (refreshSchemas != null) {
@@ -295,13 +343,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -314,19 +361,26 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncResponseEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -336,12 +390,14 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/bulk/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -374,11 +430,19 @@ export class BulkSync {
      *         source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
      *     })
      */
-    public async update(
+    public update(
         id: string,
         request: Polytomic.UpdateBulkSyncRequest,
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__update(id, request, requestOptions));
+    }
+
+    private async __update(
+        id: string,
+        request: Polytomic.UpdateBulkSyncRequest,
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncResponseEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -390,13 +454,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -409,25 +472,41 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncResponseEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -437,12 +516,14 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/bulk/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -462,11 +543,19 @@ export class BulkSync {
      *         refresh_schemas: true
      *     })
      */
-    public async remove(
+    public remove(
         id: string,
         request: Polytomic.BulkSyncRemoveRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<void> {
+    ): core.HttpResponsePromise<void> {
+        return core.HttpResponsePromise.fromPromise(this.__remove(id, request, requestOptions));
+    }
+
+    private async __remove(
+        id: string,
+        request: Polytomic.BulkSyncRemoveRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<void>> {
         const { refresh_schemas: refreshSchemas } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (refreshSchemas != null) {
@@ -484,13 +573,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -503,23 +591,36 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return;
+            return { data: undefined, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -529,19 +630,21 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/bulk/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
      * @param {string} id
-     * @param {Polytomic.ActivateSyncInput} request
+     * @param {Polytomic.BulkSyncActivateRequest} request
      * @param {BulkSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -551,14 +654,24 @@ export class BulkSync {
      *
      * @example
      *     await client.bulkSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         active: true
+     *         body: {
+     *             active: true
+     *         }
      *     })
      */
-    public async activate(
+    public activate(
         id: string,
-        request: Polytomic.ActivateSyncInput,
+        request: Polytomic.BulkSyncActivateRequest,
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.ActivateSyncEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ActivateSyncEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__activate(id, request, requestOptions));
+    }
+
+    private async __activate(
+        id: string,
+        request: Polytomic.BulkSyncActivateRequest,
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ActivateSyncEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -570,13 +683,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -589,23 +701,36 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ActivateSyncEnvelope;
+            return { data: _response.body as Polytomic.ActivateSyncEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -615,6 +740,7 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -623,12 +749,14 @@ export class BulkSync {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
      * @param {string} id - The active execution of this bulk sync ID will be cancelled.
+     * @param {Polytomic.BulkSyncCancelRequest} request
      * @param {BulkSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -639,10 +767,19 @@ export class BulkSync {
      * @example
      *     await client.bulkSync.cancel("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async cancel(
+    public cancel(
         id: string,
+        request: Polytomic.BulkSyncCancelRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.CancelBulkSyncResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.CancelBulkSyncResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__cancel(id, request, requestOptions));
+    }
+
+    private async __cancel(
+        id: string,
+        request: Polytomic.BulkSyncCancelRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.CancelBulkSyncResponseEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -654,13 +791,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -672,23 +808,39 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.CancelBulkSyncResponseEnvelope;
+            return {
+                data: _response.body as Polytomic.CancelBulkSyncResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -698,6 +850,7 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -706,6 +859,7 @@ export class BulkSync {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -722,11 +876,19 @@ export class BulkSync {
      * @example
      *     await client.bulkSync.start("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async start(
+    public start(
         id: string,
         request: Polytomic.StartBulkSyncRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncExecutionEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncExecutionEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__start(id, request, requestOptions));
+    }
+
+    private async __start(
+        id: string,
+        request: Polytomic.StartBulkSyncRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncExecutionEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -738,13 +900,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -757,21 +918,31 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncExecutionEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncExecutionEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 409:
-                    throw new Polytomic.ConflictError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -781,6 +952,7 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -789,12 +961,14 @@ export class BulkSync {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
      * @param {string} id
+     * @param {Polytomic.BulkSyncGetStatusRequest} request
      * @param {BulkSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -804,10 +978,19 @@ export class BulkSync {
      * @example
      *     await client.bulkSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async getStatus(
+    public getStatus(
         id: string,
+        request: Polytomic.BulkSyncGetStatusRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncStatusEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncStatusEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getStatus(id, request, requestOptions));
+    }
+
+    private async __getStatus(
+        id: string,
+        request: Polytomic.BulkSyncGetStatusRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncStatusEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -819,13 +1002,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -837,21 +1019,31 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncStatusEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncStatusEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -861,6 +1053,7 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -869,6 +1062,7 @@ export class BulkSync {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -888,11 +1082,19 @@ export class BulkSync {
      *         include_fields: true
      *     })
      */
-    public async getSource(
+    public getSource(
         id: string,
         request: Polytomic.BulkSyncGetSourceRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncSourceEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncSourceEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getSource(id, request, requestOptions));
+    }
+
+    private async __getSource(
+        id: string,
+        request: Polytomic.BulkSyncGetSourceRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncSourceEnvelope>> {
         const { include_fields: includeFields } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (includeFields != null) {
@@ -910,13 +1112,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -929,23 +1130,36 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncSourceEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncSourceEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -955,6 +1169,7 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -963,12 +1178,14 @@ export class BulkSync {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
 
     /**
      * @param {string} id
+     * @param {Polytomic.BulkSyncGetDestinationRequest} request
      * @param {BulkSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -979,10 +1196,19 @@ export class BulkSync {
      * @example
      *     await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async getDestination(
+    public getDestination(
         id: string,
+        request: Polytomic.BulkSyncGetDestinationRequest = {},
         requestOptions?: BulkSync.RequestOptions,
-    ): Promise<Polytomic.BulkSyncDestEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.BulkSyncDestEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getDestination(id, request, requestOptions));
+    }
+
+    private async __getDestination(
+        id: string,
+        request: Polytomic.BulkSyncGetDestinationRequest = {},
+        requestOptions?: BulkSync.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.BulkSyncDestEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -994,13 +1220,12 @@ export class BulkSync {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -1012,23 +1237,36 @@ export class BulkSync {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.BulkSyncDestEnvelope;
+            return { data: _response.body as Polytomic.BulkSyncDestEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -1038,6 +1276,7 @@ export class BulkSync {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -1046,6 +1285,7 @@ export class BulkSync {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }

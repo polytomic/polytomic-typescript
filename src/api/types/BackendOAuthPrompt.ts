@@ -3,7 +3,7 @@
  */
 
 export interface BackendOAuthPrompt {
-    key?: string;
-    value?: string;
+    key?: string | null;
+    value?: string | null;
     when?: string;
 }
