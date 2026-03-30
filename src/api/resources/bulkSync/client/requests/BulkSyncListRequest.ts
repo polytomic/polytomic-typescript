@@ -9,5 +9,5 @@
  *     }
  */
 export interface BulkSyncListRequest {
-    active?: boolean;
+    active?: boolean | null;
 }

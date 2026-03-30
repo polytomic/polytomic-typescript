@@ -5,9 +5,9 @@
 import * as Polytomic from "../index";
 
 export interface TargetResponse {
-    fields?: Polytomic.TargetField[];
+    fields?: Polytomic.TargetField[] | null;
     id?: string;
-    modes?: Polytomic.Mode[];
+    modes?: Polytomic.Mode[] | null;
     name?: string;
     properties?: Polytomic.SyncDestinationProperties;
     refreshed_at?: string;

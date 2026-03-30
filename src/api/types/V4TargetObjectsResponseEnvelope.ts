@@ -5,6 +5,6 @@
 import * as Polytomic from "../index";
 
 export interface V4TargetObjectsResponseEnvelope {
-    data?: Polytomic.TargetObject[];
+    data?: Polytomic.TargetObject[] | null;
     target_creation?: Polytomic.V4TargetCreator;
 }

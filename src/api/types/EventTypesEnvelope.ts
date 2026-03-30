@@ -3,5 +3,5 @@
  */
 
 export interface EventTypesEnvelope {
-    data?: string[];
+    data?: string[] | null;
 }

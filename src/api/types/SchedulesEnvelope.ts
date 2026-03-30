@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface SchedulesEnvelope {
-    data?: Polytomic.BulkBulkSyncSchedule[];
+    data?: Polytomic.BulkBulkSyncSchedule[] | null;
 }

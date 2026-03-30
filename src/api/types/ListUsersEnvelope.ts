@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ListUsersEnvelope {
-    data?: Polytomic.User[];
+    data?: Polytomic.User[] | null;
 }

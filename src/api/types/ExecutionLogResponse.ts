@@ -3,6 +3,6 @@
  */
 
 export interface ExecutionLogResponse {
-    expires?: string;
-    urls?: string[];
+    expires?: string | null;
+    urls?: string[] | null;
 }

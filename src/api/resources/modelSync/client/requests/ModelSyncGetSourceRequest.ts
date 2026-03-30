@@ -7,5 +7,5 @@
  *     {}
  */
 export interface ModelSyncGetSourceRequest {
-    params?: Record<string, string[] | undefined>;
+    params?: Record<string, string[]>;
 }

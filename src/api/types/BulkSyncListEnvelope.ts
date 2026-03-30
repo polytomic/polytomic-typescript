@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface BulkSyncListEnvelope {
-    data?: Polytomic.BulkSyncResponse[];
+    data?: Polytomic.BulkSyncResponse[] | null;
 }

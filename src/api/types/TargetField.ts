@@ -11,7 +11,7 @@ export interface TargetField {
     encryptable?: boolean;
     filterable?: boolean;
     id?: string;
-    identity_functions?: Polytomic.IdentityFunction[];
+    identity_functions?: Polytomic.IdentityFunction[] | null;
     name?: string;
     required?: boolean;
     source_type?: string;

@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ConnectionListResponseEnvelope {
-    data?: Polytomic.ConnectionResponseSchema[];
+    data?: Polytomic.ConnectionResponseSchema[] | null;
 }

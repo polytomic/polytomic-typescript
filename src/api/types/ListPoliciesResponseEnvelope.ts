@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface ListPoliciesResponseEnvelope {
-    data?: Polytomic.PolicyResponse[];
+    data?: Polytomic.PolicyResponse[] | null;
 }

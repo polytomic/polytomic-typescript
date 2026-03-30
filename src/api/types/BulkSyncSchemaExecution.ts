@@ -5,13 +5,13 @@
 import * as Polytomic from "../index";
 
 export interface BulkSyncSchemaExecution {
-    completed_at?: string;
+    completed_at?: string | null;
     created_at?: string;
     error_count?: number;
     output_name?: string;
     record_count?: number;
     schema?: string;
-    started_at?: string;
+    started_at?: string | null;
     status?: Polytomic.BulkSchemaExecutionStatus;
     status_message?: string;
     updated_at?: string;

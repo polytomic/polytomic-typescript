@@ -3,6 +3,6 @@
  */
 
 export interface ConnectionParameterValue {
-    label?: string;
+    label?: string | null;
     value?: unknown;
 }

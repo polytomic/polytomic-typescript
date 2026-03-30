@@ -9,5 +9,5 @@ import * as Polytomic from "../../../../index";
  *     {}
  */
 export interface SetPrimaryKeysRequest {
-    fields?: Polytomic.SchemaPrimaryKeyOverrideInput[];
+    fields?: Polytomic.SchemaPrimaryKeyOverrideInput[] | null;
 }

@@ -12,7 +12,7 @@ import * as Polytomic from "../../../../index";
  *     }
  */
 export interface ModelSyncListRequest {
-    active?: boolean;
+    active?: boolean | null;
     mode?: Polytomic.ModelSyncMode;
     target_connection_id?: string;
 }

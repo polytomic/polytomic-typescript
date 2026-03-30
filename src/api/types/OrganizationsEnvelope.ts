@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface OrganizationsEnvelope {
-    data?: Polytomic.Organization[];
+    data?: Polytomic.Organization[] | null;
 }

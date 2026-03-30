@@ -11,6 +11,6 @@
  */
 export interface UpdateWebhooksSchema {
     endpoint: string;
-    organization_id?: string;
+    organization_id?: string | null;
     secret: string;
 }

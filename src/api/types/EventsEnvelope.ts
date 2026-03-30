@@ -5,5 +5,5 @@
 import * as Polytomic from "../index";
 
 export interface EventsEnvelope {
-    data?: Polytomic.Event[];
+    data?: Polytomic.Event[] | null;
 }

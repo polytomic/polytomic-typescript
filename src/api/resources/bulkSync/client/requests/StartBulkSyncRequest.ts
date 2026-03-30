@@ -11,6 +11,6 @@ import * as Polytomic from "../../../../index";
 export interface StartBulkSyncRequest {
     fetch_mode?: Polytomic.BulkFetchMode;
     resync?: boolean;
-    schemas?: string[];
+    schemas?: string[] | null;
     test?: boolean;
 }

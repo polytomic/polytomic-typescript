@@ -9,5 +9,5 @@ import * as Polytomic from "../../../../index";
  *     {}
  */
 export interface UpsertSchemaFieldRequest {
-    fields?: Polytomic.V4UserFieldRequest[];
+    fields?: Polytomic.V4UserFieldRequest[] | null;
 }

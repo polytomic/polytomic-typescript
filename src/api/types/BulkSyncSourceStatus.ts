@@ -4,6 +4,6 @@
 
 export interface BulkSyncSourceStatus {
     cache_status?: string;
-    last_refresh_finished?: string;
-    last_refresh_started?: string;
+    last_refresh_finished?: string | null;
+    last_refresh_started?: string | null;
 }

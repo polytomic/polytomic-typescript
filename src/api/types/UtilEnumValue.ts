@@ -3,6 +3,6 @@
  */
 
 export interface UtilEnumValue {
-    label?: string;
+    label?: string | null;
     value?: string;
 }

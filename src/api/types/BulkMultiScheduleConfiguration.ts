@@ -5,6 +5,6 @@
 import * as Polytomic from "../index";
 
 export interface BulkMultiScheduleConfiguration {
-    schedules?: Polytomic.BulkItemizedSchedule[];
-    type?: string;
+    schedules: Polytomic.BulkItemizedSchedule[] | null;
+    type?: string | null;
 }
