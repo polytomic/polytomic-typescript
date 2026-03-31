@@ -16,7 +16,7 @@ export declare namespace Models {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -27,7 +27,7 @@ export declare namespace Models {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -50,11 +50,19 @@ export class Models {
      * @example
      *     await client.models.getEnrichmentSource("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async getEnrichmentSource(
+    public getEnrichmentSource(
         id: string,
         request: Polytomic.ModelsGetEnrichmentSourceRequest = {},
         requestOptions?: Models.RequestOptions,
-    ): Promise<Polytomic.GetModelSyncSourceMetaEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.GetModelSyncSourceMetaEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getEnrichmentSource(id, request, requestOptions));
+    }
+
+    private async __getEnrichmentSource(
+        id: string,
+        request: Polytomic.ModelsGetEnrichmentSourceRequest = {},
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.GetModelSyncSourceMetaEnvelope>> {
         const { params } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (params != null) {
@@ -72,13 +80,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -91,25 +98,44 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.GetModelSyncSourceMetaEnvelope;
+            return {
+                data: _response.body as Polytomic.GetModelSyncSourceMetaEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -119,6 +145,7 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -127,6 +154,7 @@ export class Models {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -146,11 +174,19 @@ export class Models {
      * @example
      *     await client.models.post("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async post(
+    public post(
         connectionId: string,
         request: Polytomic.GetEnrichmentInputFieldsRequest = {},
         requestOptions?: Models.RequestOptions,
-    ): Promise<Polytomic.V2GetEnrichmentInputFieldsResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.V2GetEnrichmentInputFieldsResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__post(connectionId, request, requestOptions));
+    }
+
+    private async __post(
+        connectionId: string,
+        request: Polytomic.GetEnrichmentInputFieldsRequest = {},
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.V2GetEnrichmentInputFieldsResponseEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -162,13 +198,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -181,23 +216,39 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.V2GetEnrichmentInputFieldsResponseEnvelope;
+            return {
+                data: _response.body as Polytomic.V2GetEnrichmentInputFieldsResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -207,6 +258,7 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -215,6 +267,7 @@ export class Models {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -230,6 +283,7 @@ export class Models {
      *
      * @example
      *     await client.models.preview({
+     *         async: true,
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -239,10 +293,17 @@ export class Models {
      *         }
      *     })
      */
-    public async preview(
+    public preview(
         request: Polytomic.ModelsPreviewRequest,
         requestOptions?: Models.RequestOptions,
-    ): Promise<Polytomic.ModelResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__preview(request, requestOptions));
+    }
+
+    private async __preview(
+        request: Polytomic.ModelsPreviewRequest,
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ModelResponseEnvelope>> {
         const { async, body: _body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (async != null) {
@@ -260,13 +321,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -280,23 +340,36 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ModelResponseEnvelope;
+            return { data: _response.body as Polytomic.ModelResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -306,12 +379,14 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/model-preview.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -325,7 +400,13 @@ export class Models {
      * @example
      *     await client.models.list()
      */
-    public async list(requestOptions?: Models.RequestOptions): Promise<Polytomic.ModelListResponseEnvelope> {
+    public list(requestOptions?: Models.RequestOptions): core.HttpResponsePromise<Polytomic.ModelListResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__list(requestOptions));
+    }
+
+    private async __list(
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ModelListResponseEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -337,13 +418,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -355,19 +435,26 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ModelListResponseEnvelope;
+            return { data: _response.body as Polytomic.ModelListResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -377,12 +464,14 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/models.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -398,6 +487,7 @@ export class Models {
      *
      * @example
      *     await client.models.create({
+     *         async: true,
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -407,10 +497,17 @@ export class Models {
      *         }
      *     })
      */
-    public async create(
+    public create(
         request: Polytomic.ModelsCreateRequest,
         requestOptions?: Models.RequestOptions,
-    ): Promise<Polytomic.ModelResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__create(request, requestOptions));
+    }
+
+    private async __create(
+        request: Polytomic.ModelsCreateRequest,
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ModelResponseEnvelope>> {
         const { async, body: _body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (async != null) {
@@ -428,13 +525,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -448,23 +544,36 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ModelResponseEnvelope;
+            return { data: _response.body as Polytomic.ModelResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -474,12 +583,14 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/models.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -494,13 +605,23 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         async: true
+     *     })
      */
-    public async get(
+    public get(
         id: string,
         request: Polytomic.ModelsGetRequest = {},
         requestOptions?: Models.RequestOptions,
-    ): Promise<Polytomic.ModelResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__get(id, request, requestOptions));
+    }
+
+    private async __get(
+        id: string,
+        request: Polytomic.ModelsGetRequest = {},
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ModelResponseEnvelope>> {
         const { async } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (async != null) {
@@ -518,13 +639,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -537,21 +657,31 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ModelResponseEnvelope;
+            return { data: _response.body as Polytomic.ModelResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -561,12 +691,14 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/models/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -591,11 +723,19 @@ export class Models {
      *         name: "Users"
      *     })
      */
-    public async update(
+    public update(
         id: string,
         request: Polytomic.UpdateModelRequest,
         requestOptions?: Models.RequestOptions,
-    ): Promise<Polytomic.ModelResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__update(id, request, requestOptions));
+    }
+
+    private async __update(
+        id: string,
+        request: Polytomic.UpdateModelRequest,
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ModelResponseEnvelope>> {
         const { async, ..._body } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (async != null) {
@@ -613,13 +753,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -633,23 +772,36 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ModelResponseEnvelope;
+            return { data: _response.body as Polytomic.ModelResponseEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -659,12 +811,14 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/models/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -680,13 +834,23 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         async: true
+     *     })
      */
-    public async remove(
+    public remove(
         id: string,
         request: Polytomic.ModelsRemoveRequest = {},
         requestOptions?: Models.RequestOptions,
-    ): Promise<void> {
+    ): core.HttpResponsePromise<void> {
+        return core.HttpResponsePromise.fromPromise(this.__remove(id, request, requestOptions));
+    }
+
+    private async __remove(
+        id: string,
+        request: Polytomic.ModelsRemoveRequest = {},
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<void>> {
         const { async } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (async != null) {
@@ -704,13 +868,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -723,23 +886,36 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return;
+            return { data: undefined, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -749,12 +925,14 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/models/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -772,13 +950,23 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         async: true
+     *     })
      */
-    public async sample(
+    public sample(
         id: string,
         request: Polytomic.ModelsSampleRequest = {},
         requestOptions?: Models.RequestOptions,
-    ): Promise<Polytomic.ModelSampleResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelSampleResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__sample(id, request, requestOptions));
+    }
+
+    private async __sample(
+        id: string,
+        request: Polytomic.ModelsSampleRequest = {},
+        requestOptions?: Models.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ModelSampleResponseEnvelope>> {
         const { async } = request;
         const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (async != null) {
@@ -796,13 +984,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -815,23 +1002,39 @@ export class Models {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ModelSampleResponseEnvelope;
+            return {
+                data: _response.body as Polytomic.ModelSampleResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -841,12 +1044,14 @@ export class Models {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/models/{id}/sample.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }

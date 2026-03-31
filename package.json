@@ -1,6 +1,6 @@
 {
-    "name": "polytomic",
-    "version": "1.16.1",
+    "name": "",
+    "version": "1.16.2",
     "private": false,
     "repository": "https://github.com/polytomic/polytomic-typescript",
     "license": "MIT",
@@ -40,5 +40,6 @@
         "fs": false,
         "os": false,
         "path": false
-    }
+    },
+    "packageManager": "yarn@1.22.22"
 }
