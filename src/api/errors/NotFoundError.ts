@@ -4,13 +4,15 @@
 
 import * as errors from "../../errors/index";
 import * as Polytomic from "../index";
+import * as core from "../../core";
 
 export class NotFoundError extends errors.PolytomicError {
-    constructor(body: Polytomic.ApiError) {
+    constructor(body: Polytomic.ApiError, rawResponse?: core.RawResponse) {
         super({
             message: "NotFoundError",
             statusCode: 404,
             body: body,
+            rawResponse: rawResponse,
         });
         Object.setPrototypeOf(this, NotFoundError.prototype);
     }

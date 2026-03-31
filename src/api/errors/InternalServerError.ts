@@ -4,13 +4,15 @@
 
 import * as errors from "../../errors/index";
 import * as Polytomic from "../index";
+import * as core from "../../core";
 
 export class InternalServerError extends errors.PolytomicError {
-    constructor(body: Polytomic.ApiError) {
+    constructor(body: Polytomic.ApiError, rawResponse?: core.RawResponse) {
         super({
             message: "InternalServerError",
             statusCode: 500,
             body: body,
+            rawResponse: rawResponse,
         });
         Object.setPrototypeOf(this, InternalServerError.prototype);
     }

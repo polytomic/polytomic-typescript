@@ -5,6 +5,7 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Organization {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Organization {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -48,7 +49,15 @@ export class Organization {
      * @example
      *     await client.organization.list()
      */
-    public async list(requestOptions?: Organization.RequestOptions): Promise<Polytomic.OrganizationsEnvelope> {
+    public list(
+        requestOptions?: Organization.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.OrganizationsEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__list(requestOptions));
+    }
+
+    private async __list(
+        requestOptions?: Organization.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.OrganizationsEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -60,13 +69,12 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -78,19 +86,26 @@ export class Organization {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.OrganizationsEnvelope;
+            return { data: _response.body as Polytomic.OrganizationsEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -100,12 +115,14 @@ export class Organization {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/organizations.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -128,10 +145,17 @@ export class Organization {
      *         name: "My Organization"
      *     })
      */
-    public async create(
+    public create(
         request: Polytomic.CreateOrganizationRequestSchema,
         requestOptions?: Organization.RequestOptions,
-    ): Promise<Polytomic.OrganizationEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.OrganizationEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__create(request, requestOptions));
+    }
+
+    private async __create(
+        request: Polytomic.CreateOrganizationRequestSchema,
+        requestOptions?: Organization.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.OrganizationEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -143,13 +167,12 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -162,23 +185,36 @@ export class Organization {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.OrganizationEnvelope;
+            return { data: _response.body as Polytomic.OrganizationEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 409:
-                    throw new Polytomic.ConflictError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 422:
-                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -188,12 +224,14 @@ export class Organization {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/organizations.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -207,15 +245,23 @@ export class Organization {
      * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      *
      * @example
      *     await client.organization.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async get(
+    public get(
         id: string,
         requestOptions?: Organization.RequestOptions,
-    ): Promise<Polytomic.OrganizationEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.OrganizationEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__get(id, requestOptions));
+    }
+
+    private async __get(
+        id: string,
+        requestOptions?: Organization.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.OrganizationEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -227,13 +273,12 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -245,19 +290,31 @@ export class Organization {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.OrganizationEnvelope;
+            return { data: _response.body as Polytomic.OrganizationEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -267,12 +324,14 @@ export class Organization {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/organizations/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -287,6 +346,7 @@ export class Organization {
      * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
@@ -296,11 +356,19 @@ export class Organization {
      *         name: "My Organization"
      *     })
      */
-    public async update(
+    public update(
         id: string,
         request: Polytomic.UpdateOrganizationRequestSchema,
         requestOptions?: Organization.RequestOptions,
-    ): Promise<Polytomic.OrganizationEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.OrganizationEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__update(id, request, requestOptions));
+    }
+
+    private async __update(
+        id: string,
+        request: Polytomic.UpdateOrganizationRequestSchema,
+        requestOptions?: Organization.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.OrganizationEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -312,13 +380,12 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -331,23 +398,41 @@ export class Organization {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.OrganizationEnvelope;
+            return { data: _response.body as Polytomic.OrganizationEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 409:
-                    throw new Polytomic.ConflictError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 422:
-                    throw new Polytomic.UnprocessableEntityError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -357,12 +442,14 @@ export class Organization {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/organizations/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -376,13 +463,21 @@ export class Organization {
      * @param {Organization.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
      *     await client.organization.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async remove(id: string, requestOptions?: Organization.RequestOptions): Promise<void> {
+    public remove(id: string, requestOptions?: Organization.RequestOptions): core.HttpResponsePromise<void> {
+        return core.HttpResponsePromise.fromPromise(this.__remove(id, requestOptions));
+    }
+
+    private async __remove(
+        id: string,
+        requestOptions?: Organization.RequestOptions,
+    ): Promise<core.WithRawResponse<void>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -394,13 +489,12 @@ export class Organization {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -412,21 +506,36 @@ export class Organization {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return;
+            return { data: undefined, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -436,12 +545,14 @@ export class Organization {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/organizations/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }

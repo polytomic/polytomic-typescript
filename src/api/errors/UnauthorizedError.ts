@@ -4,13 +4,15 @@
 
 import * as errors from "../../errors/index";
 import * as Polytomic from "../index";
+import * as core from "../../core";
 
 export class UnauthorizedError extends errors.PolytomicError {
-    constructor(body: Polytomic.RestErrResponse) {
+    constructor(body: Polytomic.RestErrResponse, rawResponse?: core.RawResponse) {
         super({
             message: "UnauthorizedError",
             statusCode: 401,
             body: body,
+            rawResponse: rawResponse,
         });
         Object.setPrototypeOf(this, UnauthorizedError.prototype);
     }

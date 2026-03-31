@@ -12,7 +12,7 @@ export interface V4RunQueryResult {
     expires?: string;
     /** The names of the fields returned by the query. This will not be returned until the query completes. */
     fields?: string[];
-    /** The ID of the query task. */
+    /** The ID of the query task. Poll GET /api/queries/{id} until the task reaches done or failed to retrieve results. */
     id?: string;
     /** The query results, returned as an array of objects. */
     results?: Record<string, unknown>[];

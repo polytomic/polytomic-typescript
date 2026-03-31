@@ -4,7 +4,9 @@
 
 /**
  * @example
- *     {}
+ *     {
+ *         async: true
+ *     }
  */
 export interface ModelsSampleRequest {
     async?: boolean;

@@ -5,6 +5,7 @@
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
 import * as Polytomic from "../../../../../index";
+import { toJson } from "../../../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../../../errors/index";
 
@@ -15,7 +16,7 @@ export declare namespace Schedules {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -26,7 +27,7 @@ export declare namespace Schedules {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -47,7 +48,17 @@ export class Schedules {
      * @example
      *     await client.bulkSync.schedules.list("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async list(syncId: string, requestOptions?: Schedules.RequestOptions): Promise<Polytomic.SchedulesEnvelope> {
+    public list(
+        syncId: string,
+        requestOptions?: Schedules.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.SchedulesEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__list(syncId, requestOptions));
+    }
+
+    private async __list(
+        syncId: string,
+        requestOptions?: Schedules.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.SchedulesEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -59,13 +70,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -77,23 +87,36 @@ export class Schedules {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.SchedulesEnvelope;
+            return { data: _response.body as Polytomic.SchedulesEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -103,6 +126,7 @@ export class Schedules {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -111,6 +135,7 @@ export class Schedules {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -133,11 +158,19 @@ export class Schedules {
      *         }
      *     })
      */
-    public async create(
+    public create(
         syncId: string,
         request: Polytomic.bulkSync.CreateScheduleRequest,
         requestOptions?: Schedules.RequestOptions,
-    ): Promise<Polytomic.ScheduleEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ScheduleEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__create(syncId, request, requestOptions));
+    }
+
+    private async __create(
+        syncId: string,
+        request: Polytomic.bulkSync.CreateScheduleRequest,
+        requestOptions?: Schedules.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ScheduleEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -149,13 +182,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -168,25 +200,41 @@ export class Schedules {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ScheduleEnvelope;
+            return { data: _response.body as Polytomic.ScheduleEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -196,6 +244,7 @@ export class Schedules {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -204,6 +253,7 @@ export class Schedules {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -221,11 +271,19 @@ export class Schedules {
      * @example
      *     await client.bulkSync.schedules.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async get(
+    public get(
         syncId: string,
         scheduleId: string,
         requestOptions?: Schedules.RequestOptions,
-    ): Promise<Polytomic.ScheduleEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ScheduleEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__get(syncId, scheduleId, requestOptions));
+    }
+
+    private async __get(
+        syncId: string,
+        scheduleId: string,
+        requestOptions?: Schedules.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ScheduleEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -237,13 +295,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -255,23 +312,36 @@ export class Schedules {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ScheduleEnvelope;
+            return { data: _response.body as Polytomic.ScheduleEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -281,6 +351,7 @@ export class Schedules {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -289,6 +360,7 @@ export class Schedules {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -312,12 +384,21 @@ export class Schedules {
      *         }
      *     })
      */
-    public async update(
+    public update(
         syncId: string,
         scheduleId: string,
         request: Polytomic.bulkSync.UpdateScheduleRequest,
         requestOptions?: Schedules.RequestOptions,
-    ): Promise<Polytomic.ScheduleEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ScheduleEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__update(syncId, scheduleId, request, requestOptions));
+    }
+
+    private async __update(
+        syncId: string,
+        scheduleId: string,
+        request: Polytomic.bulkSync.UpdateScheduleRequest,
+        requestOptions?: Schedules.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ScheduleEnvelope>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -329,13 +410,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -348,25 +428,41 @@ export class Schedules {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return _response.body as Polytomic.ScheduleEnvelope;
+            return { data: _response.body as Polytomic.ScheduleEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 400:
-                    throw new Polytomic.BadRequestError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -376,6 +472,7 @@ export class Schedules {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -384,6 +481,7 @@ export class Schedules {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
@@ -401,7 +499,19 @@ export class Schedules {
      * @example
      *     await client.bulkSync.schedules.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public async delete(syncId: string, scheduleId: string, requestOptions?: Schedules.RequestOptions): Promise<void> {
+    public delete(
+        syncId: string,
+        scheduleId: string,
+        requestOptions?: Schedules.RequestOptions,
+    ): core.HttpResponsePromise<void> {
+        return core.HttpResponsePromise.fromPromise(this.__delete(syncId, scheduleId, requestOptions));
+    }
+
+    private async __delete(
+        syncId: string,
+        scheduleId: string,
+        requestOptions?: Schedules.RequestOptions,
+    ): Promise<core.WithRawResponse<void>> {
         const _response = await core.fetcher({
             url: urlJoin(
                 (await core.Supplier.get(this._options.baseUrl)) ??
@@ -413,13 +523,12 @@ export class Schedules {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -431,23 +540,36 @@ export class Schedules {
             abortSignal: requestOptions?.abortSignal,
         });
         if (_response.ok) {
-            return;
+            return { data: undefined, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
                 case 401:
-                    throw new Polytomic.UnauthorizedError(_response.error.body as Polytomic.RestErrResponse);
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.RestErrResponse,
+                        _response.rawResponse,
+                    );
                 case 403:
-                    throw new Polytomic.ForbiddenError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
-                    throw new Polytomic.NotFoundError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
-                    throw new Polytomic.InternalServerError(_response.error.body as Polytomic.ApiError);
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 default:
                     throw new errors.PolytomicError({
                         statusCode: _response.error.statusCode,
                         body: _response.error.body,
+                        rawResponse: _response.rawResponse,
                     });
             }
         }
@@ -457,6 +579,7 @@ export class Schedules {
                 throw new errors.PolytomicError({
                     statusCode: _response.error.statusCode,
                     body: _response.error.rawBody,
+                    rawResponse: _response.rawResponse,
                 });
             case "timeout":
                 throw new errors.PolytomicTimeoutError(
@@ -465,6 +588,7 @@ export class Schedules {
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
+                    rawResponse: _response.rawResponse,
                 });
         }
     }
