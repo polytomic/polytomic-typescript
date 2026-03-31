@@ -1,2 +1,2 @@
-export { type CreateRoleRequest } from "./CreateRoleRequest";
-export { type UpdateRoleRequest } from "./UpdateRoleRequest";
+export type { CreateRoleRequest } from "./CreateRoleRequest";
+export type { UpdateRoleRequest } from "./UpdateRoleRequest";

@@ -1,2 +1,2 @@
-export { type TargetsGetTargetRequest } from "./TargetsGetTargetRequest";
-export { type TargetsGetTargetFieldsRequest } from "./TargetsGetTargetFieldsRequest";
+export type { TargetsGetTargetFieldsRequest } from "./TargetsGetTargetFieldsRequest";
+export type { TargetsGetTargetRequest } from "./TargetsGetTargetRequest";
