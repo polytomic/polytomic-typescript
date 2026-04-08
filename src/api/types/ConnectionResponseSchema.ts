@@ -9,7 +9,7 @@ export interface ConnectionResponseSchema {
     api_calls_last_24_hours?: number;
     configuration?: Record<string, unknown>;
     created_at?: string;
-    created_by?: Polytomic.CommonOutputActor;
+    created_by?: Polytomic.OutputActor;
     id?: string;
     name?: string;
     organization_id?: string;
@@ -21,5 +21,5 @@ export interface ConnectionResponseSchema {
     status_error?: string;
     type?: Polytomic.ConnectionTypeSchema;
     updated_at?: string;
-    updated_by?: Polytomic.CommonOutputActor;
+    updated_by?: Polytomic.OutputActor;
 }

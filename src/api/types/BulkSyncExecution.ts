@@ -13,6 +13,7 @@ export interface BulkSyncExecution {
     is_partial?: boolean;
     is_resync?: boolean;
     is_test?: boolean;
+    output_disposition?: Polytomic.BulkOutputDisposition;
     record_count?: number;
     schemas?: Polytomic.BulkSyncSchemaExecution[];
     started_at?: string;

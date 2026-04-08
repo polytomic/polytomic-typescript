@@ -7,7 +7,7 @@ import * as Polytomic from "../index";
 export interface ModelSyncResponse {
     active?: boolean;
     created_at?: string;
-    created_by?: Polytomic.CommonOutputActor;
+    created_by?: Polytomic.OutputActor;
     encryption_passphrase?: string;
     fields?: Polytomic.ModelSyncField[];
     filter_logic?: string;
@@ -28,5 +28,5 @@ export interface ModelSyncResponse {
     sync_all_records?: boolean;
     target?: Polytomic.Target;
     updated_at?: string;
-    updated_by?: Polytomic.CommonOutputActor;
+    updated_by?: Polytomic.OutputActor;
 }

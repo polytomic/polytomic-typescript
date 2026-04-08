@@ -10,7 +10,9 @@ import * as Polytomic from "../../../../index";
  */
 export interface StartBulkSyncRequest {
     fetch_mode?: Polytomic.BulkFetchMode;
+    /** Deprecated: use resync_mode instead. Equivalent to resync_mode=rebuild. */
     resync?: boolean;
+    resync_mode?: Polytomic.BulkResyncMode;
     schemas?: string[];
     test?: boolean;
 }
