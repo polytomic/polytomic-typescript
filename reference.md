@@ -1275,9 +1275,26 @@ await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668
 </dl>
 </details>
 
-<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">apiV2CreateSharedConnection</a>(id, { ...params }) -> Polytomic.V2CreateSharedConnectionResponseEnvelope</code></summary>
+<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">createSharedConnection</a>(parentConnectionId, { ...params }) -> Polytomic.V2CreateSharedConnectionResponseEnvelope</code></summary>
 <dl>
 <dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+> 🚧 Requires partner key
+>
+> Shared connections can only be created by using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
+
+</dd>
+</dl>
+</dd>
+</dl>
 
 #### 🔌 Usage
 
@@ -1288,8 +1305,8 @@ await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668
 <dd>
 
 ```typescript
-await client.connections.apiV2CreateSharedConnection("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+await client.connections.createSharedConnection("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    child_organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
 });
 ```
 
@@ -1306,7 +1323,7 @@ await client.connections.apiV2CreateSharedConnection("248df4b7-aa70-47b8-a036-33
 <dl>
 <dd>
 
-**id:** `string`
+**parentConnectionId:** `string`
 
 </dd>
 </dl>
@@ -1333,11 +1350,74 @@ await client.connections.apiV2CreateSharedConnection("248df4b7-aa70-47b8-a036-33
 </dl>
 </details>
 
+<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">listSharedConnections</a>(parentConnectionId) -> Polytomic.ConnectionListResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.listSharedConnections("248df4b7-aa70-47b8-a036-33ac447e668d");
+```
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**parentConnectionId:** `string`
+
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `Connections.RequestOptions`
+
+</dd>
+</dl>
+</dd>
+</dl>
+
+</dd>
+</dl>
+</details>
+
 ## QueryRunner
 
 <details><summary><code>client.queryRunner.<a href="/src/api/resources/queryRunner/client/Client.ts">runQuery</a>(connectionId, { ...params }) -> Polytomic.V4RunQueryEnvelope</code></summary>
 <dl>
 <dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Submit a query for asynchronous execution against the connection. The initial response may only contain the query task id and status. Poll GET /api/queries/{id} with the returned id to retrieve completion status, fields, and results.
+
+</dd>
+</dl>
+</dd>
+</dl>
 
 #### 🔌 Usage
 
@@ -1397,6 +1477,21 @@ await client.queryRunner.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Fetch the latest status for a submitted query and, once complete, return fields and paginated results. Use the query id returned by POST /api/connections/{connection_id}/query.
+
+</dd>
+</dl>
+</dd>
+</dl>
+
 #### 🔌 Usage
 
 <dl>
@@ -1406,7 +1501,9 @@ await client.queryRunner.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dd>
 
 ```typescript
-await client.queryRunner.getQuery("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.queryRunner.getQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    page: "page",
+});
 ```
 
 </dd>
@@ -2080,6 +2177,7 @@ await client.models.post("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```typescript
 await client.models.preview({
+    async: true,
     body: {
         configuration: {
             table: "public.users",
@@ -2176,6 +2274,7 @@ await client.models.list();
 
 ```typescript
 await client.models.create({
+    async: true,
     body: {
         configuration: {
             table: "public.users",
@@ -2231,7 +2330,9 @@ await client.models.create({
 <dd>
 
 ```typescript
-await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    async: true,
+});
 ```
 
 </dd>
@@ -2350,7 +2451,9 @@ await client.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dd>
 
 ```typescript
-await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    async: true,
+});
 ```
 
 </dd>
@@ -2421,7 +2524,9 @@ Returns sample records from the model. The first ten records that the source pro
 <dd>
 
 ```typescript
-await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    async: true,
+});
 ```
 
 </dd>
@@ -2593,6 +2698,7 @@ await client.modelSync.getSourceFields("248df4b7-aa70-47b8-a036-33ac447e668d");
 ```typescript
 await client.modelSync.list({
     active: true,
+    mode: "create",
     target_connection_id: "0b155265-c537-44c9-9359-a3ceb468a4da",
 });
 ```
@@ -3207,8 +3313,10 @@ await client.modelSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d");
 ```typescript
 await client.events.list({
     organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+    type: "type",
     starting_after: "2020-01-01T00:00:00Z",
     ending_before: "2020-01-01T00:00:00Z",
+    limit: 1,
 });
 ```
 
@@ -3286,7 +3394,7 @@ await client.events.getTypes();
 
 ## Jobs
 
-<details><summary><code>client.jobs.<a href="/src/api/resources/jobs/client/Client.ts">get</a>(id, type_) -> Polytomic.JobResponseEnvelope</code></summary>
+<details><summary><code>client.jobs.<a href="/src/api/resources/jobs/client/Client.ts">get</a>(type_, id) -> Polytomic.JobResponseEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -3299,7 +3407,7 @@ await client.events.getTypes();
 <dd>
 
 ```typescript
-await client.jobs.get("248df4b7-aa70-47b8-a036-33ac447e668d", "createmodel");
+await client.jobs.get("createmodel", "248df4b7-aa70-47b8-a036-33ac447e668d");
 ```
 
 </dd>
@@ -3315,7 +3423,7 @@ await client.jobs.get("248df4b7-aa70-47b8-a036-33ac447e668d", "createmodel");
 <dl>
 <dd>
 
-**id:** `string`
+**type\_:** `string`
 
 </dd>
 </dl>
@@ -3323,7 +3431,7 @@ await client.jobs.get("248df4b7-aa70-47b8-a036-33ac447e668d", "createmodel");
 <dl>
 <dd>
 
-**type\_:** `string`
+**id:** `string`
 
 </dd>
 </dl>
@@ -3928,7 +4036,7 @@ await client.users.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">get</a>(id, orgId) -> Polytomic.UserEnvelope</code></summary>
+<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">get</a>(orgId, id) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -3957,7 +4065,7 @@ await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47
 <dl>
 <dd>
 
-**id:** `string`
+**orgId:** `string`
 
 </dd>
 </dl>
@@ -3965,7 +4073,7 @@ await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47
 <dl>
 <dd>
 
-**orgId:** `string`
+**id:** `string`
 
 </dd>
 </dl>
@@ -3984,7 +4092,7 @@ await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47
 </dl>
 </details>
 
-<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">update</a>(id, orgId, { ...params }) -> Polytomic.UserEnvelope</code></summary>
+<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">update</a>(orgId, id, { ...params }) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -4015,7 +4123,7 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**id:** `string`
+**orgId:** `string`
 
 </dd>
 </dl>
@@ -4023,7 +4131,7 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**orgId:** `string`
+**id:** `string`
 
 </dd>
 </dl>
@@ -4050,7 +4158,7 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 </dl>
 </details>
 
-<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">remove</a>(id, orgId) -> Polytomic.UserEnvelope</code></summary>
+<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">remove</a>(orgId, id) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -4079,7 +4187,7 @@ await client.users.remove("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**id:** `string`
+**orgId:** `string`
 
 </dd>
 </dl>
@@ -4087,7 +4195,7 @@ await client.users.remove("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**orgId:** `string`
+**id:** `string`
 
 </dd>
 </dl>
@@ -4910,6 +5018,9 @@ await client.bulkSync.executions.getLogs(
 await client.bulkSync.executions.exportLogs(
     "248df4b7-aa70-47b8-a036-33ac447e668d",
     "248df4b7-aa70-47b8-a036-33ac447e668d",
+    {
+        notify: true,
+    },
 );
 ```
 
@@ -5556,7 +5667,10 @@ await client.bulkSync.schedules.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dd>
 
 ```typescript
-await client.modelSync.targets.getTarget("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.modelSync.targets.getTarget("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    type: "type",
+    search: "search",
+});
 ```
 
 </dd>

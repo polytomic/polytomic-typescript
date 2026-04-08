@@ -16,7 +16,7 @@ export declare namespace Models {
         baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
         /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<string | undefined>;
+        version?: core.Supplier<unknown>;
     }
 
     export interface RequestOptions {
@@ -27,7 +27,7 @@ export declare namespace Models {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
         /** Additional headers to include in the request. */
         headers?: Record<string, string>;
     }
@@ -72,13 +72,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -162,13 +161,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -230,6 +228,7 @@ export class Models {
      *
      * @example
      *     await client.models.preview({
+     *         async: true,
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -260,13 +259,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -337,13 +335,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -398,6 +395,7 @@ export class Models {
      *
      * @example
      *     await client.models.create({
+     *         async: true,
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -428,13 +426,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -494,7 +491,9 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         async: true
+     *     })
      */
     public async get(
         id: string,
@@ -518,13 +517,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -613,13 +611,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -680,7 +677,9 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         async: true
+     *     })
      */
     public async remove(
         id: string,
@@ -704,13 +703,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,
@@ -772,7 +770,9 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         async: true
+     *     })
      */
     public async sample(
         id: string,
@@ -796,13 +796,12 @@ export class Models {
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
-                "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.16.1",
-                "User-Agent": "polytomic/1.16.1",
+                "X-Fern-SDK-Name": "",
+                "X-Fern-SDK-Version": "1.16.2",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
                 ...requestOptions?.headers,

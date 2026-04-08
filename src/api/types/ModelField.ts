@@ -6,7 +6,7 @@ import * as Polytomic from "../index";
 
 export interface ModelField {
     created_at?: string;
-    created_by?: Polytomic.CommonOutputActor;
+    created_by?: Polytomic.OutputActor;
     description?: string;
     example?: unknown;
     id?: string;
