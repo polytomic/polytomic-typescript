@@ -5,6 +5,7 @@
 import * as Polytomic from "../index";
 
 export interface BulkSyncSource {
+    capabilities?: Polytomic.V3BulkSyncSourceCapabilities;
     configuration?: unknown;
     schemas?: Polytomic.Schema[];
 }

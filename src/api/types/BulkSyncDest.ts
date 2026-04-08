@@ -7,4 +7,6 @@ import * as Polytomic from "../index";
 export interface BulkSyncDest {
     configuration?: Record<string, unknown>;
     modes?: Polytomic.SupportedBulkMode[];
+    /** Resync modes supported by this destination (refetch, resync, rebuild). */
+    supported_resync_modes?: Polytomic.BulkResyncMode[];
 }
