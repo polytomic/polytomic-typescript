@@ -10,7 +10,8 @@ export type BulkSchemaExecutionStatus =
     | "canceled"
     | "completed"
     | "failed"
-    | "interrupted";
+    | "interrupted"
+    | "processing";
 export const BulkSchemaExecutionStatus = {
     Created: "created",
     Scheduled: "scheduled",
@@ -20,4 +21,5 @@ export const BulkSchemaExecutionStatus = {
     Completed: "completed",
     Failed: "failed",
     Interrupted: "interrupted",
+    Processing: "processing",
 } as const;
