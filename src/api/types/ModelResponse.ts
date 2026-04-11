@@ -8,7 +8,7 @@ export interface ModelResponse {
     configuration?: Record<string, unknown>;
     connection_id?: string;
     created_at?: string;
-    created_by?: Polytomic.CommonOutputActor;
+    created_by?: Polytomic.OutputActor;
     enricher?: Polytomic.Enrichment;
     fields?: Polytomic.ModelField[];
     id?: string;
@@ -21,6 +21,6 @@ export interface ModelResponse {
     tracking_columns?: string[];
     type?: string;
     updated_at?: string;
-    updated_by?: Polytomic.CommonOutputActor;
+    updated_by?: Polytomic.OutputActor;
     version?: number;
 }

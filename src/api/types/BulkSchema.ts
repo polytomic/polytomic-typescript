@@ -8,7 +8,9 @@ export interface BulkSchema {
     data_cutoff_timestamp?: string;
     disable_data_cutoff?: boolean;
     enabled?: boolean;
+    /** fields is not populated on the list endpoint and will be removed in a future version; retrieve individual schemas for fields. */
     fields?: Polytomic.BulkField[];
+    /** filters is not populated on the list endpoint and will be removed in a future version; retrieve individual schemas for filters. */
     filters?: Polytomic.BulkFilter[];
     id?: string;
     output_name?: string;

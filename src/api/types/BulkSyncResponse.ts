@@ -11,7 +11,7 @@ export interface BulkSyncResponse {
     /** Per-sync concurrency limit override. */
     concurrency_limit?: number;
     created_at?: string;
-    created_by?: Polytomic.CommonOutputActor;
+    created_by?: Polytomic.OutputActor;
     data_cutoff_timestamp?: string;
     /** Destination-specific bulk sync configuration. e.g. output schema name, s3 file format, etc. */
     destination_configuration?: Record<string, unknown>;
@@ -34,5 +34,5 @@ export interface BulkSyncResponse {
     source_configuration?: Record<string, unknown>;
     source_connection_id?: string;
     updated_at?: string;
-    updated_by?: Polytomic.CommonOutputActor;
+    updated_by?: Polytomic.OutputActor;
 }
