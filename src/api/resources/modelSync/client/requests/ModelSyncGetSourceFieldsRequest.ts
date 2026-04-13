@@ -7,5 +7,8 @@
  *     {}
  */
 export interface ModelSyncGetSourceFieldsRequest {
+    /**
+     * Source configuration, matching the params used with GET /api/connections/{id}/modelsync/source, that selects the specific source to return fields for.
+     */
     params?: Record<string, string[] | undefined>;
 }

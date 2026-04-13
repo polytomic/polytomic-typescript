@@ -5,5 +5,6 @@
 export interface ConnectCardResponse {
     /** URL to redirect the user to in order to create the new connection. */
     redirect_url?: string;
+    /** Opaque single-use token identifying the Connect session. */
     token?: string;
 }

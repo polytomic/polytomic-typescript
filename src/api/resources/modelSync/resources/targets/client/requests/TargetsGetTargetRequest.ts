@@ -4,12 +4,15 @@
 
 /**
  * @example
- *     {
- *         type: "type",
- *         search: "search"
- *     }
+ *     {}
  */
 export interface TargetsGetTargetRequest {
+    /**
+     * Target object type to query (e.g. schema name). When supplied, the response is narrowed to objects matching this type.
+     */
     type?: string;
+    /**
+     * Substring filter applied to target object names. Combine with type to browse large schemas.
+     */
     search?: string;
 }

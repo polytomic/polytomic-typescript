@@ -9,5 +9,8 @@
  *     }
  */
 export interface UsersCreateApiKeyRequest {
+    /**
+     * If true, revoke any existing API key for the user before creating a new one.
+     */
     force?: boolean;
 }

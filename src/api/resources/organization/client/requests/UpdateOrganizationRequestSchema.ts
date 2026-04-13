@@ -9,10 +9,16 @@
  *     }
  */
 export interface UpdateOrganizationRequestSchema {
+    /** OIDC client ID issued by the identity provider. */
     client_id?: string;
+    /** OIDC client secret issued by the identity provider. Write-only; never returned in responses. */
     client_secret?: string;
+    /** OIDC issuer URL for organizations using OpenID Connect single sign-on. */
     issuer?: string;
+    /** Human-readable name of the organization. Must be unique across the partner account. */
     name: string;
+    /** Email domain used to match users to this organization during SSO sign-in. */
     sso_domain?: string;
+    /** WorkOS organization identifier linking this organization to its SAML/SSO configuration. */
     sso_org_id?: string;
 }

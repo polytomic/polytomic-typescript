@@ -6,6 +6,7 @@
  * The health status of CDC ingestion for a bulk sync. 'ok' means ingestion is operating normally. 'warning' indicates a non-fatal issue. 'error' indicates a potentially fatal ingestion error.
  */
 export type IngestionStatusLevel = "ok" | "warning" | "error";
+
 export const IngestionStatusLevel = {
     Ok: "ok",
     Warning: "warning",

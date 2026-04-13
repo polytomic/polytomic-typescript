@@ -9,5 +9,6 @@ import * as Polytomic from "../../../../../../index";
  *     {}
  */
 export interface BulkSyncSchemasRequest {
+    /** Schemas to patch. Schemas are matched by id; only schemas present in this list are updated. */
     schemas?: Polytomic.BulkSchema[];
 }

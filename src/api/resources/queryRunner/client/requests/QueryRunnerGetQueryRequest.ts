@@ -4,10 +4,11 @@
 
 /**
  * @example
- *     {
- *         page: "page"
- *     }
+ *     {}
  */
 export interface QueryRunnerGetQueryRequest {
+    /**
+     * Opaque pagination token returned in the links.next or links.previous URL of the previous response.
+     */
     page?: string;
 }

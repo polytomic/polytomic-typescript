@@ -5,9 +5,12 @@
 import * as Polytomic from "../index";
 
 export interface JobResponse {
+    /** Error message if the job failed. */
     error?: string;
+    /** Identifier of the job. */
     job_id?: string;
     result?: unknown;
     status?: Polytomic.WorkTaskStatus;
+    /** Job type. Matches the type used to fetch the job. */
     type?: string;
 }

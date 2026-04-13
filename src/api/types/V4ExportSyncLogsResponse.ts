@@ -3,5 +3,6 @@
  */
 
 export interface V4ExportSyncLogsResponse {
+    /** Signed URL to download the exported log archive. */
     url?: string;
 }

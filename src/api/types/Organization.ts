@@ -3,9 +3,14 @@
  */
 
 export interface Organization {
+    /** Unique identifier of the organization. */
     id?: string;
+    /** OIDC issuer URL for organizations using OpenID Connect single sign-on. */
     issuer?: string;
+    /** Human-readable name of the organization. */
     name?: string;
+    /** Email domain used to match users to this organization during SSO sign-in. */
     sso_domain?: string;
+    /** WorkOS organization identifier linking this organization to its SAML/SSO configuration. */
     sso_org_id?: string;
 }

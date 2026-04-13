@@ -7,5 +7,6 @@
  *     {}
  */
 export interface V4GlobalErrorSubscribersRequest {
+    /** Email addresses to subscribe to global sync error notifications. Replaces the current subscriber list; pass an empty list to unsubscribe everyone. */
     emails?: string[];
 }

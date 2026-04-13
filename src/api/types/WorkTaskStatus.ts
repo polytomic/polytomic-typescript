@@ -3,6 +3,7 @@
  */
 
 export type WorkTaskStatus = "created" | "running" | "done" | "failed";
+
 export const WorkTaskStatus = {
     Created: "created",
     Running: "running",

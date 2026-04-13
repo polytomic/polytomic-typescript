@@ -3,7 +3,10 @@
  */
 
 export interface SourceMeta {
+    /** True when items is non-empty. Callers should present the values as a picker. */
     has_items?: boolean;
+    /** Valid values the caller may choose for this configuration item. */
     items?: unknown[];
+    /** Other configuration items this item depends on; exactly one of the listed items must also be selected. */
     requires_one_of?: string[];
 }

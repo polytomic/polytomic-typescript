@@ -5,21 +5,17 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
-import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
 export declare namespace Models {
-    export interface Options {
+    interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        /** Specify a custom URL to connect the client to. */
-        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<unknown>;
+        version?: core.Supplier<string | undefined>;
     }
 
-    export interface RequestOptions {
+    interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -27,9 +23,7 @@ export declare namespace Models {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: unknown;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: string | undefined;
     }
 }
 
@@ -37,7 +31,21 @@ export class Models {
     constructor(protected readonly _options: Models.Options) {}
 
     /**
-     * @param {string} id
+     * Describes the enrichment source configuration available on a connection.
+     *
+     * Not all connections support enrichment. Call this endpoint to determine
+     * whether a connection can serve as an enrichment source in a model sync and,
+     * if so, what configuration it accepts.
+     *
+     * > ⚠️ If the connection does not support enrichment, this endpoint returns
+     * > `404`. Check for that status before attempting to configure an enrichment
+     * > source on a sync.
+     *
+     * When a connection does support enrichment, the response describes the
+     * configuration fields required to set it up. Pass those values in the
+     * `enrichment` block when creating or updating a model sync.
+     *
+     * @param {string} id - Unique identifier of the connection.
      * @param {Polytomic.ModelsGetEnrichmentSourceRequest} request
      * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -53,39 +61,34 @@ export class Models {
     public async getEnrichmentSource(
         id: string,
         request: Polytomic.ModelsGetEnrichmentSourceRequest = {},
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.GetModelSyncSourceMetaEnvelope> {
         const { params } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (params != null) {
-            _queryParams["params"] = toJson(params);
+            _queryParams["params"] = JSON.stringify(params);
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/enrichment-source`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/enrichment-source`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -121,9 +124,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/enrichment-source.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -132,7 +133,13 @@ export class Models {
     }
 
     /**
-     * For a given connection and enrichment configuration, provides the valid sets of input fields.
+     * Returns the valid input field sets for an enrichment configuration on a connection.
+     *
+     * When configuring an enrichment source in a model sync, use this endpoint to
+     * discover which input fields the enrichment connection requires. Pass the
+     * proposed enrichment configuration in the request body; the response lists the
+     * valid input field sets that map your model's fields to the enrichment service's
+     * expected inputs.
      *
      * @param {string} connectionId
      * @param {Polytomic.GetEnrichmentInputFieldsRequest} request
@@ -149,32 +156,27 @@ export class Models {
     public async post(
         connectionId: string,
         request: Polytomic.GetEnrichmentInputFieldsRequest = {},
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.V2GetEnrichmentInputFieldsResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/enrichment/${encodeURIComponent(connectionId)}/inputfields`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/enrichment/${encodeURIComponent(connectionId)}/inputfields`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -209,9 +211,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/enrichment/{connection_id}/inputfields.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -220,6 +220,13 @@ export class Models {
     }
 
     /**
+     * Submits a job that previews the fields a model would expose without persisting it.
+     *
+     * The response contains a job ID that resolves to the list of fields the model
+     * would expose. Poll the job until it completes to retrieve the field list. The
+     * model is not persisted — this endpoint is useful for validating a query or
+     * configuration before calling [`POST /api/models`](../../api-reference/models/create) to save it.
+     *
      * @param {Polytomic.ModelsPreviewRequest} request
      * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -230,7 +237,6 @@ export class Models {
      *
      * @example
      *     await client.models.preview({
-     *         async: true,
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -242,39 +248,34 @@ export class Models {
      */
     public async preview(
         request: Polytomic.ModelsPreviewRequest,
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async, body: _body } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/model-preview",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/model-preview"
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -309,7 +310,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/model-preview.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -318,6 +319,17 @@ export class Models {
     }
 
     /**
+     * Lists all models in the caller's organization.
+     *
+     * Results are ordered by `updated_at` descending, with `id` used as a tiebreaker.
+     * If more results are available, the response includes `pagination.next_page_token`.
+     * Pass that token back unchanged to continue from the last item you received.
+     *
+     * The token is opaque. Do not construct or edit it yourself.
+     *
+     * The `limit` is capped at 50. Values above that cap are reduced to 50, and
+     * non-positive values fall back to the same default.
+     *
      * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -329,28 +341,23 @@ export class Models {
     public async list(requestOptions?: Models.RequestOptions): Promise<Polytomic.ModelListResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/models",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/models"
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -380,7 +387,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/models.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -389,6 +396,16 @@ export class Models {
     }
 
     /**
+     * Creates a new model.
+     *
+     * A model defines a query or view over a connection's data — for example, a SQL
+     * query, a filtered object, or a joined dataset. Models are used as sources when
+     * creating model syncs.
+     *
+     * The connection referenced by `connection_id` must have source capabilities. Use
+     * [`GET /api/connection_types/{id}`](../../api-reference/connections/get-connection-type-schema) to check
+     * whether a connection type supports use as a source.
+     *
      * @param {Polytomic.ModelsCreateRequest} request
      * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -399,7 +416,6 @@ export class Models {
      *
      * @example
      *     await client.models.create({
-     *         async: true,
      *         body: {
      *             configuration: {
      *                 "table": "public.users"
@@ -411,39 +427,34 @@ export class Models {
      */
     public async create(
         request: Polytomic.ModelsCreateRequest,
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async, body: _body } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/models",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/models"
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -478,7 +489,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/models.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -487,6 +498,12 @@ export class Models {
     }
 
     /**
+     * Returns a single model by ID, including its source fields, identity, and filters.
+     *
+     * The response includes the model's source fields, identity column, and any
+     * configured filters. To preview the data a model would return without saving
+     * changes, use [`GET /api/models/{id}/sample`](./sample/get).
+     *
      * @param {string} id
      * @param {Polytomic.ModelsGetRequest} request
      * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
@@ -496,46 +513,39 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         async: true
-     *     })
+     *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(
         id: string,
         request: Polytomic.ModelsGetRequest = {},
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/models/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/models/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -567,7 +577,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/models/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -576,6 +586,19 @@ export class Models {
     }
 
     /**
+     * Updates a model's configuration.
+     *
+     * Updating a model is a **full replacement** of its configuration. Every field in
+     * the request body is written to the model; any field you omit is cleared or reset
+     * to its default value.
+     *
+     * To make a partial change, fetch the current model with
+     * [`GET /api/models/{id}`](./get), modify the fields you want to change, and send
+     * the complete object back in the update request.
+     *
+     * Changes to source fields, filters, or the identity column take effect on the
+     * next sync execution that uses this model.
+     *
      * @param {string} id
      * @param {Polytomic.UpdateModelRequest} request
      * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
@@ -598,39 +621,34 @@ export class Models {
     public async update(
         id: string,
         request: Polytomic.UpdateModelRequest,
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelResponseEnvelope> {
         const { async, ..._body } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/models/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/models/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -665,7 +683,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/models/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -674,6 +692,11 @@ export class Models {
     }
 
     /**
+     * Deletes a model.
+     *
+     * > 🚧 Deleting a model used by one or more syncs will break those syncs. Remove
+     * > or reconfigure any syncs that reference this model before deleting it.
+     *
      * @param {string} id
      * @param {Polytomic.ModelsRemoveRequest} request
      * @param {Models.RequestOptions} requestOptions - Request-specific configuration.
@@ -684,46 +707,39 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         async: true
-     *     })
+     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async remove(
         id: string,
         request: Polytomic.ModelsRemoveRequest = {},
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<void> {
         const { async } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/models/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/models/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -757,7 +773,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/models/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -766,7 +782,11 @@ export class Models {
     }
 
     /**
-     * Returns sample records from the model. The first ten records that the source provides will be returned after being enriched (if applicable). Synchronous requests must complete within 10s. If either querying or enrichment exceeds 10s, please use the async option.
+     * Returns a sample of records from a model.
+     *
+     * Synchronous requests must complete within 10 seconds. If the source query or
+     * enrichment step can exceed that budget, use the asynchronous option so the
+     * work runs as a background job.
      *
      * @param {string} id
      * @param {Polytomic.ModelsSampleRequest} request
@@ -778,46 +798,39 @@ export class Models {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         async: true
-     *     })
+     *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async sample(
         id: string,
         request: Polytomic.ModelsSampleRequest = {},
-        requestOptions?: Models.RequestOptions,
+        requestOptions?: Models.RequestOptions
     ): Promise<Polytomic.ModelSampleResponseEnvelope> {
         const { async } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (async != null) {
             _queryParams["async"] = async.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/models/${encodeURIComponent(id)}/sample`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/models/${encodeURIComponent(id)}/sample`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -851,7 +864,7 @@ export class Models {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/models/{id}/sample.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

@@ -9,12 +9,19 @@ import * as Polytomic from "../../../../../../index";
  *     {}
  */
 export interface UpdateBulkSchema {
+    /** Per-schema cutoff. Records older than this timestamp are excluded from sync runs. */
     data_cutoff_timestamp?: string;
+    /** When true, the sync ignores any configured data_cutoff_timestamp for this schema. */
     disable_data_cutoff?: boolean;
+    /** Whether this schema is included in sync runs. */
     enabled?: boolean;
+    /** Field-level configuration. Supplying an empty list enables every field discovered on the source. */
     fields?: Polytomic.UpdateBulkField[];
+    /** Row-level filters applied when reading from the source. */
     filters?: Polytomic.BulkFilter[];
+    /** Source field used to partition rows when writing to the destination. */
     partition_key?: string;
+    /** Source field used to detect changes between incremental sync runs. */
     tracking_field?: string;
     user_output_name?: string;
 }

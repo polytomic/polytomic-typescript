@@ -10,7 +10,7 @@ import * as Polytomic from "../../../../index";
  *         fields: [{
  *                 target: "name"
  *             }],
- *         mode: "create",
+ *         mode: Polytomic.ModelSyncMode.Create,
  *         name: "Users Sync",
  *         schedule: {},
  *         target: {

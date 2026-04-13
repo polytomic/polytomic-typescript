@@ -3,9 +3,14 @@
  */
 
 export interface User {
+    /** Email address used to sign in and receive notifications. */
     email?: string;
+    /** Unique identifier of the user. */
     id?: string;
+    /** Unique identifier of the organization the user belongs to. */
     organization_id?: string;
+    /** Deprecated legacy role name. Use role_ids instead. */
     role?: string;
+    /** Identifiers of the permissions roles assigned to the user. */
     role_ids?: string[];
 }

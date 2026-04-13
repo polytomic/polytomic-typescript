@@ -11,6 +11,7 @@ export interface GetIdentityResponseSchema {
     is_organization?: boolean;
     /** Whether the caller is using a partner key. */
     is_partner?: boolean;
+    /** Whether the caller is a system actor. */
     is_system?: boolean;
     /** Whether the caller is a user. */
     is_user?: boolean;
@@ -18,5 +19,6 @@ export interface GetIdentityResponseSchema {
     organization_id?: string;
     /** The name of the organization the caller belongs to. */
     organization_name?: string;
+    /** Deprecated legacy role name. Populated only for user callers. */
     role?: string;
 }

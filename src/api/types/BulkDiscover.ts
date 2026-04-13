@@ -3,6 +3,7 @@
  */
 
 export type BulkDiscover = "all" | "onlyIncremental" | "onlyNonIncremental" | "none";
+
 export const BulkDiscover = {
     All: "all",
     OnlyIncremental: "onlyIncremental",

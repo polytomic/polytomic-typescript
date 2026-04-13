@@ -5,14 +5,21 @@
 import * as Polytomic from "../index";
 
 export interface BulkSyncSchemaExecutionStatus {
+    /** Timestamp when the most recent execution finished. Null while the execution is still running. */
     completed_at?: string;
+    /** Number of errors emitted during the most recent execution. */
     error_count?: number;
     /** ID of the most recent execution for the schema. */
     execution_id?: string;
+    /** Number of records processed in the most recent execution. */
     record_count?: number;
+    /** Schema (table or object) identifier. */
     schema?: string;
+    /** Timestamp when the most recent execution started. */
     started_at?: string;
     status?: Polytomic.BulkSchemaExecutionStatus;
+    /** Human-readable detail for the current status (e.g. an error message when status is failed). */
     status_message?: string;
+    /** Number of warnings emitted during the most recent execution. */
     warning_count?: number;
 }

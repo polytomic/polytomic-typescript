@@ -6,6 +6,7 @@
  *
  */
 export type BulkSyncMode = "snapshot" | "replicate";
+
 export const BulkSyncMode = {
     Snapshot: "snapshot",
     Replicate: "replicate",

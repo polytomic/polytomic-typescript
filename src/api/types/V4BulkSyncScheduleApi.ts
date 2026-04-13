@@ -5,11 +5,16 @@
 import * as Polytomic from "../index";
 
 export interface V4BulkSyncScheduleApi {
+    /** Day of the month (1-31) for monthly schedules. */
     dayOfMonth?: string;
+    /** Day of the week for weekly schedules. */
     dayOfWeek?: string;
     frequency: Polytomic.ScheduleFrequency;
+    /** Hour of the day (0-23, in UTC) the schedule fires. */
     hour?: string;
+    /** Minute of the hour (0-59) the schedule fires. */
     minute?: string;
+    /** Month of the year (1-12) for yearly schedules. */
     month?: string;
     selectiveMode?: Polytomic.BulkSelectiveMode;
 }

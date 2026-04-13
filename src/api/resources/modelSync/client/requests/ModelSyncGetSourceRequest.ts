@@ -7,5 +7,8 @@
  *     {}
  */
 export interface ModelSyncGetSourceRequest {
+    /**
+     * Query parameters used to incrementally refine a dependent source configuration. Keys correspond to configuration fields returned by previous calls to this endpoint.
+     */
     params?: Record<string, string[] | undefined>;
 }

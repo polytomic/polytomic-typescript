@@ -3,5 +3,6 @@
  */
 
 export interface V4GlobalErrorSubscribersResponse {
+    /** Email addresses subscribed to global sync error notifications for the organization. */
     emails?: string[];
 }

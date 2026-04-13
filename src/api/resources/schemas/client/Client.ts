@@ -5,21 +5,17 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
-import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
 export declare namespace Schemas {
-    export interface Options {
+    interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        /** Specify a custom URL to connect the client to. */
-        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<unknown>;
+        version?: core.Supplier<string | undefined>;
     }
 
-    export interface RequestOptions {
+    interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -27,9 +23,7 @@ export declare namespace Schemas {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: unknown;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: string | undefined;
     }
 }
 
@@ -37,8 +31,20 @@ export class Schemas {
     constructor(protected readonly _options: Schemas.Options) {}
 
     /**
-     * @param {string} connectionId
-     * @param {string} schemaId
+     * Creates or updates user-defined fields on a schema, matched by field_id.
+     *
+     * Fields are matched by `field_id`. Reusing an existing `field_id` updates that
+     * field; using a new `field_id` creates a new user-defined field.
+     *
+     * This makes the endpoint safe to retry when you are intentionally upserting the
+     * same field definitions. It is not a patch-by-position operation.
+     *
+     * If some fields succeed and others fail, the endpoint can return a partial
+     * success response. Validate the response status and message rather than assuming
+     * the whole batch was applied uniformly.
+     *
+     * @param {string} connectionId - Unique identifier of the connection.
+     * @param {string} schemaId - Identifier of the schema the fields belong to.
      * @param {Polytomic.UpsertSchemaFieldRequest} request
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -54,32 +60,27 @@ export class Schemas {
         connectionId: string,
         schemaId: string,
         request: Polytomic.UpsertSchemaFieldRequest = {},
-        requestOptions?: Schemas.RequestOptions,
+        requestOptions?: Schemas.RequestOptions
     ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(schemaId)}/fields`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(schemaId)}/fields`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -114,9 +115,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/connections/{connection_id}/schemas/{schema_id}/fields.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -125,9 +124,20 @@ export class Schemas {
     }
 
     /**
-     * @param {string} connectionId
-     * @param {string} schemaId
-     * @param {string} fieldId
+     * Removes a user-defined field from a schema.
+     *
+     * Only user-defined fields — those created via
+     * [`POST /api/connections/{connection_id}/schemas/{schema_id}/fields`](../../../../../../../api-reference/schemas/upsert-field)
+     * — can be removed through this endpoint. Fields detected automatically from
+     * the source cannot be deleted here; they are managed through schema refresh.
+     *
+     * > 🚧 Deleting a field that is referenced in an active sync mapping may cause
+     * > that sync to error on its next execution. Remove or update any dependent
+     * > mappings before deleting the field.
+     *
+     * @param {string} connectionId - Unique identifier of the connection.
+     * @param {string} schemaId - Identifier of the schema the field belongs to.
+     * @param {string} fieldId - Identifier of the user-defined field to delete.
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -142,32 +152,29 @@ export class Schemas {
         connectionId: string,
         schemaId: string,
         fieldId: string,
-        requestOptions?: Schemas.RequestOptions,
+        requestOptions?: Schemas.RequestOptions
     ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(schemaId)}/fields/${encodeURIComponent(fieldId)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(
+                    schemaId
+                )}/fields/${encodeURIComponent(fieldId)}`
             ),
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -201,9 +208,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling DELETE /api/connections/{connection_id}/schemas/{schema_id}/fields/{field_id}.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -212,8 +217,21 @@ export class Schemas {
     }
 
     /**
-     * @param {string} connectionId
-     * @param {string} schemaId
+     * Overrides the primary key detected on a schema.
+     *
+     * This is a full replacement: the keys you supply become the complete override
+     * set, replacing any previously configured overrides. Omitting a key that was
+     * previously set removes it.
+     *
+     * Primary key overrides are useful when the source does not expose a primary
+     * key or when the source-detected key is not the correct deduplication
+     * identifier for your use case.
+     *
+     * > 📘 To revert to the source-detected primary keys and remove all overrides,
+     * > use [`DELETE /api/connections/{connection_id}/schemas/{schema_id}/primary_keys`](./delete).
+     *
+     * @param {string} connectionId - Unique identifier of the connection.
+     * @param {string} schemaId - Identifier of the schema whose primary keys are being overridden.
      * @param {Polytomic.SetPrimaryKeysRequest} request
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -229,32 +247,29 @@ export class Schemas {
         connectionId: string,
         schemaId: string,
         request: Polytomic.SetPrimaryKeysRequest = {},
-        requestOptions?: Schemas.RequestOptions,
+        requestOptions?: Schemas.RequestOptions
     ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(schemaId)}/primary_keys`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(
+                    schemaId
+                )}/primary_keys`
             ),
             method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -289,9 +304,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling PUT /api/connections/{connection_id}/schemas/{schema_id}/primary_keys.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -300,10 +313,14 @@ export class Schemas {
     }
 
     /**
-     * Delete all primary key overrides for a schema. After this call the schema will use the primary keys detected from the source connection, if any.
+     * Deletes all primary key overrides for a schema, reverting to the primary keys detected from the source.
      *
-     * @param {string} connectionId
-     * @param {string} schemaId
+     * To replace the overrides with a new set rather than clearing them entirely,
+     * use [`PUT /api/connections/{connection_id}/schemas/{schema_id}/primary_keys`](./put)
+     * instead.
+     *
+     * @param {string} connectionId - Unique identifier of the connection.
+     * @param {string} schemaId - Identifier of the schema whose primary key override should be cleared.
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -317,32 +334,29 @@ export class Schemas {
     public async resetPrimaryKeys(
         connectionId: string,
         schemaId: string,
-        requestOptions?: Schemas.RequestOptions,
+        requestOptions?: Schemas.RequestOptions
     ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(schemaId)}/primary_keys`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(connectionId)}/schemas/${encodeURIComponent(
+                    schemaId
+                )}/primary_keys`
             ),
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -376,9 +390,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling DELETE /api/connections/{connection_id}/schemas/{schema_id}/primary_keys.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -387,7 +399,28 @@ export class Schemas {
     }
 
     /**
-     * @param {string} id
+     * Refreshes a connection's cached schemas.
+     *
+     * Call this when the upstream source has added, removed, or changed tables,
+     * objects, or fields and you need Polytomic to re-inspect the connection before
+     * creating or updating sync configuration.
+     *
+     * This endpoint does not return the refreshed schemas directly. Follow the
+     * `Location` header or poll [`GET /api/connections/{id}/schemas/status`](./get-status)
+     * until the refresh completes, then fetch the schemas you need.
+     *
+     * > 📘 Schema refresh is asynchronous
+     * >
+     * > This endpoint kicks off a background refresh of the connection's cached
+     * > schemas and returns a `Location` header pointing at
+     * > [`GET /api/connections/{id}/schemas/status`](../../../../../api-reference/schemas/get-status).
+     * > Poll that endpoint until `cache_status` transitions from `refreshing` to
+     * > `fresh` (or until `last_refresh_finished` advances past
+     * > `last_refresh_started`) to observe completion.
+     * >
+     * > Only connections whose current health status is healthy may be refreshed.
+     *
+     * @param {string} id - Unique identifier of the connection whose schema cache should be refreshed.
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -401,28 +434,23 @@ export class Schemas {
     public async refresh(id: string, requestOptions?: Schemas.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/schemas/refresh`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/schemas/refresh`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -456,9 +484,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/connections/{id}/schemas/refresh.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -467,9 +493,25 @@ export class Schemas {
     }
 
     /**
-     * Polytomic periodically inspects the schemas for connections to discover new fields and update metadata. This endpoint returns the current inspection status.
+     * Returns the current schema inspection status for a connection.
      *
-     * @param {string} id
+     * Poll this endpoint after calling
+     * [`POST /api/connections/{id}/schemas/refresh`](../../../../../api-reference/schemas/refresh) to track
+     * progress. When `status` transitions to `completed`, the refreshed schemas
+     * are available for use in sync configuration.
+     *
+     * > 📘 Schema refresh is asynchronous
+     * >
+     * > This endpoint kicks off a background refresh of the connection's cached
+     * > schemas and returns a `Location` header pointing at
+     * > [`GET /api/connections/{id}/schemas/status`](../../../../../api-reference/schemas/get-status).
+     * > Poll that endpoint until `cache_status` transitions from `refreshing` to
+     * > `fresh` (or until `last_refresh_finished` advances past
+     * > `last_refresh_started`) to observe completion.
+     * >
+     * > Only connections whose current health status is healthy may be refreshed.
+     *
+     * @param {string} id - Unique identifier of the connection whose schema cache status should be returned.
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -482,32 +524,27 @@ export class Schemas {
      */
     public async getStatus(
         id: string,
-        requestOptions?: Schemas.RequestOptions,
+        requestOptions?: Schemas.RequestOptions
     ): Promise<Polytomic.BulkSyncSourceStatusEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/schemas/status`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/schemas/status`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -541,9 +578,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/schemas/status.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -552,8 +587,18 @@ export class Schemas {
     }
 
     /**
-     * @param {string} id
-     * @param {string} schemaId
+     * Returns a single schema on a connection.
+     *
+     * The schema is returned from the connection's cached schema set. If the
+     * upstream source has changed since the last inspection, the result may be
+     * stale.
+     *
+     * > 📘 Trigger [`POST /api/connections/{id}/schemas/refresh`](../../../../../api-reference/schemas/refresh)
+     * > and wait for it to complete before fetching this endpoint if you need
+     * > up-to-date field definitions.
+     *
+     * @param {string} id - Unique identifier of the connection.
+     * @param {string} schemaId - Identifier of the schema within the connection. Format depends on the connection type (e.g. schema.table for databases, object name for SaaS backends).
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -567,32 +612,27 @@ export class Schemas {
     public async get(
         id: string,
         schemaId: string,
-        requestOptions?: Schemas.RequestOptions,
+        requestOptions?: Schemas.RequestOptions
     ): Promise<Polytomic.BulkSyncSourceSchemaEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/schemas/${encodeURIComponent(schemaId)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/schemas/${encodeURIComponent(schemaId)}`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -626,9 +666,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/schemas/{schema_id}.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -637,8 +675,21 @@ export class Schemas {
     }
 
     /**
-     * @param {string} id
-     * @param {string} schemaId
+     * Returns a sample of records from a schema on a connection.
+     *
+     * The sample is intended for previewing the shape and values of data before
+     * committing to a sync configuration, not for full data export.
+     *
+     * > 🚧 The sample is not guaranteed to be representative of the full dataset.
+     * > Row selection is implementation-defined and may differ across connection
+     * > types.
+     *
+     * > 📘 If the schema's field definitions are stale, refresh them first with
+     * > [`POST /api/connections/{id}/schemas/refresh`](../../../../../../api-reference/schemas/refresh) to ensure
+     * > the sample aligns with the current schema structure.
+     *
+     * @param {string} id - Unique identifier of the connection.
+     * @param {string} schemaId - Identifier of the schema within the connection.
      * @param {Schemas.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -653,32 +704,27 @@ export class Schemas {
     public async getRecords(
         id: string,
         schemaId: string,
-        requestOptions?: Schemas.RequestOptions,
+        requestOptions?: Schemas.RequestOptions
     ): Promise<Polytomic.SchemaRecordsResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/schemas/${encodeURIComponent(schemaId)}/records`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/schemas/${encodeURIComponent(schemaId)}/records`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -714,9 +760,7 @@ export class Schemas {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/schemas/{schema_id}/records.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

@@ -9,5 +9,8 @@
  *     }
  */
 export interface BulkSyncListRequest {
+    /**
+     * Filter to only active (true) or only paused (false) syncs. Omit to return both.
+     */
     active?: boolean;
 }

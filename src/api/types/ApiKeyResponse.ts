@@ -3,5 +3,6 @@
  */
 
 export interface ApiKeyResponse {
+    /** Newly created API key. This value is shown only once; store it securely. */
     value?: string;
 }

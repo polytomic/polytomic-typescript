@@ -11,15 +11,15 @@
  */
 export interface ExecutionsListStatusRequest {
     /**
-     * Return the execution status of all syncs in the organization
+     * When true, return status for every sync in the caller's organization. Overrides any sync_id values.
      */
     all?: boolean;
     /**
-     * Return the execution status of all active syncs in the organization
+     * When true, return status only for active syncs in the caller's organization. Overrides any sync_id values.
      */
     active?: boolean;
     /**
-     * Return the execution status of the specified sync; this may be supplied multiple times.
+     * Return status for the specified bulk sync. Repeat the parameter to target multiple syncs. Ignored if all or active is true.
      */
     sync_id?: string | string[];
 }

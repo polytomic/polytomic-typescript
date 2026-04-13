@@ -9,5 +9,6 @@ import * as Polytomic from "../../../../index";
  *     {}
  */
 export interface UpsertSchemaFieldRequest {
+    /** Fields to create or update on the schema. Existing user-defined fields with the same field_id are replaced. */
     fields?: Polytomic.V4UserFieldRequest[];
 }

@@ -13,6 +13,8 @@ export interface StartBulkSyncRequest {
     /** Deprecated: use resync_mode instead. Equivalent to resync_mode=rebuild. */
     resync?: boolean;
     resync_mode?: Polytomic.BulkResyncMode;
+    /** Optional list of schema IDs to include in this execution. If empty, all enabled schemas are included. */
     schemas?: string[];
+    /** When true, runs a test execution that validates the configuration without writing to the destination. Mutually exclusive with resync and resync_mode. */
     test?: boolean;
 }

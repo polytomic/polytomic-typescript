@@ -9,5 +9,6 @@ import * as Polytomic from "../../../../index";
  *     {}
  */
 export interface SetPrimaryKeysRequest {
+    /** Ordered list of source fields that together form the primary key. Replaces any existing override; supply an empty list to clear. */
     fields?: Polytomic.SchemaPrimaryKeyOverrideInput[];
 }

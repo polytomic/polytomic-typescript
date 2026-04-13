@@ -8,7 +8,7 @@ import * as Polytomic from "../../../../../../index";
  * @example
  *     {
  *         schedule: {
- *             frequency: "manual"
+ *             frequency: Polytomic.ScheduleFrequency.Manual
  *         }
  *     }
  */

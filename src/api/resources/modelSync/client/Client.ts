@@ -5,23 +5,19 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
-import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 import { Targets } from "../resources/targets/client/Client";
 import { Executions } from "../resources/executions/client/Client";
 
 export declare namespace ModelSync {
-    export interface Options {
+    interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        /** Specify a custom URL to connect the client to. */
-        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<unknown>;
+        version?: core.Supplier<string | undefined>;
     }
 
-    export interface RequestOptions {
+    interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -29,28 +25,22 @@ export declare namespace ModelSync {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: unknown;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: string | undefined;
     }
 }
 
 export class ModelSync {
-    protected _targets: Targets | undefined;
-    protected _executions: Executions | undefined;
-
     constructor(protected readonly _options: ModelSync.Options) {}
 
-    public get targets(): Targets {
-        return (this._targets ??= new Targets(this._options));
-    }
-
-    public get executions(): Executions {
-        return (this._executions ??= new Executions(this._options));
-    }
-
     /**
-     * @param {string} id
+     * Describes the source configuration available on a connection for use as a model sync source.
+     *
+     * Use this endpoint before creating a model to understand what configuration is
+     * available. Once you have a configuration, resolve the fields available for
+     * sync mapping with
+     * [`GET /api/connections/{id}/modelsync/source/fields`](./fields/get).
+     *
+     * @param {string} id - Unique identifier of the connection.
      * @param {Polytomic.ModelSyncGetSourceRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -66,39 +56,34 @@ export class ModelSync {
     public async getSource(
         id: string,
         request: Polytomic.ModelSyncGetSourceRequest = {},
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.GetModelSyncSourceMetaEnvelope> {
         const { params } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (params != null) {
-            _queryParams["params"] = toJson(params);
+            _queryParams["params"] = JSON.stringify(params);
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/source`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/source`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -134,9 +119,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/source.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -145,7 +128,20 @@ export class ModelSync {
     }
 
     /**
-     * @param {string} id
+     * Returns the source fields available on a connection for a given source configuration.
+     *
+     * Pass the model's source configuration as query parameters to resolve the
+     * fields that the connection will expose for that specific configuration. The
+     * returned fields are what can be referenced in sync field mappings.
+     *
+     * > 📘 Results depend on the source configuration you supply. A different
+     * > table or query in the configuration may return a completely different field
+     * > list.
+     *
+     * The available source configuration parameters are described by
+     * [`GET /api/connections/{id}/modelsync/source`](../../../../../../api-reference/model-sync/get-source).
+     *
+     * @param {string} id - Unique identifier of the connection.
      * @param {Polytomic.ModelSyncGetSourceFieldsRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -161,39 +157,34 @@ export class ModelSync {
     public async getSourceFields(
         id: string,
         request: Polytomic.ModelSyncGetSourceFieldsRequest = {},
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ModelFieldResponse> {
         const { params } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (params != null) {
-            _queryParams["params"] = toJson(params);
+            _queryParams["params"] = JSON.stringify(params);
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/source/fields`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/source/fields`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -229,9 +220,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/source/fields.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -240,6 +229,21 @@ export class ModelSync {
     }
 
     /**
+     * Lists all model syncs in the caller's organization.
+     *
+     * Results are ordered by `updated_at` descending, with `id` used as a tiebreaker.
+     * If more results are available, the response includes `pagination.next_page_token`.
+     * Pass that token back unchanged to continue from the last item you received.
+     *
+     * The token is opaque. Do not construct or edit it yourself.
+     *
+     * The `limit` is capped at 50. Values above that cap are reduced to 50, and
+     * non-positive values fall back to the same default.
+     *
+     * This endpoint returns syncs visible to the current caller's organization scope.
+     * To inspect a specific sync in more detail, follow up with
+     * [`GET /api/syncs/{id}`](./get).
+     *
      * @param {Polytomic.ModelSyncListRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -251,16 +255,15 @@ export class ModelSync {
      * @example
      *     await client.modelSync.list({
      *         active: true,
-     *         mode: "create",
      *         target_connection_id: "0b155265-c537-44c9-9359-a3ceb468a4da"
      *     })
      */
     public async list(
         request: Polytomic.ModelSyncListRequest = {},
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ListModelSyncResponseEnvelope> {
         const { active, mode, target_connection_id: targetConnectionId } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (active != null) {
             _queryParams["active"] = active.toString();
         }
@@ -275,29 +278,24 @@ export class ModelSync {
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/syncs",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/syncs"
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -331,7 +329,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -340,6 +338,8 @@ export class ModelSync {
     }
 
     /**
+     * Creates a new model sync.
+     *
      * Create a new sync from one or more models to a destination.
      *
      * All of the functionality described in [the product
@@ -348,8 +348,8 @@ export class ModelSync {
      *
      * Guides:
      *
-     * - [Model sync (Reverse ETL) from Snowflake query to Salesforce](https://apidocs.polytomic.com/2024-02-08/guides/code-examples/model-sync-reverse-etl-from-snowflake-query-to-salesforce)
-     * - [Joined model sync from Postgres, Airtable, and Stripe to Hubspot](https://apidocs.polytomic.com/2024-02-08/guides/code-examples/joined-model-sync-from-postgres-airtable-and-stripe-to-hubspot)
+     * - [Model sync (Reverse ETL) from Snowflake query to Salesforce](../../guides/code-examples/model-sync-reverse-etl-from-snowflake-query-to-salesforce)
+     * - [Joined model sync from Postgres, Airtable, and Stripe to Hubspot](../../guides/code-examples/joined-model-sync-from-postgres-airtable-and-stripe-to-hubspot)
      *
      * ## Targets (Destinations)
      *
@@ -369,10 +369,10 @@ export class ModelSync {
      *
      * Some connections support additional configuration for targets. For example,
      * [Salesforce
-     * connections](https://apidocs.polytomic.com/2024-02-08/guides/configuring-your-connections/connections/salesforce#target)
+     * connections](../../guides/configuring-your-connections/connections/salesforce#target)
      * support optionally specifying the ingestion API to use. The target specific
      * options are passed as `configuration`; consult the [integration
-     * guides](https://apidocs.polytomic.com/2024-02-08/guides/configuring-your-connections/overview)
+     * guides](../../guides/configuring-your-connections/overview)
      * for details about specific connection configurations.
      *
      * ### Creating a new target
@@ -411,7 +411,7 @@ export class ModelSync {
      *         fields: [{
      *                 target: "name"
      *             }],
-     *         mode: "create",
+     *         mode: Polytomic.ModelSyncMode.Create,
      *         name: "Users Sync",
      *         schedule: {},
      *         target: {
@@ -421,32 +421,27 @@ export class ModelSync {
      */
     public async create(
         request: Polytomic.CreateModelSyncRequest,
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/syncs",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/syncs"
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -483,7 +478,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/syncs.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -492,6 +487,12 @@ export class ModelSync {
     }
 
     /**
+     * Returns the schedule types available when creating or updating a model sync.
+     *
+     * Use the `type` identifiers returned by this endpoint in the `schedule` field
+     * when creating or updating a sync via
+     * [`POST /api/syncs`](../../../api-reference/model-sync/create) or [`PUT /api/syncs/{id}`](../../../api-reference/model-sync/update).
+     *
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -501,32 +502,27 @@ export class ModelSync {
      *     await client.modelSync.getScheduleOptions()
      */
     public async getScheduleOptions(
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ScheduleOptionResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/syncs/schedules",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/syncs/schedules"
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -556,7 +552,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs/schedules.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -565,6 +561,12 @@ export class ModelSync {
     }
 
     /**
+     * Returns a single model sync by ID.
+     *
+     * To check whether a sync is currently running or has recently completed, use
+     * [`GET /api/syncs/{id}/status`](./status/get). For the full history of
+     * executions, use [`GET /api/syncs/{id}/executions`](./executions/get).
+     *
      * @param {string} id
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -577,32 +579,27 @@ export class ModelSync {
      */
     public async get(
         id: string,
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -634,7 +631,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -643,6 +640,22 @@ export class ModelSync {
     }
 
     /**
+     * Updates a model sync's configuration.
+     *
+     * Updating a model sync is a **full replacement** of the sync's configuration.
+     * Every field in the request body is written to the sync; any field you omit is
+     * cleared or reset to its default value.
+     *
+     * To make a partial change — for example, toggling `active` or adjusting a
+     * single field mapping — fetch the current sync with
+     * [`GET /api/syncs/{id}`](../../../api-reference/model-sync/get),
+     * modify the fields you want to change, and send the complete object back in
+     * the update request.
+     *
+     * Updates to `active`, `schedule`, and `policies` take effect immediately.
+     * Changes to source fields, target configuration, filters, or field mappings
+     * take effect on the sync's next execution.
+     *
      * @param {string} id
      * @param {Polytomic.UpdateModelSyncRequest} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
@@ -659,7 +672,7 @@ export class ModelSync {
      *         fields: [{
      *                 target: "name"
      *             }],
-     *         mode: "create",
+     *         mode: Polytomic.ModelSyncMode.Create,
      *         name: "Users Sync",
      *         schedule: {},
      *         target: {
@@ -670,32 +683,27 @@ export class ModelSync {
     public async update(
         id: string,
         request: Polytomic.UpdateModelSyncRequest,
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -734,7 +742,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/syncs/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -743,6 +751,12 @@ export class ModelSync {
     }
 
     /**
+     * Deletes a model sync, cancelling any running executions.
+     *
+     * Deletion is permanent. Any running execution is cancelled before the sync
+     * record is removed. Deleted syncs cannot be recovered; recreate them using
+     * [`POST /api/syncs`](../../../api-reference/model-sync/create) if needed.
+     *
      * @param {string} id
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -758,28 +772,23 @@ export class ModelSync {
     public async remove(id: string, requestOptions?: ModelSync.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -815,7 +824,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/syncs/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -824,6 +833,15 @@ export class ModelSync {
     }
 
     /**
+     * Sets whether a model sync is active.
+     *
+     * Only active syncs execute on schedule or in response to a manual trigger. Set
+     * `active` to `false` to pause a sync without deleting it.
+     *
+     * > 📘 Deactivating a sync does not cancel an execution that is already in
+     * > progress. Use [`POST /api/syncs/{id}/cancel`](../../../../api-reference/model-sync/cancel) to stop a
+     * > running execution.
+     *
      * @param {string} id
      * @param {Polytomic.ActivateSyncInput} request
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
@@ -841,32 +859,27 @@ export class ModelSync {
     public async activate(
         id: string,
         request: Polytomic.ActivateSyncInput,
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.ActivateSyncEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/activate`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/activate`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -901,7 +914,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/syncs/{id}/activate.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -910,6 +923,14 @@ export class ModelSync {
     }
 
     /**
+     * Requests cancellation of any running executions on a model sync.
+     *
+     * Cancellation is asynchronous. A successful response means the cancellation
+     * signal has been queued; the running execution continues until the signal is
+     * processed. Poll `GET /api/syncs/{id}/status` until the current execution
+     * reaches a terminal state (`completed`, `canceled`, or `failed`) to confirm
+     * cancellation has taken effect.
+     *
      * @param {string} id - The active execution of this sync ID will be cancelled.
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -923,32 +944,27 @@ export class ModelSync {
      */
     public async cancel(
         id: string,
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.CancelModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/cancel`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/cancel`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -982,7 +998,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/syncs/{id}/cancel.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -991,6 +1007,8 @@ export class ModelSync {
     }
 
     /**
+     * Starts a new execution of a model sync.
+     *
      * > 🚧 Force full resync
      * >
      * > Use caution when setting the `resync` parameter to `true`. This will force a full resync of the data from the source system. This can be a time-consuming operation and may impact the performance of the source system. It is recommended to only use this option when necessary.
@@ -1012,32 +1030,27 @@ export class ModelSync {
     public async start(
         id: string,
         request: Polytomic.StartModelSyncRequest = {},
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.StartModelSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/executions`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/executions`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -1076,9 +1089,7 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/syncs/{id}/executions.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -1087,6 +1098,12 @@ export class ModelSync {
     }
 
     /**
+     * Returns the current status of a model sync.
+     *
+     * The response includes a summary of the most recent execution, including its
+     * start time, completion time, and record counts. For the complete execution
+     * history, use [`GET /api/syncs/{id}/executions`](../../../../api-reference/model-sync/executions/list).
+     *
      * @param {string} id
      * @param {ModelSync.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1099,32 +1116,27 @@ export class ModelSync {
      */
     public async getStatus(
         id: string,
-        requestOptions?: ModelSync.RequestOptions,
+        requestOptions?: ModelSync.RequestOptions
     ): Promise<Polytomic.SyncStatusEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/syncs/${encodeURIComponent(id)}/status`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/syncs/${encodeURIComponent(id)}/status`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1156,12 +1168,24 @@ export class ModelSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/syncs/{id}/status.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
                 });
         }
+    }
+
+    protected _targets: Targets | undefined;
+
+    public get targets(): Targets {
+        return (this._targets ??= new Targets(this._options));
+    }
+
+    protected _executions: Executions | undefined;
+
+    public get executions(): Executions {
+        return (this._executions ??= new Executions(this._options));
     }
 
     protected async _getAuthorizationHeader(): Promise<string> {

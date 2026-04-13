@@ -3,6 +3,7 @@
  */
 
 export type BulkOutputDisposition = "retain" | "truncate" | "rebuild";
+
 export const BulkOutputDisposition = {
     Retain: "retain",
     Truncate: "truncate",

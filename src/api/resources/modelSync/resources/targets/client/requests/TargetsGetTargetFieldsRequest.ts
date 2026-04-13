@@ -10,6 +10,12 @@
  *     }
  */
 export interface TargetsGetTargetFieldsRequest {
+    /**
+     * Identifier of the target object (e.g. schema.table for a database destination, object name for a SaaS destination).
+     */
     target: string;
+    /**
+     * When true, force a cache refresh of the target's schema before returning its fields.
+     */
     refresh?: boolean;
 }

@@ -7,7 +7,6 @@ import * as Polytomic from "../../../../index";
 /**
  * @example
  *     {
- *         async: true,
  *         body: {
  *             configuration: {
  *                 "table": "public.users"

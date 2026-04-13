@@ -8,16 +8,13 @@ import { Policies } from "../resources/policies/client/Client";
 import { Roles } from "../resources/roles/client/Client";
 
 export declare namespace Permissions {
-    export interface Options {
+    interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        /** Specify a custom URL to connect the client to. */
-        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<unknown>;
+        version?: core.Supplier<string | undefined>;
     }
 
-    export interface RequestOptions {
+    interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -25,21 +22,20 @@ export declare namespace Permissions {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: unknown;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: string | undefined;
     }
 }
 
 export class Permissions {
-    protected _policies: Policies | undefined;
-    protected _roles: Roles | undefined;
-
     constructor(protected readonly _options: Permissions.Options) {}
+
+    protected _policies: Policies | undefined;
 
     public get policies(): Policies {
         return (this._policies ??= new Policies(this._options));
     }
+
+    protected _roles: Roles | undefined;
 
     public get roles(): Roles {
         return (this._roles ??= new Roles(this._options));

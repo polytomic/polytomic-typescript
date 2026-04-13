@@ -5,21 +5,17 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
-import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
 export declare namespace Connections {
-    export interface Options {
+    interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        /** Specify a custom URL to connect the client to. */
-        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<unknown>;
+        version?: core.Supplier<string | undefined>;
     }
 
-    export interface RequestOptions {
+    interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -27,9 +23,7 @@ export declare namespace Connections {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: unknown;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: string | undefined;
     }
 }
 
@@ -37,6 +31,15 @@ export class Connections {
     constructor(protected readonly _options: Connections.Options) {}
 
     /**
+     * Lists all connection types supported by this deployment.
+     *
+     * Each entry includes per-type metadata:
+     *
+     * - The available operations the connection type supports.
+     * - Its category.
+     * - Whether the connection type is enabled for the caller's organization.
+     * - Which modes (source, destination, enrichment) it can act as.
+     *
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -46,32 +49,27 @@ export class Connections {
      *     await client.connections.getTypes()
      */
     public async getTypes(
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.ConnectionTypeResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/connection_types",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/connection_types"
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -101,7 +99,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/connection_types.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -110,7 +108,16 @@ export class Connections {
     }
 
     /**
-     * @param {string} id
+     * Returns the JSON schema for a connection type.
+     *
+     * This schema is intended for building forms or validating configuration payloads
+     * client-side. It describes the structure Polytomic expects when you create or
+     * update a connection of the given type.
+     *
+     * The response is metadata about the shape of the configuration, not a live
+     * connection instance and not a set of current credential values.
+     *
+     * @param {string} id - Connection type identifier (e.g. postgresql, salesforce, hubspot).
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -122,32 +129,27 @@ export class Connections {
      */
     public async getConnectionTypeSchema(
         id: string,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.JsonschemaSchema> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connection_types/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connection_types/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -179,7 +181,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/connection_types/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -188,7 +190,17 @@ export class Connections {
     }
 
     /**
-     * @param {string} type_
+     * Returns completion values for parameter fields on a connection type.
+     *
+     * This endpoint is useful during connection setup, before a connection exists or
+     * before you want to persist it. The supplied `parameters` are applied to a
+     * temporary in-memory connection shape and used to resolve dependent options.
+     *
+     * When an endpoint requires upstream authorization before it can return values,
+     * Polytomic returns an error instead of guessing. In that case, complete the
+     * authorization flow first and call the endpoint again.
+     *
+     * @param {string} type
      * @param {Polytomic.GetConnectionTypeParameterValuesRequestSchema} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -203,34 +215,29 @@ export class Connections {
      *     })
      */
     public async getTypeParameterValues(
-        type_: string,
+        type: string,
         request: Polytomic.GetConnectionTypeParameterValuesRequestSchema,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.ConnectionParameterValuesResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connection_types/${encodeURIComponent(type_)}/parameter_values`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connection_types/${encodeURIComponent(type)}/parameter_values`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -265,9 +272,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/connection_types/{type}/parameter_values.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -276,6 +281,17 @@ export class Connections {
     }
 
     /**
+     * Lists every connection in the caller's organization, with sensitive fields redacted.
+     *
+     * Sensitive configuration values — passwords, API tokens, private keys — are
+     * redacted from all responses. To understand which fields a connection type
+     * exposes, consult the parameter schema returned by
+     * [`GET /api/connection_types`](../../api-reference/connections/get-types).
+     *
+     * To inspect the data objects available on a specific connection, use
+     * [`POST /api/connections/{id}/schemas/refresh`](../../api-reference/schemas/refresh)
+     * followed by [`GET /api/connections/{id}/schemas/status`](../../api-reference/schemas/get-status).
+     *
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -287,28 +303,23 @@ export class Connections {
     public async list(requestOptions?: Connections.RequestOptions): Promise<Polytomic.ConnectionListResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/connections",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/connections"
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -338,7 +349,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/connections.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -347,6 +358,18 @@ export class Connections {
     }
 
     /**
+     * Creates a new connection of the specified type.
+     *
+     * Use [`GET /api/connection_types`](../../api-reference/connections/get-types) to retrieve the
+     * list of available types and their parameter schemas. The `configuration`
+     * object is type-specific; consult the [integration
+     * guides](../../guides/configuring-your-connections/overview)
+     * for the required and optional fields for each type.
+     *
+     * > 📘 Polytomic validates the connection against the upstream service
+     * > immediately on creation. The request will fail if the credentials or
+     * > endpoint cannot be reached.
+     *
      * @param {Polytomic.CreateConnectionRequestSchema} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -371,32 +394,27 @@ export class Connections {
      */
     public async create(
         request: Polytomic.CreateConnectionRequestSchema,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.CreateConnectionResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/connections",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/connections"
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -433,7 +451,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/connections.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -442,15 +460,11 @@ export class Connections {
     }
 
     /**
-     * Creates a new request for [Polytomic Connect](https://www.polytomic.com/connect).
-     *
-     * This endpoint configures a Polytomic Connect request and returns the URL to
-     * redirect users to. This allows embedding Polytomic connection authorization in
-     * other applications.
+     * Creates a Polytomic Connect session and returns a redirect URL that embeds the Connect modal.
      *
      * See also:
      *
-     * - [Embedding authentication](https://apidocs.polytomic.com/2024-02-08/guides/embedding-authentication), a guide to using Polytomic Connect.
+     * - [Embedding authentication](../../../guides/embedding-authentication), a guide to using Polytomic Connect.
      *
      * @param {Polytomic.ConnectCardRequest} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
@@ -468,32 +482,27 @@ export class Connections {
      */
     public async connect(
         request: Polytomic.ConnectCardRequest,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.ConnectCardResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/connections/connect/",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/connections/connect/"
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -528,7 +537,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/connections/connect/.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -538,6 +547,17 @@ export class Connections {
 
     /**
      * Tests a connection configuration.
+     *
+     * This endpoint is useful for setup flows that want to verify credentials before
+     * persisting them.
+     *
+     * If you provide `connection_id`, Polytomic starts from the saved configuration
+     * for that connection and then applies the request's `configuration` values on
+     * top. This lets callers test a partial change without resending every existing
+     * field.
+     *
+     * The request does not persist any configuration changes even when validation
+     * succeeds.
      *
      * @param {Polytomic.TestConnectionRequest} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
@@ -561,32 +581,27 @@ export class Connections {
      */
     public async testConnection(
         request: Polytomic.TestConnectionRequest,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/connections/test",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/connections/test"
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -621,7 +636,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/connections/test.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -630,6 +645,13 @@ export class Connections {
     }
 
     /**
+     * Returns a single connection by ID, with sensitive fields redacted.
+     *
+     * To inspect the schemas available on this connection, trigger a refresh with
+     * [`POST /api/connections/{id}/schemas/refresh`](./schemas/refresh/post) and
+     * track progress via
+     * [`GET /api/connections/{id}/schemas/status`](./schemas/status/get).
+     *
      * @param {string} id
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -642,32 +664,27 @@ export class Connections {
      */
     public async get(
         id: string,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.ConnectionResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -699,7 +716,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/connections/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -708,6 +725,21 @@ export class Connections {
     }
 
     /**
+     * Updates a connection's configuration.
+     *
+     * Updating a connection is a **full replacement** of its configuration. Any
+     * `configuration` field you omit is cleared. To make a partial change, fetch
+     * the current connection with
+     * [`GET /api/connections/{id}`](./get), apply your edits, and send the
+     * complete object back.
+     *
+     * > 📘 The connection is re-validated against the upstream service after every
+     * > update. The request will fail if the new credentials or endpoint cannot be
+     * > reached.
+     *
+     * Syncs that are already running when the update is submitted are not
+     * interrupted; the updated configuration takes effect on their next execution.
+     *
      * @param {string} id
      * @param {Polytomic.UpdateConnectionRequestSchema} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
@@ -734,32 +766,27 @@ export class Connections {
     public async update(
         id: string,
         request: Polytomic.UpdateConnectionRequestSchema,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.CreateConnectionResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -798,7 +825,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/connections/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -807,6 +834,13 @@ export class Connections {
     }
 
     /**
+     * Deletes a connection.
+     *
+     * > 🚧 Deleting a connection that is referenced by fieldsets, syncs, bulk
+     * > syncs, or schedules returns `422 connection in use` unless you pass
+     * > `force=true`. With `force=true`, the API deletes those dependent
+     * > resources before removing the connection.
+     *
      * @param {string} id
      * @param {Polytomic.ConnectionsRemoveRequest} request
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
@@ -825,39 +859,34 @@ export class Connections {
     public async remove(
         id: string,
         request: Polytomic.ConnectionsRemoveRequest = {},
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<void> {
         const { force } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (force != null) {
             _queryParams["force"] = force.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -893,7 +922,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/connections/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -902,6 +931,17 @@ export class Connections {
     }
 
     /**
+     * Returns completion values for parameter fields on a persisted connection.
+     *
+     * Use this endpoint when the available options for one parameter depend on the
+     * connection's saved credentials or previously selected settings. For example,
+     * after a connection is authorized, the upstream service may be able to return
+     * lists of databases, schemas, or similar selectable values.
+     *
+     * For new setup flows, prefer
+     * [`POST /api/connection_types/{type}/parameter_values`](./get-type-parameter-values),
+     * which lets you resolve completions before the connection has been created.
+     *
      * @param {string} id
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -914,32 +954,27 @@ export class Connections {
      */
     public async getParameterValues(
         id: string,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.ConnectionParameterValuesResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/parameter_values`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/parameter_values`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -971,9 +1006,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/parameter_values.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -982,9 +1015,11 @@ export class Connections {
     }
 
     /**
+     * Shares a connection with another organization in the caller's partner account.
+     *
      * > 🚧 Requires partner key
      * >
-     * > Shared connections can only be created by using [partner keys](https://apidocs.polytomic.com/guides/obtaining-api-keys#partner-keys).
+     * > Shared connections can only be created by using [partner keys](../../../../guides/obtaining-api-keys#partner-keys).
      *
      * @param {string} parentConnectionId
      * @param {Polytomic.ApiRequest} request
@@ -1004,32 +1039,27 @@ export class Connections {
     public async createSharedConnection(
         parentConnectionId: string,
         request: Polytomic.ApiRequest,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.V2CreateSharedConnectionResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(parentConnectionId)}/share`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(parentConnectionId)}/share`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -1066,9 +1096,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/connections/{parent_connection_id}/share.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -1077,6 +1105,8 @@ export class Connections {
     }
 
     /**
+     * Lists shared copies of a connection.
+     *
      * @param {string} parentConnectionId
      * @param {Connections.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1091,32 +1121,27 @@ export class Connections {
      */
     public async listSharedConnections(
         parentConnectionId: string,
-        requestOptions?: Connections.RequestOptions,
+        requestOptions?: Connections.RequestOptions
     ): Promise<Polytomic.ConnectionListResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(parentConnectionId)}/shared`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(parentConnectionId)}/shared`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1152,9 +1177,7 @@ export class Connections {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{parent_connection_id}/shared.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

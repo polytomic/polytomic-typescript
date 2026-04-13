@@ -5,9 +5,13 @@
 import * as Polytomic from "../index";
 
 export interface Event {
+    /** Timestamp the event was emitted. */
     created_at?: string;
     event?: Polytomic.EventBody;
+    /** Unique identifier of the event. */
     id?: string;
+    /** Organization the event belongs to. */
     organization_id?: string;
+    /** Event type identifier. */
     type?: string;
 }

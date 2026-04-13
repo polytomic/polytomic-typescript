@@ -5,21 +5,17 @@
 import * as environments from "../../../../../../environments";
 import * as core from "../../../../../../core";
 import * as Polytomic from "../../../../../index";
-import { toJson } from "../../../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../../../errors/index";
 
 export declare namespace Targets {
-    export interface Options {
+    interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        /** Specify a custom URL to connect the client to. */
-        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<unknown>;
+        version?: core.Supplier<string | undefined>;
     }
 
-    export interface RequestOptions {
+    interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -27,9 +23,7 @@ export declare namespace Targets {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: unknown;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: string | undefined;
     }
 }
 
@@ -37,7 +31,13 @@ export class Targets {
     constructor(protected readonly _options: Targets.Options) {}
 
     /**
-     * @param {string} id
+     * Returns target metadata for a connection.
+     *
+     * > 🚧 Deprecated
+     * >
+     * > Use `GET /api/connections/{id}/modelsync/targetobjects` instead.
+     *
+     * @param {string} id - Unique identifier of the connection.
      * @param {Polytomic.modelSync.TargetsGetTargetRequest} request
      * @param {Targets.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -48,18 +48,15 @@ export class Targets {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.targets.getTarget("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         type: "type",
-     *         search: "search"
-     *     })
+     *     await client.modelSync.targets.getTarget("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async getTarget(
         id: string,
         request: Polytomic.modelSync.TargetsGetTargetRequest = {},
-        requestOptions?: Targets.RequestOptions,
+        requestOptions?: Targets.RequestOptions
     ): Promise<Polytomic.GetConnectionMetaEnvelope> {
         const { type: type_, search } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         if (type_ != null) {
             _queryParams["type"] = type_;
         }
@@ -70,29 +67,24 @@ export class Targets {
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/target`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/target`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -128,9 +120,7 @@ export class Targets {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/target.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -139,7 +129,21 @@ export class Targets {
     }
 
     /**
-     * @param {string} id
+     * Returns the fields of a specific target object on a connection.
+     *
+     * Pass the target object identifier to retrieve the fields available for
+     * mapping on that object. These are the destination fields you can reference
+     * when configuring field mappings in a model sync.
+     *
+     * > 📘 To list available target objects and their identifiers, use
+     * > [`GET /api/connections/{id}/modelsync/targetobjects`](../../../../../../api-reference/model-sync/targets/list).
+     *
+     * Fields returned here reflect the connection's current cached state. If the
+     * upstream object schema has changed, trigger a schema refresh with
+     * [`POST /api/connections/{id}/schemas/refresh`](../../../../../../api-reference/schemas/refresh)
+     * before calling this endpoint.
+     *
+     * @param {string} id - Unique identifier of the connection.
      * @param {Polytomic.modelSync.TargetsGetTargetFieldsRequest} request
      * @param {Targets.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -157,10 +161,10 @@ export class Targets {
     public async getTargetFields(
         id: string,
         request: Polytomic.modelSync.TargetsGetTargetFieldsRequest,
-        requestOptions?: Targets.RequestOptions,
+        requestOptions?: Targets.RequestOptions
     ): Promise<Polytomic.TargetResponseEnvelope> {
         const { target, refresh } = request;
-        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
+        const _queryParams: Record<string, string | string[] | object | object[]> = {};
         _queryParams["target"] = target;
         if (refresh != null) {
             _queryParams["refresh"] = refresh.toString();
@@ -168,29 +172,24 @@ export class Targets {
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/target/fields`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/target/fields`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -224,9 +223,7 @@ export class Targets {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/target/fields.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -235,7 +232,7 @@ export class Targets {
     }
 
     /**
-     * Returns available model sync destinations for a connection.
+     * Lists the target objects available on a connection for use as a model sync destination.
      *
      * If the connection supports creating new destinations, the `target_creation`
      * object will contain information on what properties are required to create the
@@ -244,7 +241,7 @@ export class Targets {
      * Target creation properties are all string values; the `enum` flag indicates if
      * the property has a fixed set of valid values. When `enum` is `true`, the [Target
      * Creation Property
-     * Values](https://apidocs.polytomic.com/2024-02-08/api-reference/model-sync/targets/get-create-property)
+     * Values](../../../../../api-reference/model-sync/targets/get-create-property)
      * endpoint can be used to retrieve the valid values.
      *
      * ## Sync modes
@@ -267,32 +264,27 @@ export class Targets {
      */
     public async list(
         id: string,
-        requestOptions?: Targets.RequestOptions,
+        requestOptions?: Targets.RequestOptions
     ): Promise<Polytomic.V4TargetObjectsResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/targetobjects`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/targetobjects`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -328,9 +320,7 @@ export class Targets {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/targetobjects.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -339,6 +329,8 @@ export class Targets {
     }
 
     /**
+     * Returns the valid values for a target-creation property on a connection that supports creating new target objects.
+     *
      * Connections which support creating new sync target objects (destinations) will
      * return `target_creation` with their [target object list](./list). This endpoint
      * will return possible values for properties where `enum` is `true`.
@@ -368,7 +360,7 @@ export class Targets {
      * ```
      *
      * The `value` for the selected option should be passed when [creating a
-     * sync](https://apidocs.polytomic.com/2024-02-08/api-reference/model-sync/create).
+     * sync](../../../../../../../api-reference/model-sync/create).
      *
      * @param {string} id
      * @param {string} property
@@ -386,32 +378,29 @@ export class Targets {
     public async getCreateProperty(
         id: string,
         property: string,
-        requestOptions?: Targets.RequestOptions,
+        requestOptions?: Targets.RequestOptions
     ): Promise<Polytomic.V4TargetPropertyValuesEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/modelsync/targetobjects/properties/${encodeURIComponent(property)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/modelsync/targetobjects/properties/${encodeURIComponent(
+                    property
+                )}`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -447,9 +436,7 @@ export class Targets {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling GET /api/connections/{id}/modelsync/targetobjects/properties/{property}.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

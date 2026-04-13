@@ -9,5 +9,8 @@
  *     }
  */
 export interface BulkSyncGetSourceRequest {
+    /**
+     * When true, include per-schema field lists in the response. Set to false for a smaller payload when field details are not needed.
+     */
     include_fields?: boolean;
 }

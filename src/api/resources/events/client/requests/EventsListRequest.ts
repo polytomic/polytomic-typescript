@@ -6,16 +6,29 @@
  * @example
  *     {
  *         organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *         type: "type",
- *         starting_after: "2020-01-01T00:00:00Z",
- *         ending_before: "2020-01-01T00:00:00Z",
- *         limit: 1
+ *         starting_after: new Date("2020-01-01T00:00:00.000Z"),
+ *         ending_before: new Date("2020-01-01T00:00:00.000Z")
  *     }
  */
 export interface EventsListRequest {
+    /**
+     * Organization to list events for. Only used by system callers; normal and partner callers are always scoped to their own organization.
+     */
     organization_id?: string;
+    /**
+     * Filter to a single event type. Use GET /api/events_types to list valid values.
+     */
     type?: string;
+    /**
+     * Return events created strictly after this timestamp.
+     */
     starting_after?: string;
+    /**
+     * Return events created strictly before this timestamp.
+     */
     ending_before?: string;
+    /**
+     * Maximum number of events to return. Default 10, maximum 100.
+     */
     limit?: number;
 }

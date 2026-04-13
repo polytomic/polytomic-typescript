@@ -5,8 +5,11 @@
 import * as Polytomic from "../index";
 
 export interface BulkSyncExecutionStatus {
+    /** Next scheduled execution time, if the sync has a schedule configured. */
     nextExecutionTime?: string;
+    /** Most recent execution status for each enabled schema in the sync. */
     schemas?: Polytomic.BulkSyncSchemaExecutionStatus[];
     status?: Polytomic.BulkExecutionStatus;
+    /** Unique identifier of the bulk sync. */
     sync_id?: string;
 }

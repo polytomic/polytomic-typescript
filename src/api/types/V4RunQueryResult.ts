@@ -7,6 +7,7 @@ import * as Polytomic from "../index";
 export interface V4RunQueryResult {
     /** The number of rows returned by the query. This will not be returned until the query completes. */
     count?: number;
+    /** Error message if the query failed. */
     error?: string;
     /** The time at which the query will expire and be deleted. This will not be returned until the query completes. */
     expires?: string;

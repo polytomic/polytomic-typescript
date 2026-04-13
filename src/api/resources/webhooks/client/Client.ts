@@ -5,21 +5,17 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
-import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
 export declare namespace Webhooks {
-    export interface Options {
+    interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
-        /** Specify a custom URL to connect the client to. */
-        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        /** Override the X-Polytomic-Version header */
-        version?: core.Supplier<unknown>;
+        version?: core.Supplier<string | undefined>;
     }
 
-    export interface RequestOptions {
+    interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -27,9 +23,7 @@ export declare namespace Webhooks {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: unknown;
-        /** Additional headers to include in the request. */
-        headers?: Record<string, string>;
+        version?: string | undefined;
     }
 }
 
@@ -37,11 +31,14 @@ export class Webhooks {
     constructor(protected readonly _options: Webhooks.Options) {}
 
     /**
-     * Webooks can be set up using the webhook API endpoints. Currently, only one
-     * webhook may be created per organization. The webhook will be called for events
-     * in that organization.
+     * Lists the webhooks for the caller's organization.
      *
-     * Consult the [Events documentation](https://apidocs.polytomic.com/guides/events) for more information.
+     * > 📘 One webhook per organization
+     * >
+     * > An organization can register a single webhook, which receives every event
+     * > produced in that organization. See the
+     * > [Events documentation](../../guides/events) for the
+     * > list of event types and payload shapes.
      *
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -54,28 +51,23 @@ export class Webhooks {
     public async list(requestOptions?: Webhooks.RequestOptions): Promise<Polytomic.WebhookListEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/webhooks",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/webhooks"
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -105,7 +97,7 @@ export class Webhooks {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/webhooks.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -114,11 +106,14 @@ export class Webhooks {
     }
 
     /**
-     * Webooks can be set up using the webhook API endpoints. Currently, only one
-     * webhook may be created per organization. The webhook will be called for events
-     * in that organization.
+     * Creates the organization's webhook.
      *
-     * Consult the [Events documentation](https://apidocs.polytomic.com/guides/events) for more information.
+     * > 📘 One webhook per organization
+     * >
+     * > An organization can register a single webhook, which receives every event
+     * > produced in that organization. See the
+     * > [Events documentation](../../guides/events) for the
+     * > list of event types and payload shapes.
      *
      * @param {Polytomic.CreateWebhooksSchema} request
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
@@ -135,32 +130,27 @@ export class Webhooks {
      */
     public async create(
         request: Polytomic.CreateWebhooksSchema,
-        requestOptions?: Webhooks.RequestOptions,
+        requestOptions?: Webhooks.RequestOptions
     ): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                "api/webhooks",
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                "api/webhooks"
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -193,7 +183,7 @@ export class Webhooks {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/webhooks.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -202,11 +192,14 @@ export class Webhooks {
     }
 
     /**
-     * Webooks can be set up using the webhook API endpoints. Currently, only one
-     * webhook may be created per organization. The webhook will be called for events
-     * in that organization.
+     * Returns a single webhook by ID.
      *
-     * Consult the [Events documentation](https://apidocs.polytomic.com/guides/events) for more information.
+     * > 📘 One webhook per organization
+     * >
+     * > An organization can register a single webhook, which receives every event
+     * > produced in that organization. See the
+     * > [Events documentation](../../../guides/events) for the
+     * > list of event types and payload shapes.
      *
      * @param {string} id
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
@@ -220,28 +213,23 @@ export class Webhooks {
     public async get(id: string, requestOptions?: Webhooks.RequestOptions): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/webhooks/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/webhooks/${encodeURIComponent(id)}`
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -271,7 +259,7 @@ export class Webhooks {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/webhooks/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -280,11 +268,14 @@ export class Webhooks {
     }
 
     /**
-     * Webooks can be set up using the webhook API endpoints. Currently, only one
-     * webhook may be created per organization. The webhook will be called for events
-     * in that organization.
+     * Updates an existing webhook.
      *
-     * Consult the [Events documentation](https://apidocs.polytomic.com/guides/events) for more information.
+     * > 📘 One webhook per organization
+     * >
+     * > An organization can register a single webhook, which receives every event
+     * > produced in that organization. See the
+     * > [Events documentation](../../../guides/events) for the
+     * > list of event types and payload shapes.
      *
      * @param {string} id
      * @param {Polytomic.UpdateWebhooksSchema} request
@@ -303,32 +294,27 @@ export class Webhooks {
     public async update(
         id: string,
         request: Polytomic.UpdateWebhooksSchema,
-        requestOptions?: Webhooks.RequestOptions,
+        requestOptions?: Webhooks.RequestOptions
     ): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/webhooks/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/webhooks/${encodeURIComponent(id)}`
             ),
             method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -361,7 +347,7 @@ export class Webhooks {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/webhooks/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -370,6 +356,19 @@ export class Webhooks {
     }
 
     /**
+     * Deletes a webhook.
+     *
+     * > 📘 One webhook per organization
+     * >
+     * > An organization can register a single webhook, which receives every event
+     * > produced in that organization. See the
+     * > [Events documentation](../../../guides/events) for the
+     * > list of event types and payload shapes.
+     *
+     * Deletion is permanent. To stop delivery without losing the webhook
+     * configuration, use
+     * [`POST /api/webhooks/{id}/disable`](./disable/post) instead.
+     *
      * @param {string} id
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -383,28 +382,23 @@ export class Webhooks {
     public async remove(id: string, requestOptions?: Webhooks.RequestOptions): Promise<void> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/webhooks/${encodeURIComponent(id)}`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/webhooks/${encodeURIComponent(id)}`
             ),
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -436,7 +430,7 @@ export class Webhooks {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/webhooks/{id}.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -445,6 +439,20 @@ export class Webhooks {
     }
 
     /**
+     * Disables a webhook without deleting it.
+     *
+     * > 📘 One webhook per organization
+     * >
+     * > An organization can register a single webhook, which receives every event
+     * > produced in that organization. See the
+     * > [Events documentation](../../../../guides/events) for the
+     * > list of event types and payload shapes.
+     *
+     * Events are not queued while the webhook is disabled — any activity that occurs
+     * during the disabled period is not delivered retroactively. To resume
+     * delivery, re-enable the webhook using
+     * [`POST /api/webhooks/{id}/enable`](../../../../api-reference/webhooks/enable).
+     *
      * @param {string} id
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -458,28 +466,23 @@ export class Webhooks {
     public async disable(id: string, requestOptions?: Webhooks.RequestOptions): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/webhooks/${encodeURIComponent(id)}/disable`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/webhooks/${encodeURIComponent(id)}/disable`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -511,9 +514,7 @@ export class Webhooks {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError(
-                    "Timeout exceeded when calling POST /api/webhooks/{id}/disable.",
-                );
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -522,6 +523,18 @@ export class Webhooks {
     }
 
     /**
+     * Re-enables a previously disabled webhook.
+     *
+     * > 📘 One webhook per organization
+     * >
+     * > An organization can register a single webhook, which receives every event
+     * > produced in that organization. See the
+     * > [Events documentation](../../../../guides/events) for the
+     * > list of event types and payload shapes.
+     *
+     * Delivery resumes from the next event generated after this call. Events that
+     * occurred while the webhook was disabled are not replayed.
+     *
      * @param {string} id
      * @param {Webhooks.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -535,28 +548,23 @@ export class Webhooks {
     public async enable(id: string, requestOptions?: Webhooks.RequestOptions): Promise<Polytomic.WebhookEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/webhooks/${encodeURIComponent(id)}/enable`,
+                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
+                `api/webhooks/${encodeURIComponent(id)}/enable`
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    typeof (await core.Supplier.get(this._options.version)) === "string"
+                    (await core.Supplier.get(this._options.version)) != null
                         ? await core.Supplier.get(this._options.version)
-                        : toJson(await core.Supplier.get(this._options.version)),
+                        : undefined,
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.0",
-                "User-Agent": "polytomic/1.17.0",
+                "X-Fern-SDK-Version": "1.17.1",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
-                ...requestOptions?.headers,
             },
             contentType: "application/json",
-            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -588,7 +596,7 @@ export class Webhooks {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/webhooks/{id}/enable.");
+                throw new errors.PolytomicTimeoutError();
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
