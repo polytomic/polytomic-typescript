@@ -5,17 +5,21 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
 export declare namespace QueryRunner {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        version?: core.Supplier<string | undefined>;
+        /** Override the X-Polytomic-Version header */
+        version?: core.Supplier<unknown>;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -23,7 +27,9 @@ export declare namespace QueryRunner {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -34,7 +40,7 @@ export class QueryRunner {
      * Submits a query for asynchronous execution against the connection.
      *
      * This endpoint returns immediately with a query task ID. It does not wait for
-     * the query to finish. Poll [`GET /api/queries/{id}`](./get-query) until `status`
+     * the query to finish. Poll [`GET /api/queries/{id}`](../../../../api-reference/query-runner/get-query) until `status`
      * reaches `done` or `failed`.
      *
      * Only the user who created the query can fetch its results later. Query results
@@ -58,34 +64,39 @@ export class QueryRunner {
     public async runQuery(
         connectionId: string,
         request: Polytomic.V4RunQueryRequest = {},
-        requestOptions?: QueryRunner.RequestOptions
+        requestOptions?: QueryRunner.RequestOptions,
     ): Promise<Polytomic.V4RunQueryEnvelope> {
         const { query, ..._body } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (query != null) {
             _queryParams["query"] = query;
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(connectionId)}/query`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(connectionId)}/query`,
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             body: _body,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -120,7 +131,9 @@ export class QueryRunner {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling POST /api/connections/{connection_id}/query.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -132,7 +145,7 @@ export class QueryRunner {
      * Fetches the latest status for a submitted query and, once complete, returns fields and paginated results.
      *
      * This endpoint is the second step of the query-runner flow. First call
-     * [`POST /api/connections/{connection_id}/query`](./run-query),
+     * [`POST /api/connections/{connection_id}/query`](../../../api-reference/query-runner/run-query),
      * then poll this endpoint with the returned ID.
      *
      * Results may be paginated across multiple blobs. When that happens, use the
@@ -153,39 +166,46 @@ export class QueryRunner {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.queryRunner.getQuery("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.queryRunner.getQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         page: "page"
+     *     })
      */
     public async getQuery(
         id: string,
         request: Polytomic.QueryRunnerGetQueryRequest = {},
-        requestOptions?: QueryRunner.RequestOptions
+        requestOptions?: QueryRunner.RequestOptions,
     ): Promise<Polytomic.V4QueryResultsEnvelope> {
         const { page } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (page != null) {
             _queryParams["page"] = page;
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/queries/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/queries/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -219,7 +239,7 @@ export class QueryRunner {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/queries/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

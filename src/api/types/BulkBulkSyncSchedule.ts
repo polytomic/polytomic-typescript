@@ -13,6 +13,7 @@ export interface BulkBulkSyncSchedule {
     deletedBy?: string;
     frequency: Polytomic.ScheduleFrequency;
     hour?: string;
+    isDefault?: boolean;
     minute?: string;
     month?: string;
     schemas?: string[];

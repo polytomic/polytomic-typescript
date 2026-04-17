@@ -3,7 +3,6 @@
  */
 
 export type BulkResyncMode = "refetch" | "resync" | "rebuild";
-
 export const BulkResyncMode = {
     Refetch: "refetch",
     Resync: "resync",

@@ -32,7 +32,6 @@ export type FilterFunction =
     | "StringLike"
     | "StringNotLike"
     | "StringMatchesTrimmed";
-
 export const FilterFunction = {
     Equality: "Equality",
     Inequality: "Inequality",

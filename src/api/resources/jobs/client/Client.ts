@@ -5,17 +5,21 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
 export declare namespace Jobs {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        version?: core.Supplier<string | undefined>;
+        /** Override the X-Polytomic-Version header */
+        version?: core.Supplier<unknown>;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -23,7 +27,9 @@ export declare namespace Jobs {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -43,8 +49,8 @@ export class Jobs {
      * Only specific job types are supported by this endpoint. Passing an unknown
      * `type` returns `400`.
      *
+     * @param {string} type_ - Job type. One of: createmodel, updatemodel, previewmodel, samplemodel, exportlogs.
      * @param {string} id - Unique identifier of the job (usually returned by whichever endpoint started the job).
-     * @param {string} type - Job type. One of: createmodel, updatemodel, previewmodel, samplemodel, exportlogs.
      * @param {Jobs.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -53,32 +59,37 @@ export class Jobs {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.jobs.get("248df4b7-aa70-47b8-a036-33ac447e668d", "createmodel")
+     *     await client.jobs.get("createmodel", "248df4b7-aa70-47b8-a036-33ac447e668d")
      */
     public async get(
+        type_: string,
         id: string,
-        type: string,
-        requestOptions?: Jobs.RequestOptions
+        requestOptions?: Jobs.RequestOptions,
     ): Promise<Polytomic.JobResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/jobs/${encodeURIComponent(type)}/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/jobs/${encodeURIComponent(type_)}/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -112,7 +123,7 @@ export class Jobs {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/jobs/{type}/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

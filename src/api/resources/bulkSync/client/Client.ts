@@ -5,6 +5,7 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 import { Executions } from "../resources/executions/client/Client";
@@ -12,13 +13,16 @@ import { Schemas } from "../resources/schemas/client/Client";
 import { Schedules } from "../resources/schedules/client/Client";
 
 export declare namespace BulkSync {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        version?: core.Supplier<string | undefined>;
+        /** Override the X-Polytomic-Version header */
+        version?: core.Supplier<unknown>;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -26,12 +30,30 @@ export declare namespace BulkSync {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
 export class BulkSync {
+    protected _executions: Executions | undefined;
+    protected _schemas: Schemas | undefined;
+    protected _schedules: Schedules | undefined;
+
     constructor(protected readonly _options: BulkSync.Options) {}
+
+    public get executions(): Executions {
+        return (this._executions ??= new Executions(this._options));
+    }
+
+    public get schemas(): Schemas {
+        return (this._schemas ??= new Schemas(this._options));
+    }
+
+    public get schedules(): Schedules {
+        return (this._schedules ??= new Schedules(this._options));
+    }
 
     /**
      * Lists bulk syncs in the caller's organization.
@@ -60,34 +82,39 @@ export class BulkSync {
      */
     public async list(
         request: Polytomic.BulkSyncListRequest = {},
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncListEnvelope> {
         const { active } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (active != null) {
             _queryParams["active"] = active.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/bulk/syncs"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/bulk/syncs",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -117,7 +144,7 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/bulk/syncs.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -186,34 +213,39 @@ export class BulkSync {
      *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
      *         name: "My Bulk Sync",
      *         schedule: {
-     *             frequency: Polytomic.ScheduleFrequency.Manual
+     *             frequency: "manual"
      *         },
      *         source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
      *     })
      */
     public async create(
         request: Polytomic.CreateBulkSyncRequest,
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/bulk/syncs"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/bulk/syncs",
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -250,7 +282,7 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling POST /api/bulk/syncs.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -284,34 +316,39 @@ export class BulkSync {
     public async get(
         id: string,
         request: Polytomic.BulkSyncGetRequest = {},
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncResponseEnvelope> {
         const { refresh_schemas: refreshSchemas } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (refreshSchemas != null) {
             _queryParams["refresh_schemas"] = refreshSchemas.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -341,7 +378,7 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/bulk/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -358,7 +395,7 @@ export class BulkSync {
      *
      * To make a partial change — for example, toggling `active` or swapping a
      * schedule — fetch the current sync with
-     * [`GET /api/bulk/syncs/{id}`](./get),
+     * [`GET /api/bulk/syncs/{id}`](../../../../api-reference/bulk-sync/get),
      * modify the fields you want to change, and send the complete object back in
      * the update request.
      *
@@ -381,9 +418,9 @@ export class BulkSync {
      * > 📘 Updating schemas
      * >
      * > Schema updates are not performed through this endpoint. Use the
-     * > [Update Bulk Sync Schemas](./schemas/patch)
+     * > [Update Bulk Sync Schemas](../../../../api-reference/bulk-sync/schemas/patch)
      * > endpoint to change a subset of schemas, or
-     * > [Update Bulk Sync Schema](./schemas/%7Bschema_id%7D/put)
+     * > [Update Bulk Sync Schema](../../../../api-reference/bulk-sync/schemas/update)
      * > to replace a single schema's configuration.
      *
      * @param {string} id
@@ -404,7 +441,7 @@ export class BulkSync {
      *         destination_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
      *         name: "My Bulk Sync",
      *         schedule: {
-     *             frequency: Polytomic.ScheduleFrequency.Manual
+     *             frequency: "manual"
      *         },
      *         source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
      *     })
@@ -412,27 +449,32 @@ export class BulkSync {
     public async update(
         id: string,
         request: Polytomic.UpdateBulkSyncRequest,
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}`,
             ),
             method: "PUT",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -469,7 +511,7 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling PUT /api/bulk/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -503,34 +545,39 @@ export class BulkSync {
     public async remove(
         id: string,
         request: Polytomic.BulkSyncRemoveRequest = {},
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<void> {
         const { refresh_schemas: refreshSchemas } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (refreshSchemas != null) {
             _queryParams["refresh_schemas"] = refreshSchemas.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(id)}`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}`,
             ),
             method: "DELETE",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -564,7 +611,7 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling DELETE /api/bulk/syncs/{id}.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -601,27 +648,32 @@ export class BulkSync {
     public async activate(
         id: string,
         request: Polytomic.ActivateSyncInput,
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.ActivateSyncEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(id)}/activate`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}/activate`,
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -656,7 +708,9 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling POST /api/bulk/syncs/{id}/activate.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -686,27 +740,32 @@ export class BulkSync {
      */
     public async cancel(
         id: string,
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.CancelBulkSyncResponseEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(id)}/cancel`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}/cancel`,
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -740,7 +799,9 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling POST /api/bulk/syncs/{id}/cancel.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -780,27 +841,32 @@ export class BulkSync {
     public async start(
         id: string,
         request: Polytomic.StartBulkSyncRequest = {},
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncExecutionEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(id)}/executions`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}/executions`,
             ),
             method: "POST",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             body: request,
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
@@ -833,7 +899,9 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling POST /api/bulk/syncs/{id}/executions.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -866,27 +934,32 @@ export class BulkSync {
      */
     public async getStatus(
         id: string,
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncStatusEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/bulk/syncs/${encodeURIComponent(id)}/status`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/bulk/syncs/${encodeURIComponent(id)}/status`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -918,7 +991,9 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling GET /api/bulk/syncs/{id}/status.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -959,34 +1034,39 @@ export class BulkSync {
     public async getSource(
         id: string,
         request: Polytomic.BulkSyncGetSourceRequest = {},
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncSourceEnvelope> {
         const { include_fields: includeFields } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (includeFields != null) {
             _queryParams["include_fields"] = includeFields.toString();
         }
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/bulksync/source`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/bulksync/source`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1020,7 +1100,9 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling GET /api/connections/{id}/bulksync/source.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -1054,27 +1136,32 @@ export class BulkSync {
      */
     public async getDestination(
         id: string,
-        requestOptions?: BulkSync.RequestOptions
+        requestOptions?: BulkSync.RequestOptions,
     ): Promise<Polytomic.BulkSyncDestEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                `api/connections/${encodeURIComponent(id)}/bulksync/target`
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/connections/${encodeURIComponent(id)}/bulksync/target`,
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1108,30 +1195,14 @@ export class BulkSync {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError(
+                    "Timeout exceeded when calling GET /api/connections/{id}/bulksync/target.",
+                );
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
                 });
         }
-    }
-
-    protected _executions: Executions | undefined;
-
-    public get executions(): Executions {
-        return (this._executions ??= new Executions(this._options));
-    }
-
-    protected _schemas: Schemas | undefined;
-
-    public get schemas(): Schemas {
-        return (this._schemas ??= new Schemas(this._options));
-    }
-
-    protected _schedules: Schedules | undefined;
-
-    public get schedules(): Schedules {
-        return (this._schedules ??= new Schedules(this._options));
     }
 
     protected async _getAuthorizationHeader(): Promise<string> {

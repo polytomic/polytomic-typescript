@@ -3,7 +3,6 @@
  */
 
 export type BulkNormalizeNames = "enabled" | "disabled" | "legacy";
-
 export const BulkNormalizeNames = {
     Enabled: "enabled",
     Disabled: "disabled",

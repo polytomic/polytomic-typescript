@@ -3,6 +3,7 @@
  */
 
 export interface V4UserFieldRequest {
+    /** Example value shown in the UI and used as a hint for downstream consumers. */
     example?: unknown;
     /** Stable identifier for the user-defined field. Reuse an existing field_id to update a field in place. */
     field_id: string;

@@ -5,17 +5,21 @@
 import * as environments from "../../../../environments";
 import * as core from "../../../../core";
 import * as Polytomic from "../../../index";
+import { toJson } from "../../../../core/json";
 import urlJoin from "url-join";
 import * as errors from "../../../../errors/index";
 
 export declare namespace Events {
-    interface Options {
+    export interface Options {
         environment?: core.Supplier<environments.PolytomicEnvironment | string>;
+        /** Specify a custom URL to connect the client to. */
+        baseUrl?: core.Supplier<string>;
         token: core.Supplier<core.BearerToken>;
-        version?: core.Supplier<string | undefined>;
+        /** Override the X-Polytomic-Version header */
+        version?: core.Supplier<unknown>;
     }
 
-    interface RequestOptions {
+    export interface RequestOptions {
         /** The maximum time to wait for a response in seconds. */
         timeoutInSeconds?: number;
         /** The number of times to retry the request. Defaults to 2. */
@@ -23,7 +27,9 @@ export declare namespace Events {
         /** A hook to abort the request. */
         abortSignal?: AbortSignal;
         /** Override the X-Polytomic-Version header */
-        version?: string | undefined;
+        version?: unknown;
+        /** Additional headers to include in the request. */
+        headers?: Record<string, string>;
     }
 }
 
@@ -54,13 +60,15 @@ export class Events {
      * @example
      *     await client.events.list({
      *         organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-     *         starting_after: new Date("2020-01-01T00:00:00.000Z"),
-     *         ending_before: new Date("2020-01-01T00:00:00.000Z")
+     *         type: "type",
+     *         starting_after: "2020-01-01T00:00:00Z",
+     *         ending_before: "2020-01-01T00:00:00Z",
+     *         limit: 1
      *     })
      */
     public async list(
         request: Polytomic.EventsListRequest = {},
-        requestOptions?: Events.RequestOptions
+        requestOptions?: Events.RequestOptions,
     ): Promise<Polytomic.EventsEnvelope> {
         const {
             organization_id: organizationId,
@@ -69,7 +77,7 @@ export class Events {
             ending_before: endingBefore,
             limit,
         } = request;
-        const _queryParams: Record<string, string | string[] | object | object[]> = {};
+        const _queryParams: Record<string, string | string[] | object | object[] | null> = {};
         if (organizationId != null) {
             _queryParams["organization_id"] = organizationId;
         }
@@ -92,24 +100,29 @@ export class Events {
 
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/events"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/events",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
             queryParameters: _queryParams,
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -141,7 +154,7 @@ export class Events {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/events.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,
@@ -165,23 +178,28 @@ export class Events {
     public async getTypes(requestOptions?: Events.RequestOptions): Promise<Polytomic.EventTypesEnvelope> {
         const _response = await core.fetcher({
             url: urlJoin(
-                (await core.Supplier.get(this._options.environment)) ?? environments.PolytomicEnvironment.Default,
-                "api/events_types"
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/events_types",
             ),
             method: "GET",
             headers: {
                 Authorization: await this._getAuthorizationHeader(),
                 "X-Polytomic-Version":
-                    (await core.Supplier.get(this._options.version)) != null
+                    typeof (await core.Supplier.get(this._options.version)) === "string"
                         ? await core.Supplier.get(this._options.version)
-                        : undefined,
+                        : toJson(await core.Supplier.get(this._options.version)),
                 "X-Fern-Language": "JavaScript",
                 "X-Fern-SDK-Name": "polytomic",
-                "X-Fern-SDK-Version": "1.17.1",
+                "X-Fern-SDK-Version": "1.18.0",
+                "User-Agent": "polytomic/1.18.0",
                 "X-Fern-Runtime": core.RUNTIME.type,
                 "X-Fern-Runtime-Version": core.RUNTIME.version,
+                ...requestOptions?.headers,
             },
             contentType: "application/json",
+            requestType: "json",
             timeoutMs: requestOptions?.timeoutInSeconds != null ? requestOptions.timeoutInSeconds * 1000 : 60000,
             maxRetries: requestOptions?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -209,7 +227,7 @@ export class Events {
                     body: _response.error.rawBody,
                 });
             case "timeout":
-                throw new errors.PolytomicTimeoutError();
+                throw new errors.PolytomicTimeoutError("Timeout exceeded when calling GET /api/events_types.");
             case "unknown":
                 throw new errors.PolytomicError({
                     message: _response.error.errorMessage,

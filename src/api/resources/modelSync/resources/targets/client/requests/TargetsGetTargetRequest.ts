@@ -4,7 +4,10 @@
 
 /**
  * @example
- *     {}
+ *     {
+ *         type: "type",
+ *         search: "search"
+ *     }
  */
 export interface TargetsGetTargetRequest {
     /**

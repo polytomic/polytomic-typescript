@@ -6,7 +6,6 @@
  * How the data is fetched. 'none' is normal operation for Polytomic. 'incremental' and 'full' apply to syncs from Salesforce. 'incremental' indicates the data is synced incrementally using record modification time. 'full' is necessary to catch up to the latest values for formula fields and rollup fields whose updates don't show up in incremental runs due to limitations in Salesforce.
  */
 export type BulkFetchMode = "none" | "incremental" | "full";
-
 export const BulkFetchMode = {
     None: "none",
     Incremental: "incremental",

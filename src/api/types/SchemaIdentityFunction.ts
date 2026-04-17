@@ -3,7 +3,6 @@
  */
 
 export type SchemaIdentityFunction = "Equality" | "ISubstring" | "OneOf" | "DomainMatch" | "HostnameMatch";
-
 export const SchemaIdentityFunction = {
     Equality: "Equality",
     ISubstring: "ISubstring",

@@ -8,6 +8,7 @@ import * as Polytomic from "../../../../index";
  * @example
  *     {
  *         active: true,
+ *         mode: "create",
  *         target_connection_id: "0b155265-c537-44c9-9359-a3ceb468a4da"
  *     }
  */

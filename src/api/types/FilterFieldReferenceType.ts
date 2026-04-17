@@ -3,7 +3,6 @@
  */
 
 export type FilterFieldReferenceType = "Model" | "Target";
-
 export const FilterFieldReferenceType = {
     Model: "Model",
     Target: "Target",

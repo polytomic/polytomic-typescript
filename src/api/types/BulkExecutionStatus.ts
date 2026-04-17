@@ -14,7 +14,6 @@ export type BulkExecutionStatus =
     | "processing"
     | "errors"
     | "interrupted";
-
 export const BulkExecutionStatus = {
     Created: "created",
     Scheduled: "scheduled",
