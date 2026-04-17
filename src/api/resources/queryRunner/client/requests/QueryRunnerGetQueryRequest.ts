@@ -4,9 +4,7 @@
 
 /**
  * @example
- *     {
- *         page: "page"
- *     }
+ *     {}
  */
 export interface QueryRunnerGetQueryRequest {
     /**

@@ -13,6 +13,7 @@ export type ScheduleFrequency =
     | "runafter"
     | "multi"
     | "dbtcloud";
+
 export const ScheduleFrequency = {
     Manual: "manual",
     Continuous: "continuous",

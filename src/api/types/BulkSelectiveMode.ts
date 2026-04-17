@@ -3,6 +3,7 @@
  */
 
 export type BulkSelectiveMode = "none" | "incrementalFields" | "nonincrementalFields";
+
 export const BulkSelectiveMode = {
     None: "none",
     IncrementalFields: "incrementalFields",

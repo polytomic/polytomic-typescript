@@ -3,6 +3,7 @@
  */
 
 export type UtilFieldType = "unknown" | "string" | "number" | "boolean" | "datetime" | "array" | "object" | "binary";
+
 export const UtilFieldType = {
     Unknown: "unknown",
     String: "string",

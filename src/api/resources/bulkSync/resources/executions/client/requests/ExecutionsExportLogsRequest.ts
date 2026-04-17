@@ -4,9 +4,7 @@
 
 /**
  * @example
- *     {
- *         notify: true
- *     }
+ *     {}
  */
 export interface ExecutionsExportLogsRequest {
     /**

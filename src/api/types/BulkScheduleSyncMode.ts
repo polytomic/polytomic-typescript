@@ -3,6 +3,7 @@
  */
 
 export type BulkScheduleSyncMode = "normal" | "refetch" | "resync" | "rebuild";
+
 export const BulkScheduleSyncMode = {
     Normal: "normal",
     Refetch: "refetch",

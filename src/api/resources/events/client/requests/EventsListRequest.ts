@@ -6,10 +6,8 @@
  * @example
  *     {
  *         organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
- *         type: "type",
- *         starting_after: "2020-01-01T00:00:00Z",
- *         ending_before: "2020-01-01T00:00:00Z",
- *         limit: 1
+ *         starting_after: new Date("2020-01-01T00:00:00.000Z"),
+ *         ending_before: new Date("2020-01-01T00:00:00.000Z")
  *     }
  */
 export interface EventsListRequest {

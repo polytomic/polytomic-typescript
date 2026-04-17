@@ -4,9 +4,7 @@
 
 /**
  * @example
- *     {
- *         async: true
- *     }
+ *     {}
  */
 export interface ModelsRemoveRequest {
     async?: boolean;

@@ -3,6 +3,7 @@
  */
 
 export type V2ExecutionLogType = "records" | "errors" | "warnings" | "inserts" | "updates" | "deletes";
+
 export const V2ExecutionLogType = {
     Records: "records",
     Errors: "errors",

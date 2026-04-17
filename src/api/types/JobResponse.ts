@@ -9,7 +9,6 @@ export interface JobResponse {
     error?: string;
     /** Identifier of the job. */
     job_id?: string;
-    /** Job result. Shape depends on the job type; only populated once status is done. */
     result?: unknown;
     status?: Polytomic.WorkTaskStatus;
     /** Job type. Matches the type used to fetch the job. */
