@@ -917,7 +917,7 @@ export class ConnectionsClient {
      * > resources before removing the connection.
      *
      * @param {string} id
-     * @param {Polytomic.ConnectionsRemoveRequest} request
+     * @param {Polytomic.ConnectionsDeleteRequest} request
      * @param {ConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -927,21 +927,21 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.connections.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.connections.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         force: true
      *     })
      */
-    public remove(
+    public delete(
         id: string,
-        request: Polytomic.ConnectionsRemoveRequest = {},
+        request: Polytomic.ConnectionsDeleteRequest = {},
         requestOptions?: ConnectionsClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, request, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, request, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
-        request: Polytomic.ConnectionsRemoveRequest = {},
+        request: Polytomic.ConnectionsDeleteRequest = {},
         requestOptions?: ConnectionsClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {
         const { force } = request;
@@ -1115,8 +1115,6 @@ export class ConnectionsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Proxies an HTTP request to a connection's underlying API using the connection's stored credentials, subject to per-connection rate limits and size caps.
      *
      * This endpoint is intended for controlled passthrough use, not as a general
@@ -1267,8 +1265,6 @@ export class ConnectionsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Returns the proxy contract for a connection.
      *
      * Use this endpoint before calling
@@ -1385,8 +1381,6 @@ export class ConnectionsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists shared copies of a connection that the caller's organization owns.
      *
      * The returned connections are the child copies, not the parent connection
@@ -1486,8 +1480,6 @@ export class ConnectionsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists shared copies of a connection owned by a specific organization in the partner account.
      *
      * The `org_id` must match the organization that owns the parent connection. If it
@@ -1597,8 +1589,6 @@ export class ConnectionsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Shares a connection with another organization in the caller's partner account.
      *
      * @param {string} org_id - Unique identifier of the organization that owns the parent connection.

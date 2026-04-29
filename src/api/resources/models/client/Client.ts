@@ -754,7 +754,7 @@ export class ModelsClient {
      * > or reconfigure any syncs that reference this model before deleting it.
      *
      * @param {string} id
-     * @param {Polytomic.ModelsRemoveRequest} request
+     * @param {Polytomic.ModelsDeleteRequest} request
      * @param {ModelsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -762,21 +762,21 @@ export class ModelsClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.models.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         async: true
      *     })
      */
-    public remove(
+    public delete(
         id: string,
-        request: Polytomic.ModelsRemoveRequest = {},
+        request: Polytomic.ModelsDeleteRequest = {},
         requestOptions?: ModelsClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, request, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, request, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
-        request: Polytomic.ModelsRemoveRequest = {},
+        request: Polytomic.ModelsDeleteRequest = {},
         requestOptions?: ModelsClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {
         const { async } = request;

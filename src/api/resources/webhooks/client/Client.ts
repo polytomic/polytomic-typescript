@@ -391,16 +391,16 @@ export class WebhooksClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.webhooks.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.webhooks.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public remove(
+    public delete(
         id: string,
         requestOptions?: WebhooksClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
         requestOptions?: WebhooksClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {

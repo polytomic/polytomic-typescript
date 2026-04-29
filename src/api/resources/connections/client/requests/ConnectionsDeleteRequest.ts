@@ -3,9 +3,9 @@
 /**
  * @example
  *     {
- *         refresh_schemas: true
+ *         force: true
  *     }
  */
-export interface BulkSyncRemoveRequest {
-    refresh_schemas?: boolean;
+export interface ConnectionsDeleteRequest {
+    force?: boolean;
 }

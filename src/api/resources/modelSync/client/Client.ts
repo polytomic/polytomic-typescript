@@ -262,8 +262,6 @@ export class ModelSyncClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists model syncs in the caller's organization.
      *
      * Results are ordered by `updated_at` descending, with `id` used as a tiebreaker.
@@ -837,16 +835,16 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public remove(
+    public delete(
         id: string,
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {

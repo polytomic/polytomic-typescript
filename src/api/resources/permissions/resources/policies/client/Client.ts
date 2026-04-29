@@ -405,16 +405,16 @@ export class PoliciesClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.permissions.policies.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.policies.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public remove(
+    public delete(
         id: string,
         requestOptions?: PoliciesClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
         requestOptions?: PoliciesClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {

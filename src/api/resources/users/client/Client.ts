@@ -379,16 +379,16 @@ export class UsersClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.users.removeCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.users.deleteCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public removeCurrentOrgUser(
+    public deleteCurrentOrgUser(
         id: string,
         requestOptions?: UsersClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<Polytomic.UserEnvelope> {
-        return core.HttpResponsePromise.fromPromise(this.__removeCurrentOrgUser(id, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__deleteCurrentOrgUser(id, requestOptions));
     }
 
-    private async __removeCurrentOrgUser(
+    private async __deleteCurrentOrgUser(
         id: string,
         requestOptions?: UsersClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.UserEnvelope>> {
@@ -866,17 +866,17 @@ export class UsersClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.users.remove("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.users.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public remove(
+    public delete(
         org_id: string,
         id: string,
         requestOptions?: UsersClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<Polytomic.UserEnvelope> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(org_id, id, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(org_id, id, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         org_id: string,
         id: string,
         requestOptions?: UsersClient.IdempotentRequestOptions,

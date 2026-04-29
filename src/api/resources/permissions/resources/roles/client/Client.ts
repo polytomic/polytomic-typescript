@@ -391,13 +391,13 @@ export class RolesClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.permissions.roles.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.permissions.roles.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public remove(id: string, requestOptions?: RolesClient.IdempotentRequestOptions): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, requestOptions));
+    public delete(id: string, requestOptions?: RolesClient.IdempotentRequestOptions): core.HttpResponsePromise<void> {
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
         requestOptions?: RolesClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {

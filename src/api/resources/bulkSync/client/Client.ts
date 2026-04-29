@@ -515,7 +515,7 @@ export class BulkSyncClient {
      * > deleted along with the sync.
      *
      * @param {string} id
-     * @param {Polytomic.BulkSyncRemoveRequest} request
+     * @param {Polytomic.BulkSyncDeleteRequest} request
      * @param {BulkSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -523,21 +523,21 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.bulkSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *     await client.bulkSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
      *         refresh_schemas: true
      *     })
      */
-    public remove(
+    public delete(
         id: string,
-        request: Polytomic.BulkSyncRemoveRequest = {},
+        request: Polytomic.BulkSyncDeleteRequest = {},
         requestOptions?: BulkSyncClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, request, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, request, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
-        request: Polytomic.BulkSyncRemoveRequest = {},
+        request: Polytomic.BulkSyncDeleteRequest = {},
         requestOptions?: BulkSyncClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {
         const { refresh_schemas: refreshSchemas } = request;

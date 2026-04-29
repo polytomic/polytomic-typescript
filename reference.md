@@ -385,7 +385,7 @@ await client.bulkSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.bulkSync.<a href="/src/api/resources/bulkSync/client/Client.ts">remove</a>(id, { ...params }) -> void</code></summary>
+<details><summary><code>client.bulkSync.<a href="/src/api/resources/bulkSync/client/Client.ts">delete</a>(id, { ...params }) -> void</code></summary>
 <dl>
 <dd>
 
@@ -418,7 +418,7 @@ removed.
 <dd>
 
 ```typescript
-await client.bulkSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+await client.bulkSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
     refresh_schemas: true
 });
 
@@ -444,7 +444,7 @@ await client.bulkSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**request:** `Polytomic.BulkSyncRemoveRequest` 
+**request:** `Polytomic.BulkSyncDeleteRequest` 
     
 </dd>
 </dl>
@@ -1608,7 +1608,7 @@ await client.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">remove</a>(id, { ...params }) -> void</code></summary>
+<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">delete</a>(id, { ...params }) -> void</code></summary>
 <dl>
 <dd>
 
@@ -1640,7 +1640,7 @@ Deletes a connection.
 <dd>
 
 ```typescript
-await client.connections.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+await client.connections.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
     force: true
 });
 
@@ -1666,7 +1666,7 @@ await client.connections.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**request:** `Polytomic.ConnectionsRemoveRequest` 
+**request:** `Polytomic.ConnectionsDeleteRequest` 
     
 </dd>
 </dl>
@@ -3545,7 +3545,7 @@ await client.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.models.<a href="/src/api/resources/models/client/Client.ts">remove</a>(id, { ...params }) -> void</code></summary>
+<details><summary><code>client.models.<a href="/src/api/resources/models/client/Client.ts">delete</a>(id, { ...params }) -> void</code></summary>
 <dl>
 <dd>
 
@@ -3575,7 +3575,7 @@ Deletes a model.
 <dd>
 
 ```typescript
-await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
+await client.models.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
     async: true
 });
 
@@ -3601,7 +3601,7 @@ await client.models.remove("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**request:** `Polytomic.ModelsRemoveRequest` 
+**request:** `Polytomic.ModelsDeleteRequest` 
     
 </dd>
 </dl>
@@ -4290,7 +4290,7 @@ await client.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">remove</a>(id) -> void</code></summary>
+<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">delete</a>(id) -> void</code></summary>
 <dl>
 <dd>
 
@@ -4321,7 +4321,7 @@ record is removed. Deleted syncs cannot be recovered; recreate them using
 <dd>
 
 ```typescript
-await client.modelSync.remove("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.modelSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>
@@ -5621,7 +5621,7 @@ await client.organization.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.organization.<a href="/src/api/resources/organization/client/Client.ts">remove</a>(id) -> void</code></summary>
+<details><summary><code>client.organization.<a href="/src/api/resources/organization/client/Client.ts">delete</a>(id) -> void</code></summary>
 <dl>
 <dd>
 
@@ -5650,7 +5650,7 @@ Partner callers cannot delete their own owner organization.
 <dd>
 
 ```typescript
-await client.organization.remove("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.organization.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>
@@ -5949,7 +5949,7 @@ await client.users.updateCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d");
 </dl>
 </details>
 
-<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">removeCurrentOrgUser</a>(id) -> Polytomic.UserEnvelope</code></summary>
+<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">deleteCurrentOrgUser</a>(id) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -5980,7 +5980,7 @@ Deletes a user from the caller's current organization.
 <dd>
 
 ```typescript
-await client.users.removeCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.users.deleteCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>
@@ -6328,7 +6328,7 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 </dl>
 </details>
 
-<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">remove</a>(org_id, id) -> Polytomic.UserEnvelope</code></summary>
+<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">delete</a>(org_id, id) -> Polytomic.UserEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -6363,7 +6363,7 @@ Deletes a user from the specified organization.
 <dd>
 
 ```typescript
-await client.users.remove("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.users.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>
@@ -6778,7 +6778,7 @@ await client.webhooks.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.webhooks.<a href="/src/api/resources/webhooks/client/Client.ts">remove</a>(id) -> void</code></summary>
+<details><summary><code>client.webhooks.<a href="/src/api/resources/webhooks/client/Client.ts">delete</a>(id) -> void</code></summary>
 <dl>
 <dd>
 
@@ -6816,7 +6816,7 @@ configuration, use
 <dd>
 
 ```typescript
-await client.webhooks.remove("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.webhooks.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>
@@ -9510,7 +9510,7 @@ await client.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d",
 </dl>
 </details>
 
-<details><summary><code>client.permissions.policies.<a href="/src/api/resources/permissions/resources/policies/client/Client.ts">remove</a>(id) -> void</code></summary>
+<details><summary><code>client.permissions.policies.<a href="/src/api/resources/permissions/resources/policies/client/Client.ts">delete</a>(id) -> void</code></summary>
 <dl>
 <dd>
 
@@ -9540,7 +9540,7 @@ is revoked immediately for all users who depended on it.
 <dd>
 
 ```typescript
-await client.permissions.policies.remove("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.permissions.policies.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>
@@ -9853,7 +9853,7 @@ await client.permissions.roles.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.permissions.roles.<a href="/src/api/resources/permissions/resources/roles/client/Client.ts">remove</a>(id) -> void</code></summary>
+<details><summary><code>client.permissions.roles.<a href="/src/api/resources/permissions/resources/roles/client/Client.ts">delete</a>(id) -> void</code></summary>
 <dl>
 <dd>
 
@@ -9888,7 +9888,7 @@ leaving stale role references.
 <dd>
 
 ```typescript
-await client.permissions.roles.remove("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.permissions.roles.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>

@@ -489,16 +489,16 @@ export class OrganizationClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.organization.remove("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.organization.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public remove(
+    public delete(
         id: string,
         requestOptions?: OrganizationClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<void> {
-        return core.HttpResponsePromise.fromPromise(this.__remove(id, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__delete(id, requestOptions));
     }
 
-    private async __remove(
+    private async __delete(
         id: string,
         requestOptions?: OrganizationClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<void>> {

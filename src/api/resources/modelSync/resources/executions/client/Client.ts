@@ -321,8 +321,6 @@ export class ExecutionsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Fetch the latest console log entries for a sync execution. Returns at most the most recent 50 entries retained in Redis.
      *
      * @param {string} sync_id

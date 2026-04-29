@@ -6,6 +6,6 @@
  *         async: true
  *     }
  */
-export interface ModelsRemoveRequest {
+export interface ModelsDeleteRequest {
     async?: boolean;
 }
