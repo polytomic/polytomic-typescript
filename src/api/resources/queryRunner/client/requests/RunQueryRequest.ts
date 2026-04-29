@@ -9,6 +9,4 @@
 export interface RunQueryRequest {
     /** The query to execute against the connection. */
     query?: string;
-    /** The query to execute against the connection. */
-    query?: string;
 }
