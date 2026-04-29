@@ -1,2 +1,2 @@
-export { type ExecutionsListRequest } from "./ExecutionsListRequest";
-export { type UpdateExecutionRequest } from "./UpdateExecutionRequest";
+export type { ExecutionsGetConsoleLogsRequest } from "./ExecutionsGetConsoleLogsRequest";
+export type { ExecutionsListRequest } from "./ExecutionsListRequest";

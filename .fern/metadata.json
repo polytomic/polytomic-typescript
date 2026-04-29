@@ -1,0 +1,23 @@
+{
+    "cliVersion": "4.107.0",
+    "generatorName": "fernapi/fern-typescript-node-sdk",
+    "generatorVersion": "3.66.4",
+    "generatorConfig": {
+        "namespaceExport": "Polytomic",
+        "noSerdeLayer": true,
+        "omitUndefined": false,
+        "skipResponseValidation": false,
+        "useLegacyExports": true,
+        "fileResponseType": "stream",
+        "formDataSupport": "Node18",
+        "fetchSupport": "native",
+        "packageManager": "yarn",
+        "testFramework": "jest"
+    },
+    "originGitCommit": "57ef307c05e68da5dcb23b53ca56f979b7bc7c7a",
+    "originGitCommitIsDirty": false,
+    "invokedBy": "ci",
+    "requestedVersion": "25.9.0",
+    "ciProvider": "github",
+    "sdkVersion": "25.9.0"
+}

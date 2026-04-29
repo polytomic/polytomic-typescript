@@ -1,6 +1,17 @@
-import qs from "qs";
-import { RUNTIME } from "../runtime";
-import { APIResponse } from "./APIResponse";
+import { toJson } from "../json";
+import { createLogger, type LogConfig, type Logger } from "../logging/logger";
+import type { APIResponse } from "./APIResponse";
+import { createRequestUrl } from "./createRequestUrl";
+import type { EndpointMetadata } from "./EndpointMetadata";
+import { EndpointSupplier } from "./EndpointSupplier";
+import { getErrorResponseBody } from "./getErrorResponseBody";
+import { getFetchFn } from "./getFetchFn";
+import { getRequestBody } from "./getRequestBody";
+import { getResponseBody } from "./getResponseBody";
+import { Headers } from "./Headers";
+import { makeRequest } from "./makeRequest";
+import { abortRawResponse, toRawResponse, unknownRawResponse } from "./RawResponse";
+import { requestWithRetries } from "./requestWithRetries";
 
 export type FetchFunction = <R = unknown>(args: Fetcher.Args) => Promise<APIResponse<R, Fetcher.Error>>;
 
@@ -9,17 +20,28 @@ export declare namespace Fetcher {
         url: string;
         method: string;
         contentType?: string;
-        headers?: Record<string, string | undefined>;
-        queryParameters?: Record<string, string | string[] | object | object[]>;
+        headers?: Record<string, unknown>;
+        /**
+         * @deprecated Prefer `queryString` (produced by `core.url.queryBuilder()`).
+         * Retained for backwards compatibility with custom fetchers and callers that
+         * still construct request args with a query-parameter object.
+         */
+        queryParameters?: Record<string, unknown>;
+        queryString?: string;
         body?: unknown;
         timeoutMs?: number;
         maxRetries?: number;
         withCredentials?: boolean;
         abortSignal?: AbortSignal;
-        responseType?: "json" | "blob" | "streaming" | "text";
+        requestType?: "json" | "file" | "bytes" | "form" | "other";
+        responseType?: "json" | "blob" | "sse" | "streaming" | "text" | "arrayBuffer" | "binary-response";
+        duplex?: "half";
+        endpointMetadata?: EndpointMetadata;
+        fetchFn?: typeof fetch;
+        logging?: LogConfig | Logger;
     }
 
-    export type Error = FailedStatusCodeError | NonJsonError | TimeoutError | UnknownError;
+    export type Error = FailedStatusCodeError | NonJsonError | BodyIsNullError | TimeoutError | UnknownError;
 
     export interface FailedStatusCodeError {
         reason: "status-code";
@@ -33,253 +55,359 @@ export declare namespace Fetcher {
         rawBody: string;
     }
 
+    export interface BodyIsNullError {
+        reason: "body-is-null";
+        statusCode: number;
+    }
+
     export interface TimeoutError {
         reason: "timeout";
+        cause?: unknown;
     }
 
     export interface UnknownError {
         reason: "unknown";
         errorMessage: string;
+        cause?: unknown;
     }
 }
 
-const INITIAL_RETRY_DELAY = 1;
-const MAX_RETRY_DELAY = 60;
-const DEFAULT_MAX_RETRIES = 2;
+const SENSITIVE_HEADERS = new Set([
+    "authorization",
+    "www-authenticate",
+    "x-api-key",
+    "api-key",
+    "apikey",
+    "x-api-token",
+    "x-auth-token",
+    "auth-token",
+    "cookie",
+    "set-cookie",
+    "proxy-authorization",
+    "proxy-authenticate",
+    "x-csrf-token",
+    "x-xsrf-token",
+    "x-session-token",
+    "x-access-token",
+]);
 
-async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse<R, Fetcher.Error>> {
-    const headers: Record<string, string> = {};
+function redactHeaders(headers: Headers | Record<string, string>): Record<string, string> {
+    const filtered: Record<string, string> = {};
+    for (const [key, value] of headers instanceof Headers ? headers.entries() : Object.entries(headers)) {
+        if (SENSITIVE_HEADERS.has(key.toLowerCase())) {
+            filtered[key] = "[REDACTED]";
+        } else {
+            filtered[key] = value;
+        }
+    }
+    return filtered;
+}
+
+const SENSITIVE_QUERY_PARAMS = new Set([
+    "api_key",
+    "api-key",
+    "apikey",
+    "token",
+    "access_token",
+    "access-token",
+    "auth_token",
+    "auth-token",
+    "password",
+    "passwd",
+    "secret",
+    "api_secret",
+    "api-secret",
+    "apisecret",
+    "key",
+    "session",
+    "session_id",
+    "session-id",
+]);
+
+function redactQueryParameters(
+    queryParameters: Record<string, unknown> | undefined,
+): Record<string, unknown> | undefined {
+    if (queryParameters == null) {
+        return undefined;
+    }
+    const redacted: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(queryParameters)) {
+        redacted[key] = SENSITIVE_QUERY_PARAMS.has(key.toLowerCase()) ? "[REDACTED]" : value;
+    }
+    return redacted;
+}
+
+function redactUrl(url: string): string {
+    const protocolIndex = url.indexOf("://");
+    if (protocolIndex === -1) return url;
+
+    const afterProtocol = protocolIndex + 3;
+
+    // Find the first delimiter that marks the end of the authority section
+    const pathStart = url.indexOf("/", afterProtocol);
+    let queryStart = url.indexOf("?", afterProtocol);
+    let fragmentStart = url.indexOf("#", afterProtocol);
+
+    const firstDelimiter = Math.min(
+        pathStart === -1 ? url.length : pathStart,
+        queryStart === -1 ? url.length : queryStart,
+        fragmentStart === -1 ? url.length : fragmentStart,
+    );
+
+    // Find the LAST @ before the delimiter (handles multiple @ in credentials)
+    let atIndex = -1;
+    for (let i = afterProtocol; i < firstDelimiter; i++) {
+        if (url[i] === "@") {
+            atIndex = i;
+        }
+    }
+
+    if (atIndex !== -1) {
+        url = `${url.slice(0, afterProtocol)}[REDACTED]@${url.slice(atIndex + 1)}`;
+    }
+
+    // Recalculate queryStart since url might have changed
+    queryStart = url.indexOf("?");
+    if (queryStart === -1) return url;
+
+    fragmentStart = url.indexOf("#", queryStart);
+    const queryEnd = fragmentStart !== -1 ? fragmentStart : url.length;
+    const queryString = url.slice(queryStart + 1, queryEnd);
+
+    if (queryString.length === 0) return url;
+
+    // FAST PATH: Quick check if any sensitive keywords present
+    // Using indexOf is faster than regex for simple substring matching
+    const lower = queryString.toLowerCase();
+    const hasSensitive =
+        lower.includes("token") ||
+        lower.includes("key") ||
+        lower.includes("password") ||
+        lower.includes("passwd") ||
+        lower.includes("secret") ||
+        lower.includes("session") ||
+        lower.includes("auth");
+
+    if (!hasSensitive) {
+        return url;
+    }
+
+    // SLOW PATH: Parse and redact
+    const redactedParams: string[] = [];
+    const params = queryString.split("&");
+
+    for (const param of params) {
+        const equalIndex = param.indexOf("=");
+        if (equalIndex === -1) {
+            redactedParams.push(param);
+            continue;
+        }
+
+        const key = param.slice(0, equalIndex);
+        let shouldRedact = SENSITIVE_QUERY_PARAMS.has(key.toLowerCase());
+
+        if (!shouldRedact && key.includes("%")) {
+            try {
+                const decodedKey = decodeURIComponent(key);
+                shouldRedact = SENSITIVE_QUERY_PARAMS.has(decodedKey.toLowerCase());
+            } catch {}
+        }
+
+        redactedParams.push(shouldRedact ? `${key}=[REDACTED]` : param);
+    }
+
+    return url.slice(0, queryStart + 1) + redactedParams.join("&") + url.slice(queryEnd);
+}
+
+async function getHeaders(args: Fetcher.Args): Promise<Headers> {
+    const newHeaders: Headers = new Headers();
+
+    newHeaders.set(
+        "Accept",
+        args.responseType === "json"
+            ? "application/json"
+            : args.responseType === "text"
+              ? "text/plain"
+              : args.responseType === "sse"
+                ? "text/event-stream"
+                : "*/*",
+    );
     if (args.body !== undefined && args.contentType != null) {
-        headers["Content-Type"] = args.contentType;
+        newHeaders.set("Content-Type", args.contentType);
     }
 
-    if (args.headers != null) {
-        for (const [key, value] of Object.entries(args.headers)) {
-            if (value != null) {
-                headers[key] = value;
-            }
-        }
+    if (args.headers == null) {
+        return newHeaders;
     }
 
-    const url =
-        Object.keys(args.queryParameters ?? {}).length > 0
-            ? `${args.url}?${qs.stringify(args.queryParameters, { arrayFormat: "repeat" })}`
-            : args.url;
-
-    let body: BodyInit | undefined = undefined;
-    const maybeStringifyBody = (body: any) => {
-        if (body instanceof Uint8Array) {
-            return body;
-        } else if (args.contentType === "application/x-www-form-urlencoded" && typeof args.body === "string") {
-            return args.body;
-        } else {
-            return JSON.stringify(body);
+    for (const [key, value] of Object.entries(args.headers)) {
+        const result = await EndpointSupplier.get(value, { endpointMetadata: args.endpointMetadata ?? {} });
+        if (typeof result === "string") {
+            newHeaders.set(key, result);
+            continue;
         }
-    };
-
-    if (RUNTIME.type === "node") {
-        if (args.body instanceof (await import("formdata-node")).FormData) {
-            // @ts-expect-error
-            body = args.body;
-        } else if (args.body instanceof (await import("stream")).Readable) {
-            // @ts-expect-error
-            body = args.body;
-        } else {
-            body = maybeStringifyBody(args.body);
+        if (result == null) {
+            continue;
         }
+        newHeaders.set(key, `${result}`);
+    }
+    return newHeaders;
+}
+
+export async function fetcherImpl<R = unknown>(args: Fetcher.Args): Promise<APIResponse<R, Fetcher.Error>> {
+    let url = args.url;
+    if (args.queryString != null && args.queryString.length > 0) {
+        url = `${url}?${args.queryString}`;
     } else {
-        if (args.body instanceof (await import("form-data")).default) {
-            // @ts-expect-error
-            body = args.body;
-        } else {
-            body = maybeStringifyBody(args.body);
-        }
+        url = createRequestUrl(args.url, args.queryParameters);
     }
+    const requestBody: BodyInit | undefined = await getRequestBody({
+        body: args.body,
+        type: args.requestType ?? "other",
+    });
+    const fetchFn = args.fetchFn ?? (await getFetchFn());
+    const headers = await getHeaders(args);
+    const logger = createLogger(args.logging);
 
-    const fetchFn = await getFetchFn();
-
-    const makeRequest = async (): Promise<Response> => {
-        const signals: AbortSignal[] = [];
-
-        // Add timeout signal
-        let timeoutAbortId: NodeJS.Timeout | undefined = undefined;
-        if (args.timeoutMs != null) {
-            const { signal, abortId } = getTimeoutSignal(args.timeoutMs);
-            timeoutAbortId = abortId;
-            signals.push(signal);
-        }
-
-        // Add arbitrary signal
-        if (args.abortSignal != null) {
-            signals.push(args.abortSignal);
-        }
-
-        const response = await fetchFn(url, {
+    if (logger.isDebug()) {
+        const metadata = {
             method: args.method,
-            headers,
-            body,
-            signal: anySignal(signals),
-            credentials: args.withCredentials ? "include" : undefined,
-        });
-
-        if (timeoutAbortId != null) {
-            clearTimeout(timeoutAbortId);
-        }
-
-        return response;
-    };
+            url: redactUrl(url),
+            headers: redactHeaders(headers),
+            queryParameters: redactQueryParameters(args.queryParameters),
+            hasBody: requestBody != null,
+        };
+        logger.debug("Making HTTP request", metadata);
+    }
 
     try {
-        let response = await makeRequest();
-
-        for (let i = 0; i < (args.maxRetries ?? DEFAULT_MAX_RETRIES); ++i) {
-            if (
-                response.status === 408 ||
-                response.status === 409 ||
-                response.status === 429 ||
-                response.status >= 500
-            ) {
-                const delay = Math.min(INITIAL_RETRY_DELAY * Math.pow(i, 2), MAX_RETRY_DELAY);
-                await new Promise((resolve) => setTimeout(resolve, delay));
-                response = await makeRequest();
-            } else {
-                break;
-            }
-        }
-
-        let body: unknown;
-        if (response.body != null && args.responseType === "blob") {
-            body = await response.blob();
-        } else if (response.body != null && args.responseType === "streaming") {
-            body = response.body;
-        } else if (response.body != null && args.responseType === "text") {
-            body = await response.text();
-        } else {
-            const text = await response.text();
-            if (text.length > 0) {
-                try {
-                    body = JSON.parse(text);
-                } catch (err) {
-                    return {
-                        ok: false,
-                        error: {
-                            reason: "non-json",
-                            statusCode: response.status,
-                            rawBody: text,
-                        },
-                    };
-                }
-            }
-        }
+        const response = await requestWithRetries(
+            async () =>
+                makeRequest(
+                    fetchFn,
+                    url,
+                    args.method,
+                    headers,
+                    requestBody,
+                    args.timeoutMs,
+                    args.abortSignal,
+                    args.withCredentials,
+                    args.duplex,
+                    args.responseType === "streaming" || args.responseType === "sse",
+                ),
+            args.maxRetries,
+        );
 
         if (response.status >= 200 && response.status < 400) {
+            if (logger.isDebug()) {
+                const metadata = {
+                    method: args.method,
+                    url: redactUrl(url),
+                    statusCode: response.status,
+                    responseHeaders: redactHeaders(response.headers),
+                };
+                logger.debug("HTTP request succeeded", metadata);
+            }
+            const body = await getResponseBody(response, args.responseType);
             return {
                 ok: true,
                 body: body as R,
                 headers: response.headers,
+                rawResponse: toRawResponse(response),
             };
         } else {
+            if (logger.isError()) {
+                const metadata = {
+                    method: args.method,
+                    url: redactUrl(url),
+                    statusCode: response.status,
+                    responseHeaders: redactHeaders(Object.fromEntries(response.headers.entries())),
+                };
+                logger.error("HTTP request failed with error status", metadata);
+            }
             return {
                 ok: false,
                 error: {
                     reason: "status-code",
                     statusCode: response.status,
-                    body,
+                    body: await getErrorResponseBody(response),
                 },
+                rawResponse: toRawResponse(response),
             };
         }
     } catch (error) {
-        if (args.abortSignal != null && args.abortSignal.aborted) {
+        if (args.abortSignal?.aborted) {
+            if (logger.isError()) {
+                const metadata = {
+                    method: args.method,
+                    url: redactUrl(url),
+                };
+                logger.error("HTTP request was aborted", metadata);
+            }
             return {
                 ok: false,
                 error: {
                     reason: "unknown",
                     errorMessage: "The user aborted a request",
+                    cause: error,
                 },
+                rawResponse: abortRawResponse,
             };
         } else if (error instanceof Error && error.name === "AbortError") {
+            if (logger.isError()) {
+                const metadata = {
+                    method: args.method,
+                    url: redactUrl(url),
+                    timeoutMs: args.timeoutMs,
+                };
+                logger.error("HTTP request timed out", metadata);
+            }
             return {
                 ok: false,
                 error: {
                     reason: "timeout",
+                    cause: error,
                 },
+                rawResponse: abortRawResponse,
             };
         } else if (error instanceof Error) {
+            if (logger.isError()) {
+                const metadata = {
+                    method: args.method,
+                    url: redactUrl(url),
+                    errorMessage: error.message,
+                };
+                logger.error("HTTP request failed with error", metadata);
+            }
             return {
                 ok: false,
                 error: {
                     reason: "unknown",
                     errorMessage: error.message,
+                    cause: error,
                 },
+                rawResponse: unknownRawResponse,
             };
         }
 
+        if (logger.isError()) {
+            const metadata = {
+                method: args.method,
+                url: redactUrl(url),
+                error: toJson(error),
+            };
+            logger.error("HTTP request failed with unknown error", metadata);
+        }
         return {
             ok: false,
             error: {
                 reason: "unknown",
-                errorMessage: JSON.stringify(error),
+                errorMessage: toJson(error),
+                cause: error,
             },
+            rawResponse: unknownRawResponse,
         };
     }
-}
-
-const TIMEOUT = "timeout";
-
-function getTimeoutSignal(timeoutMs: number): { signal: AbortSignal; abortId: NodeJS.Timeout } {
-    const controller = new AbortController();
-    const abortId = setTimeout(() => controller.abort(TIMEOUT), timeoutMs);
-    return { signal: controller.signal, abortId };
-}
-
-/**
- * Returns an abort signal that is getting aborted when
- * at least one of the specified abort signals is aborted.
- *
- * Requires at least node.js 18.
- */
-function anySignal(...args: AbortSignal[] | [AbortSignal[]]): AbortSignal {
-    // Allowing signals to be passed either as array
-    // of signals or as multiple arguments.
-    const signals = <AbortSignal[]>(args.length === 1 && Array.isArray(args[0]) ? args[0] : args);
-
-    const controller = new AbortController();
-
-    for (const signal of signals) {
-        if (signal.aborted) {
-            // Exiting early if one of the signals
-            // is already aborted.
-            controller.abort((signal as any)?.reason);
-            break;
-        }
-
-        // Listening for signals and removing the listeners
-        // when at least one symbol is aborted.
-        signal.addEventListener("abort", () => controller.abort((signal as any)?.reason), {
-            signal: controller.signal,
-        });
-    }
-
-    return controller.signal;
-}
-
-/**
- * Returns a fetch function based on the runtime
- */
-async function getFetchFn(): Promise<any> {
-    // In Node.js environments, the SDK always uses`node-fetch`.
-    if (RUNTIME.type === "node") {
-        return (await import("node-fetch")).default as any;
-    }
-
-    // Otherwise the SDK uses global fetch if available,
-    // and falls back to node-fetch.
-    if (typeof fetch == "function") {
-        return fetch;
-    }
-
-    // Defaults to node `node-fetch` if global fetch isn't available
-    return (await import("node-fetch")).default as any;
 }
 
 export const fetcher: FetchFunction = fetcherImpl;

@@ -1,2 +1,2 @@
-export { type UpsertSchemaFieldRequest } from "./UpsertSchemaFieldRequest";
-export { type SetPrimaryKeysRequest } from "./SetPrimaryKeysRequest";
+export type { SetPrimaryKeysRequest } from "./SetPrimaryKeysRequest";
+export type { UpsertSchemaFieldRequest } from "./UpsertSchemaFieldRequest";
