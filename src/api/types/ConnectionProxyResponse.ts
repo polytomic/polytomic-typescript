@@ -8,7 +8,7 @@ export interface ConnectionProxyResponse {
     /** Content-Type of the upstream response. */
     contentType?: string | undefined;
     /** Response headers returned by the upstream service. Headers listed in blockedResponseHeaders are removed. */
-    headers?: Record<string, string> | undefined;
+    headers?: Record<string, string | undefined> | undefined;
     /** Identifier for the async proxy job when async is true. */
     jobId?: string | undefined;
     jobStatus?: Polytomic.WorkTaskStatus | undefined;

@@ -6,7 +6,7 @@ export interface SyncSourceMetaResponse {
     /** Additional configuration fields available for this source, keyed by field name. */
     configuration?: Record<string, Polytomic.ConfigurationValue> | undefined;
     /** Map of configuration item name to its metadata (available values, required-one-of groups). */
-    items?: Record<string, Polytomic.SourceMeta> | undefined;
+    items?: Record<string, Polytomic.SourceMeta | undefined> | undefined;
     /** Configuration items where exactly one must be selected by the caller. */
     requires_one_of?: string[] | undefined;
 }

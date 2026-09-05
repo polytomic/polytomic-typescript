@@ -42,6 +42,8 @@ export class JobsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.jobs.get("createmodel", "248df4b7-aa70-47b8-a036-33ac447e668d")

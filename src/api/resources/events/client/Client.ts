@@ -41,6 +41,8 @@ export class EventsClient {
      *
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.events.list({
@@ -140,6 +142,9 @@ export class EventsClient {
      * [`GET /api/events`](../../api-reference/events/list).
      *
      * @param {EventsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.events.getTypes()

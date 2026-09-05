@@ -78,6 +78,8 @@ export class EntitiesClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.entities.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -208,6 +210,8 @@ export class EntitiesClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.entities.getForPartner("248df4b7-aa70-47b8-a036-33ac447e668d")

@@ -4,7 +4,7 @@ import type * as Polytomic from "../index";
 
 export interface HarborPipelineStatusResponse {
     /** Dataset refresh evidence keyed by the effective destination name visible to Harbor queries. */
-    datasets?: Record<string, Polytomic.HarborDatasetStatusResponse> | undefined;
+    datasets?: Record<string, Polytomic.HarborDatasetStatusResponse | undefined> | undefined;
     /** Unique identifier of the Polytomic pipeline. */
     id: string;
     /** Whether this pipeline is enabled. */

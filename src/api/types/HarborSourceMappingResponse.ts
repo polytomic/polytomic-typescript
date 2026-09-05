@@ -4,7 +4,7 @@ export interface HarborSourceMappingResponse {
     /** Qualified table name in the Harbor's backing Connection. Empty unless status is resolved. */
     destination_schema_id?: string | undefined;
     /** Requested source field identifiers mapped to their destination names. A requested field that was not materialized is absent. */
-    fields?: Record<string, string> | undefined;
+    fields?: Record<string, string | undefined> | undefined;
     /** resolved when exactly one completed materialization was found, unresolved when none was, ambiguous when more than one was. */
     status?: string | undefined;
 }

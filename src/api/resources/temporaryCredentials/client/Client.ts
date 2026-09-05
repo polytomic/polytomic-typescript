@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseIdempotentRequestOptions, BaseRequestOption
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../BaseClient";
 import * as core from "../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers";
+import { mergeAdditionalBodyParameters } from "../../../../core/requestBody";
 import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
@@ -25,8 +26,6 @@ export class TemporaryCredentialsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Issues a non-renewable credential with a bounded lifetime for a user or Agent Data profile.
      *
      * The response contains the credential secret once. Store it securely and send it
@@ -78,6 +77,8 @@ export class TemporaryCredentialsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.TooManyRequestsError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.temporaryCredentials.create({
@@ -119,7 +120,7 @@ export class TemporaryCredentialsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,

@@ -75,6 +75,8 @@ export class TargetsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.targets.getTargetFields("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -202,6 +204,8 @@ export class TargetsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -342,6 +346,8 @@ export class TargetsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.targets.getCreateProperty("248df4b7-aa70-47b8-a036-33ac447e668d", "property")

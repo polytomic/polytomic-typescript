@@ -6,5 +6,5 @@
  */
 export interface SchemasListRequest {
     /** Optional filters applied to the returned schemas. Supports enabled=true to return only enabled schemas and enabled=false to return only disabled schemas. */
-    filters?: Record<string, string>;
+    filters?: Record<string, string | undefined>;
 }

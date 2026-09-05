@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseIdempotentRequestOptions, BaseRequestOption
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../BaseClient";
 import * as core from "../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers";
+import { mergeAdditionalBodyParameters } from "../../../../core/requestBody";
 import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
@@ -65,6 +66,8 @@ export class BulkSyncClient {
      * @param {BulkSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.list({
@@ -189,6 +192,8 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.create({
@@ -236,7 +241,7 @@ export class BulkSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -297,6 +302,8 @@ export class BulkSyncClient {
      * @param {BulkSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -417,6 +424,8 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -466,7 +475,7 @@ export class BulkSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -527,6 +536,8 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -632,6 +643,8 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -673,7 +686,7 @@ export class BulkSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -733,6 +746,8 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.cancel("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -834,6 +849,8 @@ export class BulkSyncClient {
      *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ConflictError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.start("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -873,7 +890,7 @@ export class BulkSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -931,6 +948,8 @@ export class BulkSyncClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -1022,6 +1041,8 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1131,6 +1152,8 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d")

@@ -5,6 +5,8 @@ import * as errors from "../../errors/index";
 import type * as Polytomic from "../index";
 
 export class GatewayTimeoutError extends errors.PolytomicError {
+    public declare readonly body: Polytomic.ApiError;
+
     constructor(body: Polytomic.ApiError, rawResponse?: core.RawResponse) {
         super({
             message: "GatewayTimeoutError",
@@ -17,6 +19,6 @@ export class GatewayTimeoutError extends errors.PolytomicError {
             Error.captureStackTrace(this, this.constructor);
         }
 
-        this.name = this.constructor.name;
+        this.name = "GatewayTimeoutError";
     }
 }

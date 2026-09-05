@@ -42,6 +42,8 @@ export class ExecutionsClient {
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -142,6 +144,8 @@ export class ExecutionsClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -231,6 +235,8 @@ export class ExecutionsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -332,6 +338,8 @@ export class ExecutionsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.RequestTimeoutError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.executions.getConsoleLogs("248df4b7-aa70-47b8-a036-33ac447e668d", "0ecd09c1-b901-4d27-9053-f0367c427254", {
@@ -443,6 +451,8 @@ export class ExecutionsClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.executions.getLogsIndex("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -536,6 +546,8 @@ export class ExecutionsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.executions.getLogUrls("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "records")
@@ -638,6 +650,8 @@ export class ExecutionsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d", "0ecd09c1-b901-4d27-9053-f0367c427254", "records", "file.json")

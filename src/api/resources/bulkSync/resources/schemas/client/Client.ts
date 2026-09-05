@@ -5,6 +5,7 @@ import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } 
 import * as core from "../../../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../../../core/headers";
 import { toJson } from "../../../../../../core/json";
+import { mergeAdditionalBodyParameters } from "../../../../../../core/requestBody";
 import * as environments from "../../../../../../environments";
 import { handleNonStatusCodeError } from "../../../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../../../errors/index";
@@ -44,6 +45,8 @@ export class SchemasClient {
      * @param {SchemasClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.schemas.list("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -142,6 +145,8 @@ export class SchemasClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.schemas.patch("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -181,7 +186,7 @@ export class SchemasClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -251,6 +256,8 @@ export class SchemasClient {
      * @param {SchemasClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "Contact")
@@ -346,6 +353,8 @@ export class SchemasClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.schemas.update("248df4b7-aa70-47b8-a036-33ac447e668d", "contact")
@@ -387,7 +396,7 @@ export class SchemasClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -449,6 +458,8 @@ export class SchemasClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.schemas.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id")

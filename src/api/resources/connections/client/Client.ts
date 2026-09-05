@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseIdempotentRequestOptions, BaseRequestOption
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../BaseClient";
 import * as core from "../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers";
+import { mergeAdditionalBodyParameters } from "../../../../core/requestBody";
 import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
@@ -49,6 +50,8 @@ export class ConnectionsClient {
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.getTypes()
@@ -126,6 +129,8 @@ export class ConnectionsClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.getConnectionTypeSchema("postgresql")
@@ -212,6 +217,8 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.getTypeParameterValues("type", {
@@ -253,7 +260,7 @@ export class ConnectionsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -316,6 +323,8 @@ export class ConnectionsClient {
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.list()
@@ -401,6 +410,8 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.create({
@@ -448,7 +459,7 @@ export class ConnectionsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -523,6 +534,8 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.connect({
@@ -563,7 +576,7 @@ export class ConnectionsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -631,6 +644,8 @@ export class ConnectionsClient {
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.getConnectSession()
@@ -720,6 +735,8 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.testConnection({
@@ -764,7 +781,7 @@ export class ConnectionsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -817,6 +834,8 @@ export class ConnectionsClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -911,6 +930,8 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -959,7 +980,7 @@ export class ConnectionsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1034,6 +1055,8 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1147,6 +1170,8 @@ export class ConnectionsClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -1246,6 +1271,8 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.connections.getUsage("248df4b7-aa70-47b8-a036-33ac447e668d")

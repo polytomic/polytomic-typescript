@@ -5,6 +5,7 @@ import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } 
 import * as core from "../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers";
 import { toJson } from "../../../../core/json";
+import { mergeAdditionalBodyParameters } from "../../../../core/requestBody";
 import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
@@ -48,6 +49,8 @@ export class ModelsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.getEnrichmentSource("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -157,6 +160,8 @@ export class ModelsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.post("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -196,7 +201,7 @@ export class ModelsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -258,6 +263,8 @@ export class ModelsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.preview({
@@ -312,7 +319,7 @@ export class ModelsClient {
                 .mergeAdditional(requestOptions?.queryParams)
                 .build(),
             requestType: "json",
-            body: _body,
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -367,6 +374,8 @@ export class ModelsClient {
      * @param {ModelsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.list()
@@ -445,6 +454,8 @@ export class ModelsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.create({
@@ -499,7 +510,7 @@ export class ModelsClient {
                 .mergeAdditional(requestOptions?.queryParams)
                 .build(),
             requestType: "json",
-            body: _body,
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -552,6 +563,8 @@ export class ModelsClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -653,6 +666,8 @@ export class ModelsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -707,7 +722,7 @@ export class ModelsClient {
                 .mergeAdditional(requestOptions?.queryParams)
                 .build(),
             requestType: "json",
-            body: _body,
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -760,6 +775,8 @@ export class ModelsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -860,6 +877,8 @@ export class ModelsClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d", {

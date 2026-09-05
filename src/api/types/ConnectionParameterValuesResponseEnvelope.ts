@@ -3,5 +3,5 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectionParameterValuesResponseEnvelope {
-    data?: Record<string, Polytomic.ConnectionParameterValuesResp> | undefined;
+    data?: Record<string, Polytomic.ConnectionParameterValuesResp | undefined> | undefined;
 }

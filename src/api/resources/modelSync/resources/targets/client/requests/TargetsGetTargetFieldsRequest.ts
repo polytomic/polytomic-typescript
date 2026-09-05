@@ -13,5 +13,5 @@ export interface TargetsGetTargetFieldsRequest {
     /** When true, force a cache refresh of the target's schema before returning its fields. Ignored when properties is supplied. */
     refresh?: boolean;
     /** Target-creation property values, supplied as properties[key]=value, matching the target_creation.properties returned by GET /api/connections/{id}/modelsync/targetobjects. When supplied, the response describes the not-yet-created target that would result from these inputs, in the same shape as for an existing target. Exactly one of target or properties must be supplied. */
-    properties?: Record<string, string[]>;
+    properties?: Record<string, string[] | undefined>;
 }

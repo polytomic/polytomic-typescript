@@ -5,6 +5,7 @@ import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } 
 import * as core from "../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers";
 import { toJson } from "../../../../core/json";
+import { mergeAdditionalBodyParameters } from "../../../../core/requestBody";
 import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
@@ -59,6 +60,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -174,6 +177,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.getSourceFields("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -289,6 +294,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.list({
@@ -448,6 +455,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.create({
@@ -495,7 +504,7 @@ export class ModelSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -558,6 +567,8 @@ export class ModelSyncClient {
      * @param {ModelSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.getScheduleOptions()
@@ -634,6 +645,8 @@ export class ModelSyncClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -732,6 +745,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -781,7 +796,7 @@ export class ModelSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -854,6 +869,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -956,6 +973,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -997,7 +1016,7 @@ export class ModelSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1057,6 +1076,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.cancel("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -1147,6 +1168,8 @@ export class ModelSyncClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.start("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -1186,7 +1209,7 @@ export class ModelSyncClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1248,6 +1271,8 @@ export class ModelSyncClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.modelSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d")

@@ -39,6 +39,8 @@ export class IdentityClient {
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.identity.get()

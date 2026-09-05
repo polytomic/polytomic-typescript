@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseIdempotentRequestOptions, BaseRequestOption
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../BaseClient";
 import * as core from "../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers";
+import { mergeAdditionalBodyParameters } from "../../../../core/requestBody";
 import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
@@ -25,8 +26,6 @@ export class RecordViewLinksClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Creates a short-lived capability link for viewing one stored record snapshot.
      *
      * @param {Polytomic.CreateRecordViewLinkRequest} request
@@ -36,6 +35,8 @@ export class RecordViewLinksClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.recordViewLinks.create({
@@ -78,7 +79,7 @@ export class RecordViewLinksClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -127,8 +128,6 @@ export class RecordViewLinksClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Checks whether record-view links can be created for a connection schema.
      *
      * @param {Polytomic.RecordViewLinksGetCapabilitiesRequest} request
@@ -138,6 +137,8 @@ export class RecordViewLinksClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.recordViewLinks.getCapabilities({

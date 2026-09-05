@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseIdempotentRequestOptions, BaseRequestOption
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../../../BaseClient";
 import * as core from "../../../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../../../core/headers";
+import { mergeAdditionalBodyParameters } from "../../../../../../core/requestBody";
 import * as environments from "../../../../../../environments";
 import { handleNonStatusCodeError } from "../../../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../../../errors/index";
@@ -36,6 +37,8 @@ export class PoliciesClient {
      * @param {PoliciesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.permissions.policies.list()
@@ -115,6 +118,8 @@ export class PoliciesClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.permissions.policies.create({
@@ -154,7 +159,7 @@ export class PoliciesClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -210,6 +215,8 @@ export class PoliciesClient {
      *
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.permissions.policies.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -300,6 +307,8 @@ export class PoliciesClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -341,7 +350,7 @@ export class PoliciesClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -403,6 +412,8 @@ export class PoliciesClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.permissions.policies.delete("248df4b7-aa70-47b8-a036-33ac447e668d")

@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseIdempotentRequestOptions, BaseRequestOption
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../../../BaseClient";
 import * as core from "../../../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../../../core/headers";
+import { mergeAdditionalBodyParameters } from "../../../../../../core/requestBody";
 import * as environments from "../../../../../../environments";
 import { handleNonStatusCodeError } from "../../../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../../../errors/index";
@@ -33,6 +34,8 @@ export class ErrorHandlingClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.errorHandling.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -125,6 +128,8 @@ export class ErrorHandlingClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.bulkSync.errorHandling.update("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -164,7 +169,7 @@ export class ErrorHandlingClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,

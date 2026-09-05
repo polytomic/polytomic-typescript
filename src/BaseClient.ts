@@ -5,6 +5,12 @@ import * as core from "./core";
 import { mergeHeaders } from "./core/headers";
 import type * as environments from "./environments";
 
+export type AuthOption =
+    | false
+    | core.AuthProvider["getAuthRequest"]
+    | core.AuthProvider
+    | BearerAuthProvider.AuthOptions;
+
 export type BaseClientOptions = {
     environment?: core.Supplier<environments.PolytomicEnvironment | string>;
     /** Specify a custom URL to connect the client to. */
@@ -21,6 +27,10 @@ export type BaseClientOptions = {
     fetch?: typeof fetch;
     /** Configure logging for the client. */
     logging?: core.logging.LogConfig | core.logging.Logger;
+    /** Default options for SSE stream reconnection behavior. Has no effect on non-resumable endpoints. */
+    stream?: { reconnectionEnabled?: boolean; maxReconnectionAttempts?: number };
+    /** Override auth. Pass false to disable, a function returning auth headers, an AuthProvider, or auth options. */
+    auth?: AuthOption;
 } & BearerAuthProvider.AuthOptions;
 
 export interface BaseRequestOptions {
@@ -34,8 +44,12 @@ export interface BaseRequestOptions {
     version?: string | undefined;
     /** Additional query string parameters to include in the request. */
     queryParams?: Record<string, unknown>;
+    /** A dictionary containing additional parameters to spread into the request's body. */
+    additionalBodyParameters?: Record<string, unknown>;
     /** Additional headers to include in the request. */
     headers?: Record<string, string | core.Supplier<string | null | undefined> | null | undefined>;
+    /** Options for SSE stream reconnection behavior. Has no effect on non-resumable endpoints. */
+    stream?: { reconnectionEnabled?: boolean; maxReconnectionAttempts?: number };
 }
 
 export interface BaseIdempotentRequestOptions {
@@ -59,8 +73,8 @@ export function normalizeClientOptions<T extends BaseClientOptions = BaseClientO
         {
             "X-Fern-Language": "JavaScript",
             "X-Fern-SDK-Name": "polytomic",
-            "X-Fern-SDK-Version": "25.9.3",
-            "User-Agent": "polytomic/25.9.3",
+            "X-Fern-SDK-Version": "25.9.4",
+            "User-Agent": "polytomic/25.9.4",
             "X-Fern-Runtime": core.RUNTIME.type,
             "X-Fern-Runtime-Version": core.RUNTIME.version,
             "X-Polytomic-Version": options?.version ?? "2025-09-18",
@@ -79,6 +93,23 @@ export function normalizeClientOptionsWithAuth<T extends BaseClientOptions = Bas
     options: T,
 ): NormalizedClientOptionsWithAuth<T> {
     const normalized = normalizeClientOptions(options) as NormalizedClientOptionsWithAuth<T>;
+
+    if (options.auth === false) {
+        normalized.authProvider = new core.NoOpAuthProvider();
+        return normalized;
+    }
+    if (options.auth != null) {
+        if (typeof options.auth === "function") {
+            normalized.authProvider = { getAuthRequest: options.auth };
+            return normalized;
+        }
+        if (core.isAuthProvider(options.auth)) {
+            normalized.authProvider = options.auth;
+            return normalized;
+        }
+        Object.assign(normalized, options.auth);
+    }
+
     const normalizedWithNoOpAuthProvider = withNoOpAuthProvider(normalized);
     normalized.authProvider ??= new BearerAuthProvider(normalizedWithNoOpAuthProvider);
     return normalized;

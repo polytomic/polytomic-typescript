@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseIdempotentRequestOptions, BaseRequestOption
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../BaseClient";
 import * as core from "../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../core/headers";
+import { mergeAdditionalBodyParameters } from "../../../../core/requestBody";
 import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
@@ -25,12 +26,13 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists profile-authorized connections and capabilities for the current Harbor credential.
      *
      * @param {Polytomic.HarborsListAuthorizedConnectionsRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.listAuthorizedConnections({
@@ -109,13 +111,14 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists one bounded page of schema resources authorized by the current Harbor profile.
      *
      * @param {string} connection_id
      * @param {Polytomic.HarborsListAuthorizedSchemasRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.listAuthorizedSchemas("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -200,14 +203,15 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Returns one schema resource authorized by the current Harbor profile.
      *
      * @param {string} connection_id
      * @param {string} schema_id
      * @param {Polytomic.HarborsGetAuthorizedSchemaRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.getAuthorizedSchema("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id")
@@ -284,8 +288,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Registers a service-attested MCP transport session for a scoped Harbor credential.
      *
      * @param {Polytomic.RegisterHarborSessionRequest} request
@@ -293,6 +295,8 @@ export class HarborsClient {
      *
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.registerSession()
@@ -343,7 +347,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: _body,
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -382,8 +386,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Closes a service-attested Harbor MCP transport session.
      *
      * @param {string} session_id
@@ -392,6 +394,8 @@ export class HarborsClient {
      *
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.closeSession("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -483,8 +487,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists Harbors in the caller's current organization.
      *
      * Returns Harbors in creation order. Use `pagination.next_page_token` to continue when more results are available.
@@ -495,6 +497,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.list({
@@ -581,8 +585,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Creates a managed or customer-managed Harbor in the caller's current organization.
      *
      * `generate_api_key` defaults to `true`. Polytomic returns a new plaintext credential only in this response. Set it to `false` to create the Harbor without a credential.
@@ -596,6 +598,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.create({
@@ -636,7 +640,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -682,8 +686,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Returns one Harbor by its first-class Harbor ID.
      *
      * The response exposes the backing Connection ID but not the internal profile used to authorize Harbor credentials.
@@ -694,6 +696,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.get("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -768,8 +772,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Updates a Harbor's name and description.
      *
      * This operation does not change `backing_mode` or `backing_connection_id`.
@@ -783,6 +785,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -824,7 +828,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -875,8 +879,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Deletes a Harbor and revokes its credentials.
      *
      * > 🚧 Harbor deletion
@@ -890,6 +892,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -970,8 +974,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists context document metadata for a Harbor without returning document content.
      *
      * Collection items include the current published `version` number and omit
@@ -988,6 +990,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.listContexts("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1093,8 +1097,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Creates and attaches a context document to a Harbor.
      *
      * The new document belongs only to this Harbor. Context documents cannot be attached to multiple Harbors.
@@ -1107,6 +1109,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.createContext("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1149,7 +1153,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1200,8 +1204,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists mutable Harbor context drafts without returning document content.
      *
      * The collection includes drafts for published context documents and initial drafts
@@ -1220,6 +1222,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.listContextDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1321,8 +1325,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Creates an unpublished context document with its initial mutable draft.
      *
      * Creates a stable context identity and its initial mutable draft without publishing
@@ -1342,6 +1344,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.createContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1384,7 +1388,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1435,8 +1439,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Returns one complete Harbor context document.
      *
      * The response includes the current published `version` number and complete
@@ -1453,6 +1455,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.getContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -1542,8 +1546,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Replaces one Harbor context document.
      *
      * Each successful request publishes the next immutable version. You can omit
@@ -1560,6 +1562,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.updateContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1613,7 +1617,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: _body,
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1664,8 +1668,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Deletes one context document from a Harbor.
      *
      * Deleting a context document does not affect the Harbor or its other context documents.
@@ -1678,6 +1680,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.deleteContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -1773,8 +1777,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Returns the mutable draft for a Harbor context document.
      *
      * Drafts are available only through the draft endpoints. `base_revision_id`
@@ -1790,6 +1792,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.getContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -1881,8 +1885,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Creates or completely replaces the mutable draft for a Harbor context document.
      *
      * The request supplies the complete draft payload. If a draft already exists,
@@ -1904,6 +1906,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.saveContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -1957,7 +1961,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: _body,
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -2008,8 +2012,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Discards the mutable draft for a Harbor context document.
      *
      * Discarding a draft does not change the current published version or its
@@ -2024,6 +2026,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.deleteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -2119,8 +2123,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Promotes the draft to the next immutable published context version.
      *
      * Promotion publishes the draft's exact title, description, content, and optional
@@ -2140,6 +2142,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.promoteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -2240,8 +2244,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists immutable published versions of a Harbor context document without returning content.
      *
      * Versions are ordered from newest to oldest. Collection items omit `content`,
@@ -2266,6 +2268,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.listContextVersions("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -2378,8 +2382,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Returns one immutable published version of a Harbor context document.
      *
      * The response includes the complete title, description, and plain-text
@@ -2397,6 +2399,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.getContextVersion("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -2493,8 +2497,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists active masked credentials for a Harbor.
      *
      * Each item contains a masked `key_hint`. Polytomic never returns a credential plaintext after creation.
@@ -2507,6 +2509,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.listKeys("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -2600,8 +2604,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Generates a new Harbor credential and returns its plaintext value once.
      *
      * Store the returned `value` securely. Polytomic returns it only in this response.
@@ -2612,6 +2614,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.createKey("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -2692,8 +2696,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Revokes one Harbor credential by its credential ID.
      *
      * Revocation affects only the selected credential. Other active Harbor credentials remain valid.
@@ -2705,6 +2707,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.deleteKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -2787,8 +2791,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Resolves documented source table and field identities to the names a Harbor's backing Connection accepts.
      *
      * @param {string} harbor_id - Unique identifier of the Harbor.
@@ -2799,6 +2801,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.resolveSourceMappings("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -2838,7 +2842,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -2892,8 +2896,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Returns raw Polytomic refresh evidence for datasets written to a Harbor.
      *
      * Each pipeline corresponds to a bulk sync or model sync that writes at least one
@@ -2934,6 +2936,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -3013,8 +3017,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Lists Harbor-only users assigned to a Harbor.
      *
      * The response contains only Harbor-only users currently assigned to this Harbor.
@@ -3027,6 +3029,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.listUsers("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -3125,8 +3129,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Invites and assigns a new Harbor-only user.
      *
      * The invited account is restricted to assigned Harbors and does not receive regular Polytomic application access.
@@ -3140,6 +3142,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.inviteUser("248df4b7-aa70-47b8-a036-33ac447e668d", {
@@ -3181,7 +3185,7 @@ export class HarborsClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: request,
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -3237,8 +3241,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Assigns an existing Harbor-only user to a Harbor.
      *
      * The assignment is idempotent. Regular Polytomic users cannot be assigned because they already have application access to Harbors.
@@ -3251,6 +3253,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.assignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
@@ -3338,8 +3342,6 @@ export class HarborsClient {
     }
 
     /**
-     * @beta This endpoint is in pre-release and may change.
-     *
      * Removes a Harbor assignment without deleting the user.
      *
      * This removes only the Harbor assignment. The organization user remains available and may retain assignments to other Harbors.
@@ -3352,6 +3354,8 @@ export class HarborsClient {
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
      *
      * @example
      *     await client.harbors.unassignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
