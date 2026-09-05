@@ -9,6 +9,7 @@ import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
 import * as Polytomic from "../../../index";
+import { ErrorHandlingClient } from "../resources/errorHandling/client/Client";
 import { ExecutionsClient } from "../resources/executions/client/Client";
 import { TargetsClient } from "../resources/targets/client/Client";
 
@@ -23,6 +24,7 @@ export declare namespace ModelSyncClient {
 export class ModelSyncClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<ModelSyncClient.Options>;
     protected _targets: TargetsClient | undefined;
+    protected _errorHandling: ErrorHandlingClient | undefined;
     protected _executions: ExecutionsClient | undefined;
 
     constructor(options: ModelSyncClient.Options = {}) {
@@ -31,6 +33,10 @@ export class ModelSyncClient {
 
     public get targets(): TargetsClient {
         return (this._targets ??= new TargetsClient(this._options));
+    }
+
+    public get errorHandling(): ErrorHandlingClient {
+        return (this._errorHandling ??= new ErrorHandlingClient(this._options));
     }
 
     public get executions(): ExecutionsClient {
@@ -434,11 +440,12 @@ export class ModelSyncClient {
      * The [Get Target List](../../api-reference/model-sync/targets/list) endpoint returns information about whether
      * a connection supports target creation.
      *
-     * @param {Polytomic.CreateSyncRequest} request
+     * @param {Polytomic.CreateModelSyncV5Request} request
      * @param {ModelSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -456,16 +463,16 @@ export class ModelSyncClient {
      *     })
      */
     public create(
-        request: Polytomic.CreateSyncRequest,
+        request: Polytomic.CreateModelSyncV5Request,
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
-    ): core.HttpResponsePromise<Polytomic.SyncResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelSyncV5ResponseEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__create(request, requestOptions));
     }
 
     private async __create(
-        request: Polytomic.CreateSyncRequest,
+        request: Polytomic.CreateModelSyncV5Request,
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.SyncResponseEnvelope>> {
+    ): Promise<core.WithRawResponse<Polytomic.ModelSyncV5ResponseEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -496,7 +503,10 @@ export class ModelSyncClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Polytomic.SyncResponseEnvelope, rawResponse: _response.rawResponse };
+            return {
+                data: _response.body as Polytomic.ModelSyncV5ResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
@@ -508,6 +518,11 @@ export class ModelSyncClient {
                     );
                 case 403:
                     throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
@@ -626,14 +641,14 @@ export class ModelSyncClient {
     public get(
         id: string,
         requestOptions?: ModelSyncClient.RequestOptions,
-    ): core.HttpResponsePromise<Polytomic.SyncResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelSyncV5ResponseEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__get(id, requestOptions));
     }
 
     private async __get(
         id: string,
         requestOptions?: ModelSyncClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.SyncResponseEnvelope>> {
+    ): Promise<core.WithRawResponse<Polytomic.ModelSyncV5ResponseEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -660,7 +675,10 @@ export class ModelSyncClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Polytomic.SyncResponseEnvelope, rawResponse: _response.rawResponse };
+            return {
+                data: _response.body as Polytomic.ModelSyncV5ResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
@@ -705,7 +723,7 @@ export class ModelSyncClient {
      * take effect on the sync's next execution.
      *
      * @param {string} id
-     * @param {Polytomic.UpdateSyncRequest} request
+     * @param {Polytomic.UpdateModelSyncV5Request} request
      * @param {ModelSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -730,17 +748,17 @@ export class ModelSyncClient {
      */
     public update(
         id: string,
-        request: Polytomic.UpdateSyncRequest,
+        request: Polytomic.UpdateModelSyncV5Request,
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
-    ): core.HttpResponsePromise<Polytomic.SyncResponseEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.ModelSyncV5ResponseEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__update(id, request, requestOptions));
     }
 
     private async __update(
         id: string,
-        request: Polytomic.UpdateSyncRequest,
+        request: Polytomic.UpdateModelSyncV5Request,
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.SyncResponseEnvelope>> {
+    ): Promise<core.WithRawResponse<Polytomic.ModelSyncV5ResponseEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -771,7 +789,10 @@ export class ModelSyncClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Polytomic.SyncResponseEnvelope, rawResponse: _response.rawResponse };
+            return {
+                data: _response.body as Polytomic.ModelSyncV5ResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
@@ -933,6 +954,7 @@ export class ModelSyncClient {
      *
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
@@ -995,6 +1017,11 @@ export class ModelSyncClient {
                     );
                 case 404:
                     throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );

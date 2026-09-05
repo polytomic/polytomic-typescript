@@ -25,6 +25,7 @@ describe("TargetsClient", () => {
                         filterable: true,
                         id: "field1",
                         identity_functions: [{ id: "Equality", label: "Equality" }],
+                        multiple_associations: false,
                         name: "Field",
                         required: true,
                         source_type: "string",
@@ -55,6 +56,7 @@ describe("TargetsClient", () => {
                     supports_field_creation: true,
                     supports_field_encryption: true,
                     supports_field_type_selection: true,
+                    supports_filter_value_fields: true,
                     supports_identity_field_creation: true,
                     supports_target_filters: true,
                     target_creator: true,
@@ -94,18 +96,40 @@ describe("TargetsClient", () => {
             .mockEndpoint()
             .get("/api/connections/id/modelsync/target/fields")
             .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.modelSync.targets.getTargetFields("id");
+        }).rejects.toThrow(Polytomic.BadRequestError);
+    });
+
+    test("GetTargetFields (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/id/modelsync/target/fields")
+            .respondWith()
             .statusCode(403)
             .jsonBody(rawResponseBody)
             .build();
 
         await expect(async () => {
-            return await client.modelSync.targets.getTargetFields("id", {
-                target: "target",
-            });
+            return await client.modelSync.targets.getTargetFields("id");
         }).rejects.toThrow(Polytomic.ForbiddenError);
     });
 
-    test("GetTargetFields (3)", async () => {
+    test("GetTargetFields (4)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
             maxRetries: 0,
@@ -125,13 +149,11 @@ describe("TargetsClient", () => {
             .build();
 
         await expect(async () => {
-            return await client.modelSync.targets.getTargetFields("id", {
-                target: "target",
-            });
+            return await client.modelSync.targets.getTargetFields("id");
         }).rejects.toThrow(Polytomic.NotFoundError);
     });
 
-    test("GetTargetFields (4)", async () => {
+    test("GetTargetFields (5)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
             maxRetries: 0,
@@ -151,9 +173,7 @@ describe("TargetsClient", () => {
             .build();
 
         await expect(async () => {
-            return await client.modelSync.targets.getTargetFields("id", {
-                target: "target",
-            });
+            return await client.modelSync.targets.getTargetFields("id");
         }).rejects.toThrow(Polytomic.InternalServerError);
     });
 
@@ -174,7 +194,20 @@ describe("TargetsClient", () => {
                     name: "Contact",
                 },
             ],
-            target_creation: { properties: [{ enum: true, id: "account", title: "Account ID" }], supported: true },
+            target_creation: {
+                properties: [
+                    {
+                        enum: true,
+                        id: "account",
+                        title: "Account ID",
+                        values: [
+                            { label: "Account ID", value: "urn:li:organization:987654321" },
+                            { label: "Account ID", value: "urn:li:organization:987654321" },
+                        ],
+                    },
+                ],
+                supported: true,
+            },
         };
 
         server
@@ -185,7 +218,9 @@ describe("TargetsClient", () => {
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d");
+        const response = await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+            include_target_creation_values: true,
+        });
         expect(response).toEqual(rawResponseBody);
     });
 

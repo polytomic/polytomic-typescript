@@ -7,7 +7,7 @@ export interface SyncField {
     encryption_enabled?: boolean | undefined;
     /** New is set to true if the target field should be created by Polytomic. This is not supported by all backends. */
     "new"?: boolean | undefined;
-    /** Value to set in the target field; if provided, 'source' is ignored. */
+    /** Value to set in the target field; a mapping with an override value and no source is stored as an override field. */
     override_value?: string | undefined;
     source?: Polytomic.Source | undefined;
     /** Sync mode for the field; defaults to 'updateOrCreate'. If set to 'create', the field will not be synced if it already has a value. This is not supported by all backends. */

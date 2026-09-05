@@ -1306,7 +1306,13 @@ await client.connections.create({
 <dl>
 <dd>
 
-Creates a Polytomic Connect session and returns a redirect URL that embeds the Connect modal.
+Creates a Polytomic Connect session and returns a URL for creating or reconnecting a Connection.
+
+Open the returned URL, or send it to the person who will set up the Connection.
+Polytomic Connect guides them through authentication and configuration, then
+redirects them to `redirect_url`.
+
+Each session can create or reconnect one Connection.
 
 See also:
 
@@ -1353,6 +1359,65 @@ await client.connections.connect({
 <dd>
 
 **requestOptions:** `ConnectionsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">getConnectSession</a>() -> Polytomic.ConnectSessionResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns trusted metadata for the authenticated Polytomic Connect session.
+
+Returns the trusted metadata stored for a Polytomic Connect session. Authenticate with the opaque Connect token in the `token` query parameter.
+
+The response includes the server-enforced connection name, fixed type or whitelist, bound connection ID, completion redirect, branding, and absolute expiration time.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.getConnectSession();
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**requestOptions:** `ConnectionsClient.RequestOptions` 
     
 </dd>
 </dl>
@@ -1758,7 +1823,7 @@ await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668
 </dl>
 </details>
 
-<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">executeProxy</a>(id, { ...params }) -> Polytomic.ExecuteConnectionProxyEnvelope</code></summary>
+<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">getUsage</a>(id) -> Polytomic.GetConnectionUsageEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -1770,30 +1835,21 @@ await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-Proxies an HTTP request to a connection's underlying API using the connection's stored credentials, subject to per-connection rate limits and size caps.
+Returns the connection's API consumption over the last 24 hours, broken down by sync when the backend supports it.
 
-This endpoint is intended for controlled passthrough use, not as a general
-replacement for Polytomic's modeled endpoints. The request is executed with the
-connection's stored credentials and inherited base URL, headers, and query
-parameters.
+Not all integrations support usage reporting.
 
-Before building requests dynamically, call
-[`GET /api/connections/{id}/proxy/info`](../../../../api-reference/connections/get-proxy-info)
-to inspect the inherited base URL, blocked headers, accepted body types, and
-size and rate limits.
+- `callsLast24h` is null when the backend does not expose a usage count.
+- `reportsSyncStats` is `false`, and `bySync` is empty, when the backend
+  reports a total but cannot attribute calls to individual syncs.
 
-## Important behavior
-
-- `request.path` must be relative and start with `/`.
-- Use either `request.query` or `request.rawQuery`, not both.
-- Caller-supplied headers are merged with inherited headers, but inherited auth
-  headers cannot be overridden.
-- The proxy strips a fixed set of request and response headers for safety.
-- Response bodies larger than the configured maximum are truncated, and
-  `truncated` is set to `true`.
-
-The response includes `proxyCallId`, which you can use to correlate the call
-with audit logs.
+When per-sync stats are available, each entry in `bySync` carries a
+`categories` breakdown. **Category keys and labels are integration-specific.**
+For example, Salesforce reports `rest` and `bulk` categories
+(collapsing Bulk API v1 and v2 into a single `bulk` bucket), while another
+integration may report an entirely different set or none at all. Treat `key`
+as an opaque, backend-defined identifier and use `label` for display; do not
+assume a fixed vocabulary across connection types.
 </dd>
 </dl>
 </dd>
@@ -1808,12 +1864,7 @@ with audit logs.
 <dd>
 
 ```typescript
-await client.connections.executeProxy("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    request: {
-        method: "GET",
-        path: "/v1/objects"
-    }
-});
+await client.connections.getUsage("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 ```
 </dd>
@@ -1829,92 +1880,7 @@ await client.connections.executeProxy("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection to proxy the request through.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.ExecuteConnectionProxyRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `ConnectionsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">getProxyInfo</a>(id) -> Polytomic.GetConnectionProxyInfoEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns the proxy contract for a connection.
-
-Use this endpoint before calling
-[`POST /api/connections/{id}/proxy`](../../../../../api-reference/connections/execute-proxy)
-when you need to build requests programmatically. The response shows:
-
-- the inherited base URL that all proxied requests are sent to
-- locked headers and query parameters that are attached automatically
-- blocked request and response headers
-- allowed HTTP methods and body shapes
-- timeout, rate-limit, and payload-size limits
-
-Sensitive inherited header and query values are redacted in the response. The
-contract is still useful for discovering which keys are fixed by the
-connection, even though their raw values are not exposed.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.connections.getProxyInfo("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `string` — Unique identifier of the connection whose proxy contract should be returned.
+**id:** `string` — Unique identifier of the connection whose API consumption should be returned.
     
 </dd>
 </dl>
@@ -1923,237 +1889,6 @@ await client.connections.getProxyInfo("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dd>
 
 **requestOptions:** `ConnectionsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">listSharedConnections</a>(id) -> Polytomic.ConnectionListResponseEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists shared copies of a connection that the caller's organization owns.
-
-The returned connections are the child copies, not the parent connection
-itself. This is useful when a partner workflow needs to confirm which
-downstream organizations have already received a shared copy.
-
-Creating a new shared copy is a separate operation. Use
-[`POST /api/organizations/{org_id}/connections/{connection_id}/share`](../../../../api-reference/connections/create-shared-connection)
-for the v5 partner-scoped flow.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.connections.listSharedConnections("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**id:** `string` — Unique identifier of the parent connection whose shared copies should be listed.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `ConnectionsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">listSharedConnectionsForPartner</a>(org_id, connection_id) -> Polytomic.ConnectionListResponseEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists shared copies of a connection owned by a specific organization in the partner account.
-
-The `org_id` must match the organization that owns the parent connection. If it
-does not, the endpoint returns `404` rather than exposing information about the
-parent connection.
-
-This endpoint is useful in partner workflows where the parent connection is in
-the partner owner organization and the caller needs to audit which child
-organizations already have a shared copy.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.connections.listSharedConnectionsForPartner("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**org_id:** `string` — Unique identifier of the organization that owns the parent connection.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Unique identifier of the parent connection whose shared copies should be listed.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `ConnectionsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.connections.<a href="/src/api/resources/connections/client/Client.ts">createSharedConnection</a>(org_id, connection_id, { ...params }) -> Polytomic.CreateSharedConnectionResponseEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Shares a connection with another organization in the caller's partner account.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.connections.createSharedConnection("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-    child_organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**org_id:** `string` — Unique identifier of the organization that owns the parent connection.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Unique identifier of the parent connection to share.
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.PartnerCreateSharedConnectionRequestSchema` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `ConnectionsClient.IdempotentRequestOptions` 
     
 </dd>
 </dl>
@@ -2491,6 +2226,93 @@ await client.schemas.deleteField("248df4b7-aa70-47b8-a036-33ac447e668d", "public
 <dd>
 
 **field_id:** `string` — Identifier of the user-defined field to delete.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SchemasClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.schemas.<a href="/src/api/resources/schemas/client/Client.ts">patchField</a>(connection_id, schema_id, field_id, { ...params }) -> Polytomic.SchemaFieldResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Edits a single field on a schema, creating an override for a detected field if needed.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.schemas.patchField("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id", "field_id");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Connection holding the schema.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**schema_id:** `string` — Schema identifier.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**field_id:** `string` — Field identifier within the schema.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.PatchSchemaFieldRequest` 
     
 </dd>
 </dl>
@@ -3939,7 +3761,7 @@ await client.modelSync.list({
 </dl>
 </details>
 
-<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">create</a>({ ...params }) -> Polytomic.SyncResponseEnvelope</code></summary>
+<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">create</a>({ ...params }) -> Polytomic.ModelSyncV5ResponseEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -4049,7 +3871,7 @@ await client.modelSync.create({
 <dl>
 <dd>
 
-**request:** `Polytomic.CreateSyncRequest` 
+**request:** `Polytomic.CreateModelSyncV5Request` 
     
 </dd>
 </dl>
@@ -4128,7 +3950,7 @@ await client.modelSync.getScheduleOptions();
 </dl>
 </details>
 
-<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">get</a>(id) -> Polytomic.SyncResponseEnvelope</code></summary>
+<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">get</a>(id) -> Polytomic.ModelSyncV5ResponseEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -4195,7 +4017,7 @@ await client.modelSync.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 </dl>
 </details>
 
-<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">update</a>(id, { ...params }) -> Polytomic.SyncResponseEnvelope</code></summary>
+<details><summary><code>client.modelSync.<a href="/src/api/resources/modelSync/client/Client.ts">update</a>(id, { ...params }) -> Polytomic.ModelSyncV5ResponseEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -4270,7 +4092,7 @@ await client.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**request:** `Polytomic.UpdateSyncRequest` 
+**request:** `Polytomic.UpdateModelSyncV5Request` 
     
 </dd>
 </dl>
@@ -4666,8 +4488,9 @@ Returns a resolved entity by ID.
 Looks up a UUID within the caller's current organization and returns the
 resource type plus enough context to fetch the canonical resource.
 
-This endpoint is useful when you have an execution, sync, model, connection,
-organization, or user UUID and need to determine what it refers to.
+This endpoint is useful when you have an execution, sync, model, Connection,
+Harbor, Harbor context, Organization, or user UUID and need to determine what
+it refers to.
 
 The response always includes:
 
@@ -4693,6 +4516,8 @@ Supported `type` values currently include:
 - `sync_execution`
 - `bulk_sync`
 - `bulk_sync_execution`
+- `harbor`
+- `harbor_context`
 
 Examples:
 
@@ -4700,6 +4525,8 @@ Examples:
   relationship.
 - A bulk sync execution resolves to a `bulk_sync_execution`, includes a
   `bulk_sync` relationship, and may include `context.schema_ids`.
+- A Harbor context resolves to a `harbor_context` and includes a `harbor`
+  relationship.
 
 If the UUID does not exist, or exists outside the caller's scoped
 organization, the endpoint returns `404`.
@@ -4796,6 +4623,8 @@ Supported `type` values currently include:
 - `sync_execution`
 - `bulk_sync`
 - `bulk_sync_execution`
+- `harbor`
+- `harbor_context`
 
 Examples:
 
@@ -4803,6 +4632,8 @@ Examples:
   relationship.
 - A bulk sync execution resolves to a `bulk_sync_execution`, includes a
   `bulk_sync` relationship, and may include `context.schema_ids`.
+- A Harbor context resolves to a `harbor_context` and includes a `harbor`
+  relationship.
 
 If the UUID does not exist, the endpoint returns `404`.
 </dd>
@@ -4994,6 +4825,2490 @@ await client.events.getTypes();
 </dl>
 </details>
 
+## Harbors
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listAuthorizedConnections</a>({ ...params }) -> Polytomic.HarborConnectionListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists profile-authorized connections and capabilities for the current Harbor credential.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.listAuthorizedConnections({
+    limit: 1,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListAuthorizedConnectionsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listAuthorizedSchemas</a>(connection_id, { ...params }) -> Polytomic.HarborSchemaListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists one bounded page of schema resources authorized by the current Harbor profile.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.listAuthorizedSchemas("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 1,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**connection_id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListAuthorizedSchemasRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getAuthorizedSchema</a>(connection_id, schema_id, { ...params }) -> Polytomic.HarborConnectionSchemaEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one schema resource authorized by the current Harbor profile.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.getAuthorizedSchema("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**connection_id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**schema_id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsGetAuthorizedSchemaRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">registerSession</a>({ ...params }) -> Polytomic.RegisterHarborSessionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Registers a service-attested MCP transport session for a scoped Harbor credential.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.registerSession();
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.RegisterHarborSessionRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">closeSession</a>(session_id, { ...params }) -> Polytomic.CloseHarborSessionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Closes a service-attested Harbor MCP transport session.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.closeSession("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**session_id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsCloseSessionRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">list</a>({ ...params }) -> Polytomic.HarborListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists Harbors in the caller's current organization.
+
+Returns Harbors in creation order. Use `pagination.next_page_token` to continue when more results are available.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.list({
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">create</a>({ ...params }) -> Polytomic.CreateHarborEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a managed or customer-managed Harbor in the caller's current organization.
+
+`generate_api_key` defaults to `true`. Polytomic returns a new plaintext credential only in this response. Set it to `false` to create the Harbor without a credential.
+
+For `customer_managed`, `backing_connection_id` must identify a queryable Connection that your credential can access.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.create({
+    backing_mode: "managed",
+    name: "Revenue Operations"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.CreateHarborRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">get</a>(harbor_id) -> Polytomic.HarborEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one Harbor by its first-class Harbor ID.
+
+The response exposes the backing Connection ID but not the internal profile used to authorize Harbor credentials.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.get("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">update</a>(harbor_id, { ...params }) -> Polytomic.HarborEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates a Harbor's name and description.
+
+This operation does not change `backing_mode` or `backing_connection_id`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    name: "Revenue Operations"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.UpdateHarborRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">delete</a>(harbor_id) -> Polytomic.DeletedHarborEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes a Harbor and revokes its credentials.
+
+> 🚧 Harbor deletion
+>
+> Deleting a Harbor revokes its credentials, context documents, and user assignments. A customer-managed backing Connection remains available. Polytomic deletes a managed backing Connection only when no other resource uses it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listContexts</a>(harbor_id, { ...params }) -> Polytomic.HarborContextListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists context document metadata for a Harbor without returning document content.
+
+Collection items include the current published `version` number and omit
+`content`. Use the context item endpoint to retrieve a complete document.
+
+A Harbor profile credential can read context only when `harbor_id` identifies
+its own Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.listContexts("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListContextsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">createContext</a>(harbor_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates and attaches a context document to a Harbor.
+
+The new document belongs only to this Harbor. Context documents cannot be attached to multiple Harbors.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.createContext("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.CreateHarborContextRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listContextDrafts</a>(harbor_id, { ...params }) -> Polytomic.HarborContextDraftListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists mutable Harbor context drafts without returning document content.
+
+The collection includes drafts for published context documents and initial drafts
+that have not yet been published. Use `context_id` with the draft detail,
+replacement, promotion, and discard endpoints.
+
+Draft metadata does not include `content`. Fetch a selected draft through its
+detail endpoint to read the complete candidate. Normal context list and detail
+operations continue to return published content only.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.listContextDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListContextDraftsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">createContextDraft</a>(harbor_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates an unpublished context document with its initial mutable draft.
+
+Creates a stable context identity and its initial mutable draft without publishing
+content to the Harbor. The response includes `context_id`, which identifies the
+draft replacement, promotion, and discard routes.
+
+The initial draft has a null `base_revision_id`. It remains absent from normal
+context list/detail, GraphQL, entity lookup, and Harbor MCP reads until promoted.
+Use the regular context creation endpoint instead when the initial payload should
+be published immediately.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.createContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.CreateHarborContextDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getContext</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one complete Harbor context document.
+
+The response includes the current published `version` number and complete
+plain-text `content`.
+
+A Harbor profile credential can read context only when `harbor_id` identifies
+its own Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.getContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsGetContextRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">updateContext</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Replaces one Harbor context document.
+
+Each successful request publishes the next immutable version. You can omit
+`change_note`.
+
+A direct publication leaves an existing draft unchanged.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.updateContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.SaveHarborContextRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteContext</a>(harbor_id, context_id, { ...params }) -> Polytomic.DeletedHarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes one context document from a Harbor.
+
+Deleting a context document does not affect the Harbor or its other context documents.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.deleteContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsDeleteContextRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the mutable draft for a Harbor context document.
+
+Drafts are available only through the draft endpoints. `base_revision_id`
+identifies the published revision from which the candidate was created. Normal
+context reads and Harbor MCP tools continue to return the current published
+version. Creator and updater IDs are null when their actor type is `system`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.getContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsGetContextDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">saveContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates or completely replaces the mutable draft for a Harbor context document.
+
+The request supplies the complete draft payload. If a draft already exists,
+this request replaces it while preserving the draft ID, creation metadata, and
+`base_revision_id`.
+
+A new draft for a published document records the current revision as its base.
+An unpublished document's initial draft keeps a null base when replaced. Saving
+a draft does not change published content or its `updated_at`. Creator and
+updater provenance comes from the request actor; system actors have a null actor
+ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.saveContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.SaveHarborContextDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.DeletedHarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Discards the mutable draft for a Harbor context document.
+
+Discarding a draft does not change the current published version or its
+history. If the draft belongs to a context that has never been published,
+discarding it also removes the otherwise empty context identity.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.deleteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsDeleteContextDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">promoteContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextVersionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Promotes the draft to the next immutable published context version.
+
+Promotion publishes the draft's exact title, description, content, and optional
+change note as the next version. An unpublished context's initial draft becomes
+version 1. The draft is removed after publication.
+
+Promotion returns a conflict when the current published revision differs from
+the draft's `base_revision_id`. The stale draft remains available so an author
+can compare it with the current version before discarding and recreating it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.promoteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsPromoteContextDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listContextVersions</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextVersionListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists immutable published versions of a Harbor context document without returning content.
+
+Versions are ordered from newest to oldest. Collection items omit `content`,
+and the draft is never included. Pagination tokens continue from the last
+returned version, so publishing a newer version between requests does not shift
+or duplicate older results.
+
+Published revision IDs are durable artifact identities intended for future
+Harbor activity and audit records. Publisher IDs are paired with actor types.
+System publications have `published_by_type: "system"` and a null
+`published_by` because the system actor has no UUID.
+
+A Harbor profile credential can read versions only when `harbor_id` identifies
+its own Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.listContextVersions("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListContextVersionsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getContextVersion</a>(harbor_id, context_id, version_id, { ...params }) -> Polytomic.HarborContextVersionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one immutable published version of a Harbor context document.
+
+The response includes the complete title, description, and plain-text
+`content` captured when the version was published.
+
+Published versions cannot be changed or deleted. System publications have
+`published_by_type: "system"` and a null `published_by`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.getContextVersion("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `string` — Unique identifier of the published context version.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsGetContextVersionRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listKeys</a>(harbor_id, { ...params }) -> Polytomic.HarborKeyListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists active masked credentials for a Harbor.
+
+Each item contains a masked `key_hint`. Polytomic never returns a credential plaintext after creation.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.listKeys("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListKeysRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">createKey</a>(harbor_id) -> Polytomic.HarborKeyEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Generates a new Harbor credential and returns its plaintext value once.
+
+Store the returned `value` securely. Polytomic returns it only in this response.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.createKey("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteKey</a>(harbor_id, key_id) -> Polytomic.RevokedHarborKeyEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Revokes one Harbor credential by its credential ID.
+
+Revocation affects only the selected credential. Other active Harbor credentials remain valid.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.deleteKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**key_id:** `string` — Unique identifier of the Harbor credential.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">resolveSourceMappings</a>(harbor_id, { ...params }) -> Polytomic.ResolveHarborSourceMappingsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Resolves documented source table and field identities to the names a Harbor's backing Connection accepts.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.resolveSourceMappings("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.ResolveHarborSourceMappingsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getStatus</a>(harbor_id) -> Polytomic.HarborStatusEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns raw Polytomic refresh evidence for datasets written to a Harbor.
+
+Each pipeline corresponds to a bulk sync or model sync that writes at least one
+dataset to the Harbor's backing Connection. Tables populated outside Polytomic
+are not included, even when they are queryable through a customer-managed
+backing Connection.
+
+The response groups shared pipeline evidence so schedules and configuration are
+not repeated for every dataset:
+
+- Each entry in `pipelines` identifies the producer through `type` and `id`.
+  Separate pipelines targeting the same physical dataset remain separate
+  entries.
+- `datasets` is keyed by the effective destination dataset name.
+  `last_success_at` is the start time of the most recent execution in which that
+  dataset completed successfully, including a successful dataset within a bulk
+  execution that completes with errors. The start time is a conservative upper
+  bound because source reads and destination writes happen afterward.
+- `latest_status` preserves the latest Polytomic execution status. Never-run
+  datasets omit this field.
+- Pipeline-level `schedules` preserves schedule parameters and selectors. A
+  schedule can be manual, event-driven, advanced, selective, or limited to
+  named source schemas, so callers should not reduce the list to one inferred
+  cadence.
+- Continuous schedules use the scheduler's persisted next firing. If scheduler
+  state is unavailable, `next_run_at` is omitted rather than recalculated with
+  new jitter.
+- Paused pipelines remain present with `refresh_enabled` set to `false` and no
+  `next_run_at`.
+
+Use absolute timestamps and the raw statuses to apply the maximum acceptable
+staleness for your task. The endpoint does not classify datasets or the Harbor
+as healthy, stale, or unhealthy.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listUsers</a>(harbor_id, { ...params }) -> Polytomic.HarborUserListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists Harbor-only users assigned to a Harbor.
+
+The response contains only Harbor-only users currently assigned to this Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.listUsers("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.HarborsListUsersRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">inviteUser</a>(harbor_id, { ...params }) -> Polytomic.HarborUserEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Invites and assigns a new Harbor-only user.
+
+The invited account is restricted to assigned Harbors and does not receive regular Polytomic application access.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.inviteUser("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    email: "analyst@example.com"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.InviteHarborUserRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">assignUser</a>(harbor_id, user_id) -> Polytomic.HarborUserEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Assigns an existing Harbor-only user to a Harbor.
+
+The assignment is idempotent. Regular Polytomic users cannot be assigned because they already have application access to Harbors.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.assignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_id:** `string` — Unique identifier of the Harbor-only user.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">unassignUser</a>(harbor_id, user_id) -> Polytomic.UnassignedHarborUserEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Removes a Harbor assignment without deleting the user.
+
+This removes only the Harbor assignment. The organization user remains available and may retain assignments to other Harbors.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.unassignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_id:** `string` — Unique identifier of the Harbor-only user.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Jobs
 <details><summary><code>client.jobs.<a href="/src/api/resources/jobs/client/Client.ts">get</a>(type, id) -> Polytomic.JobResponseEnvelope</code></summary>
 <dl>
@@ -5048,7 +7363,7 @@ await client.jobs.get("createmodel", "248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**type:** `string` — Job type. One of: createmodel, updatemodel, previewmodel, samplemodel, exportlogs.
+**type:** `string` — Job type. One of: createmodel, updatemodel, previewmodel, samplemodel, exportlogs, connectionproxy.
     
 </dd>
 </dl>
@@ -5324,6 +7639,126 @@ await client.organization.getCurrent();
 <dd>
 
 **requestOptions:** `OrganizationClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.organization.<a href="/src/api/resources/organization/client/Client.ts">getRecordLogging</a>() -> Polytomic.RecordLoggingSettingsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the organization's record logging settings, including the connection record logs are delivered to.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.organization.getRecordLogging();
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**requestOptions:** `OrganizationClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.organization.<a href="/src/api/resources/organization/client/Client.ts">updateRecordLogging</a>({ ...params }) -> Polytomic.RecordLoggingSettingsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Replaces the organization's record logging settings. `deliveryConnectionId` is replaced, not merged: omitting it, or sending null, removes any destination previously configured.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.organization.updateRecordLogging({
+    enabled: true
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.UpdateRecordLoggingSettingsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `OrganizationClient.IdempotentRequestOptions` 
     
 </dd>
 </dl>
@@ -5687,7 +8122,7 @@ await client.organization.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 </details>
 
 ## Users
-<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">listCurrentOrgUsers</a>() -> Polytomic.ListUsersEnvelope</code></summary>
+<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">listCurrentOrgUsers</a>() -> Polytomic.CurrentOrgListUsersEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -5812,7 +8247,7 @@ await client.users.createCurrentOrgUser({
 </dl>
 </details>
 
-<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">getCurrentOrgUser</a>(id) -> Polytomic.UserEnvelope</code></summary>
+<details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">getCurrentOrgUser</a>(id) -> Polytomic.CurrentOrgUserEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -6480,6 +8915,249 @@ await client.users.createApiKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b
 <dd>
 
 **requestOptions:** `UsersClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## RecordViewLinks
+<details><summary><code>client.recordViewLinks.<a href="/src/api/resources/recordViewLinks/client/Client.ts">create</a>({ ...params }) -> Polytomic.CreateRecordViewLinkEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a short-lived capability link for viewing one stored record snapshot.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.recordViewLinks.create({
+    connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+    lookup_key_field: "lookup_key_field",
+    lookup_key_value: "lookup_key_value",
+    schema_id: "schema_id"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.CreateRecordViewLinkRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `RecordViewLinksClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.recordViewLinks.<a href="/src/api/resources/recordViewLinks/client/Client.ts">getCapabilities</a>({ ...params }) -> Polytomic.GetRecordViewCapabilitiesEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Checks whether record-view links can be created for a connection schema.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.recordViewLinks.getCapabilities({
+    connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+    schema_id: "schema_id"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.RecordViewLinksGetCapabilitiesRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `RecordViewLinksClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## TemporaryCredentials
+<details><summary><code>client.temporaryCredentials.<a href="/src/api/resources/temporaryCredentials/client/Client.ts">create</a>({ ...params }) -> Polytomic.TemporaryCredentialResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Issues a non-renewable credential with a bounded lifetime for a user or Agent Data profile.
+
+The response contains the credential secret once. Store it securely and send it
+as a Bearer token in the `Authorization` header.
+
+Set `subject.type` to `user` to issue a credential for your authenticated user.
+Omit `organization_id` and `user_id`; Polytomic derives both values from your
+credential. Set `mode` to `read_only` to limit the credential to the
+intersection of the user's current permissions and read-only actions. A
+read-only caller can issue only read-only credentials.
+
+Partner callers must provide both `organization_id` and `user_id`. The target
+must be an active user in an organization owned by the partner. User subjects
+must be application users; Agent Data portal-only users continue to use profile
+credentials.
+
+User credentials resolve the subject's current permissions on every request.
+Permission changes take effect immediately, and deleting the user invalidates
+the credential.
+
+Set `subject.type` to `profile` and provide the Agent Data profile ID. The
+credential uses the profile's current connection access on every request;
+changes take effect immediately, and deleting the profile invalidates the
+credential.
+
+A temporary credential stops authenticating at `expires_at`. It cannot be
+refreshed, extended, or used to create another temporary credential. Create a
+new credential with a durable authorized credential when you need a later
+expiration.
+
+Each organization may have up to 1,000 active temporary credentials. The
+endpoint returns `429 Too Many Requests` at the limit. Expired credentials stop
+counting toward the limit immediately, before periodic cleanup removes them.
+
+> ⚠️ Session names are audit labels
+>
+> Use `session_name` only for non-sensitive job or agent-session correlation.
+> Do not include secrets or personal data.
+
+Polytomic periodically removes expired credential records. API usage history
+keeps its credential ID according to the normal API usage retention period.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.temporaryCredentials.create({
+    subject: {
+        type: "user"
+    }
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.CreateTemporaryCredentialRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `TemporaryCredentialsClient.IdempotentRequestOptions` 
     
 </dd>
 </dl>
@@ -7335,7 +10013,7 @@ await client.bulkSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", 
 <dl>
 <dd>
 
-Fetch the latest console log entries for a bulk sync execution. Returns at most the most recent 50 entries retained in Redis.
+Fetch the latest console log entries for a bulk sync execution. Returns the most recent 50 entries.
 </dd>
 </dl>
 </dd>
@@ -7590,7 +10268,7 @@ await client.bulkSync.executions.exportLogs("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-Fetch the latest console log entries for a schema within a bulk sync execution. Returns at most the most recent 50 entries retained in Redis.
+Fetch the latest console log entries for a schema within a bulk sync execution. Returnst the most recent 50 entries.
 </dd>
 </dl>
 </dd>
@@ -7657,6 +10335,216 @@ await client.bulkSync.executions.getSchemaConsoleLogs("248df4b7-aa70-47b8-a036-3
 <dd>
 
 **requestOptions:** `ExecutionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.bulkSync.executions.<a href="/src/api/resources/bulkSync/resources/executions/client/Client.ts">getIngestConsoleLogs</a>(connection_id, { ...params }) -> Polytomic.ExecutionConsoleLogsResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Fetch the latest console log entries for ingestion scoped by connection and optional bulk sync. Returns the most recent 50 entries.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.bulkSync.executions.getIngestConsoleLogs("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    sync_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+    limit: 50,
+    after: "1744311099250-0"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**connection_id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.bulkSync.ExecutionsGetIngestConsoleLogsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ExecutionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## BulkSync ErrorHandling
+<details><summary><code>client.bulkSync.errorHandling.<a href="/src/api/resources/bulkSync/resources/errorHandling/client/Client.ts">get</a>(id) -> Polytomic.BulkSyncErrorHandlingEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the error handling settings for a bulk sync.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.bulkSync.errorHandling.get("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the bulk sync.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ErrorHandlingClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.bulkSync.errorHandling.<a href="/src/api/resources/bulkSync/resources/errorHandling/client/Client.ts">update</a>(id, { ...params }) -> Polytomic.BulkSyncErrorHandlingEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates the error handling settings for a bulk sync.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.bulkSync.errorHandling.update("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the bulk sync.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.bulkSync.UpdateBulkSyncErrorHandlingRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ErrorHandlingClient.IdempotentRequestOptions` 
     
 </dd>
 </dl>
@@ -8475,6 +11363,574 @@ await client.bulkSync.schedules.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "
 </dl>
 </details>
 
+## Connections Proxy
+<details><summary><code>client.connections.proxy.<a href="/src/api/resources/connections/resources/proxy/client/Client.ts">executeProxy</a>(id, { ...params }) -> Polytomic.ExecuteConnectionProxyEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Proxies an HTTP request to a connection's underlying API using the connection's stored credentials, subject to per-connection rate limits and size caps.
+
+This endpoint is intended for controlled passthrough use, not as a general
+replacement for Polytomic's modeled endpoints. The request is executed with the
+connection's stored credentials and inherited base URL, headers, and query
+parameters.
+
+Before building requests dynamically, call
+[`GET /api/connections/{id}/proxy/info`](../../../../api-reference/connections/get-proxy-info)
+to inspect the inherited base URL, blocked headers, accepted body types, and
+size and rate limits.
+
+## Important behavior
+
+- `request.path` must be relative and start with `/`.
+- Use either `request.query` or `request.rawQuery`, not both.
+- Caller-supplied headers are merged with inherited headers, but inherited auth
+  headers cannot be overridden.
+- The proxy strips a fixed set of request and response headers for safety.
+- Response bodies larger than the configured maximum are truncated, and
+  `truncated` is set to `true`.
+
+To run a `GET` request asynchronously, set `async` to `true`. The initial
+response returns `status: 202`, `jobId`, `jobStatus`, and `jobUrl`. Poll
+[`GET /api/jobs/{type}/{id}`](../../../../api-reference/jobs/get-job) with
+`type=connectionproxy` and the returned `jobId` until the job is complete. The
+completed job result includes the upstream `status`, sanitized `headers`,
+`contentType`, `contentLength`, `latencyMs`, and a short-lived
+`bodyDownloadUrl` for the upstream response body.
+
+The response includes `proxyCallId`, which you can use to correlate the call
+with audit logs.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.proxy.executeProxy("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    request: {
+        method: "GET",
+        path: "/v1/objects"
+    }
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the connection to proxy the request through.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.connections.ExecuteConnectionProxyRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ProxyClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.connections.proxy.<a href="/src/api/resources/connections/resources/proxy/client/Client.ts">getProxyInfo</a>(id) -> Polytomic.GetConnectionProxyInfoEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the proxy contract for a connection.
+
+Use this endpoint before calling
+[`POST /api/connections/{id}/proxy`](../../../../../api-reference/connections/execute-proxy)
+when you need to build requests programmatically. The response shows:
+
+- the inherited base URL that all proxied requests are sent to
+- locked headers and query parameters that are attached automatically
+- blocked request and response headers
+- allowed HTTP methods and body shapes
+- timeout, rate-limit, and payload-size limits
+
+Sensitive inherited header and query values are redacted in the response. The
+contract is still useful for discovering which keys are fixed by the
+connection, even though their raw values are not exposed.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.proxy.getProxyInfo("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the connection whose proxy contract should be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ProxyClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.connections.proxy.<a href="/src/api/resources/connections/resources/proxy/client/Client.ts">getProxySettings</a>(id) -> Polytomic.ConnectionProxySettingsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns whether a connection can be used through the Connection Proxy API.
+
+The setting is stored on the parent connection. When you request settings for a
+shared connection, the response includes both the requested `connectionId` and the
+`parentConnectionId` that controls proxy access. For non-shared connections,
+`parentConnectionId` is omitted.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.proxy.getProxySettings("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the connection whose proxy settings should be returned.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ProxyClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.connections.proxy.<a href="/src/api/resources/connections/resources/proxy/client/Client.ts">updateProxySettings</a>(id, { ...params }) -> Polytomic.ConnectionProxySettingsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Enables or disables use of a connection through the Connection Proxy API.
+
+The setting is stored on the parent connection. To update proxy access for a
+shared connection, the caller must have edit permission for the parent
+connection.
+
+Enabling proxy access requires a backend that supports the Connection Proxy API.
+If the connection backend is unsupported, the request returns `400 Bad Request`.
+Disabling proxy access is allowed for any connection the caller can edit.
+
+Setting `enabled` to `false` prevents proxy calls for the connection.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.proxy.updateProxySettings("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    enabled: true
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the connection whose proxy settings should be updated.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.connections.UpdateConnectionProxySettingsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ProxyClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Connections SharedConnections
+<details><summary><code>client.connections.sharedConnections.<a href="/src/api/resources/connections/resources/sharedConnections/client/Client.ts">listSharedConnections</a>(id) -> Polytomic.ConnectionListResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists shared copies of a connection that the caller's organization owns.
+
+The returned connections are the child copies, not the parent connection
+itself. This is useful when a partner workflow needs to confirm which
+downstream organizations have already received a shared copy.
+
+Creating a new shared copy is a separate operation. Use
+[`POST /api/organizations/{org_id}/connections/{connection_id}/share`](../../../../api-reference/connections/create-shared-connection)
+for the v5 partner-scoped flow.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.sharedConnections.listSharedConnections("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the parent connection whose shared copies should be listed.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SharedConnectionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.connections.sharedConnections.<a href="/src/api/resources/connections/resources/sharedConnections/client/Client.ts">listSharedConnectionsForPartner</a>(org_id, connection_id) -> Polytomic.ConnectionListResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists shared copies of a connection owned by a specific organization in the partner account.
+
+The `org_id` must match the organization that owns the parent connection. If it
+does not, the endpoint returns `404` rather than exposing information about the
+parent connection.
+
+This endpoint is useful in partner workflows where the parent connection is in
+the partner owner organization and the caller needs to audit which child
+organizations already have a shared copy.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.sharedConnections.listSharedConnectionsForPartner("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**org_id:** `string` — Unique identifier of the organization that owns the parent connection.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Unique identifier of the parent connection whose shared copies should be listed.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SharedConnectionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.connections.sharedConnections.<a href="/src/api/resources/connections/resources/sharedConnections/client/Client.ts">createSharedConnection</a>(org_id, connection_id, { ...params }) -> Polytomic.CreateSharedConnectionResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Shares a connection with another organization in the caller's partner account.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.connections.sharedConnections.createSharedConnection("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    child_organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**org_id:** `string` — Unique identifier of the organization that owns the parent connection.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Unique identifier of the parent connection to share.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.connections.PartnerCreateSharedConnectionRequestSchema` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SharedConnectionsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## ModelSync Targets
 <details><summary><code>client.modelSync.targets.<a href="/src/api/resources/modelSync/resources/targets/client/Client.ts">getTargetFields</a>(id, { ...params }) -> Polytomic.TargetResponseEnvelope</code></summary>
 <dl>
@@ -8488,7 +11944,7 @@ await client.bulkSync.schedules.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-Returns the fields of a specific target object on a connection.
+Returns the fields, modes, and properties of a target object on a connection.
 
 Pass the target object identifier to retrieve the fields available for
 mapping on that object. These are the destination fields you can reference
@@ -8501,6 +11957,35 @@ Fields returned here reflect the connection's current cached state. If the
 upstream object schema has changed, trigger a schema refresh with
 [`POST /api/connections/{id}/schemas/refresh`](../../../../../../api-reference/schemas/refresh)
 before calling this endpoint.
+
+## Fields for a target that hasn't been created yet
+
+Some connections support creating a new destination object as part of a
+model sync — for example, a Facebook Ads custom audience or a LinkedIn Ads
+contact list. In that case there is no existing target identifier to pass;
+instead, describe the new target with the same properties returned in the
+`target_creation` block of
+[`GET /api/connections/{id}/modelsync/targetobjects`](../../../../../../api-reference/model-sync/targets/list),
+and this endpoint will return the fields the new target will expose.
+
+Exactly one of `target` or `properties` must be supplied. Each input is
+sent as a separate `properties[key]=value` query parameter. For a Facebook
+Ads connection that requires an `account` and a `name`:
+
+```
+GET /api/connections/{id}/modelsync/target/fields
+  ?properties[account]=act_1234567
+  &properties[name]=My%20new%20audience
+```
+
+The response shape is identical to the existing-target form. For backends
+where the new target's field set is fixed (most ads platforms), `fields`
+contains those fields; for backends where the columns are user-defined
+(e.g. a SQL database), `fields` will be empty and the caller defines the
+columns at mapping time.
+
+When `properties` is supplied, the `refresh` parameter is ignored — a
+not-yet-created target has no cached schema to refresh.
 </dd>
 </dl>
 </dd>
@@ -8562,7 +12047,7 @@ await client.modelSync.targets.getTargetFields("248df4b7-aa70-47b8-a036-33ac447e
 </dl>
 </details>
 
-<details><summary><code>client.modelSync.targets.<a href="/src/api/resources/modelSync/resources/targets/client/Client.ts">list</a>(id) -> Polytomic.TargetObjectsResponseEnvelope</code></summary>
+<details><summary><code>client.modelSync.targets.<a href="/src/api/resources/modelSync/resources/targets/client/Client.ts">list</a>(id, { ...params }) -> Polytomic.TargetObjectsResponseEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -8584,7 +12069,9 @@ Target creation properties are all string values; the `enum` flag indicates if
 the property has a fixed set of valid values. When `enum` is `true`, the [Target
 Creation Property
 Values](../../../../../api-reference/model-sync/targets/get-create-property)
-endpoint can be used to retrieve the valid values.
+endpoint can be used to retrieve the valid values. Alternatively, pass
+`include_target_creation_values=true` to inline the `values` array for each
+enum property directly in this response.
 
 ## Sync modes
 
@@ -8605,7 +12092,9 @@ what operations the mode supports.
 <dd>
 
 ```typescript
-await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    include_target_creation_values: true
+});
 
 ```
 </dd>
@@ -8622,6 +12111,14 @@ await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dd>
 
 **id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.modelSync.TargetsListRequest` 
     
 </dd>
 </dl>
@@ -8732,6 +12229,141 @@ await client.modelSync.targets.getCreateProperty("248df4b7-aa70-47b8-a036-33ac44
 <dd>
 
 **requestOptions:** `TargetsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## ModelSync ErrorHandling
+<details><summary><code>client.modelSync.errorHandling.<a href="/src/api/resources/modelSync/resources/errorHandling/client/Client.ts">get</a>(id) -> Polytomic.SyncErrorHandlingEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the error handling settings for a model sync.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.modelSync.errorHandling.get("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the model sync.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ErrorHandlingClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.modelSync.errorHandling.<a href="/src/api/resources/modelSync/resources/errorHandling/client/Client.ts">update</a>(id, { ...params }) -> Polytomic.SyncErrorHandlingEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Updates the error handling settings for a model sync.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.modelSync.errorHandling.update("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the model sync.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.modelSync.UpdateSyncErrorHandlingRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ErrorHandlingClient.IdempotentRequestOptions` 
     
 </dd>
 </dl>
@@ -8987,7 +12619,7 @@ await client.modelSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-Fetch the latest console log entries for a sync execution. Returns at most the most recent 50 entries retained in Redis.
+Fetch the latest console log entries for a sync execution. Returns the most recent 50 entries.
 </dd>
 </dl>
 </dd>
@@ -9038,6 +12670,77 @@ await client.modelSync.executions.getConsoleLogs("248df4b7-aa70-47b8-a036-33ac44
 <dd>
 
 **request:** `Polytomic.modelSync.ExecutionsGetConsoleLogsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ExecutionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.modelSync.executions.<a href="/src/api/resources/modelSync/resources/executions/client/Client.ts">getLogsIndex</a>(sync_id, id) -> Polytomic.LogsIndexResponseEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns an index of the record-log types produced by this model sync execution, with the per-type endpoint to retrieve signed URLs for each type's segment files.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.modelSync.executions.getLogsIndex("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**sync_id:** `string` — Unique identifier of the model sync.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**id:** `string` — Unique identifier of the execution whose logs are being indexed.
     
 </dd>
 </dl>
@@ -9155,10 +12858,12 @@ await client.modelSync.executions.getLogUrls("248df4b7-aa70-47b8-a036-33ac447e66
 <dl>
 <dd>
 
-Returns a signed URL for a specific log file produced by a model sync execution.
+Redirects to a signed URL for a specific log file produced by a model sync execution.
 
-The URL is signed and expires after a short period. If it has expired before
-you download the file, call this endpoint again to obtain a fresh URL.
+This endpoint responds with a `302 Found` redirect; the signed URL is returned
+in the `Location` header, and the response body is empty. The URL expires
+after a short period, so call this endpoint again to obtain a fresh URL if it
+expires before you download the file.
 </dd>
 </dl>
 </dd>

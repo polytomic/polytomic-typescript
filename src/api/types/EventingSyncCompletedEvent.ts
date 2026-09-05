@@ -9,8 +9,11 @@ export interface EventingSyncCompletedEvent {
     execution_id?: string | undefined;
     inserted_count?: number | undefined;
     inserted_records?: string[] | undefined;
+    /** Endpoint returning the index of record logs produced by this execution. */
+    logs_url?: string | undefined;
     organization_id?: string | undefined;
     record_count?: number | undefined;
+    schedule?: Polytomic.EventingSyncSchedule | undefined;
     status?: Polytomic.UtilExecutionStatus | undefined;
     sync_id?: string | undefined;
     sync_name?: string | undefined;

@@ -3,6 +3,7 @@
 export interface BackendConnectionCapabilities {
     destination: boolean;
     enrichment: boolean;
+    logging: boolean;
     orchestration: boolean;
     source: boolean;
 }

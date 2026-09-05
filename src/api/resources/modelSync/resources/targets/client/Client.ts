@@ -4,6 +4,7 @@ import type { BaseClientOptions, BaseRequestOptions } from "../../../../../../Ba
 import { type NormalizedClientOptionsWithAuth, normalizeClientOptionsWithAuth } from "../../../../../../BaseClient";
 import * as core from "../../../../../../core";
 import { mergeHeaders, mergeOnlyDefinedHeaders } from "../../../../../../core/headers";
+import { toJson } from "../../../../../../core/json";
 import * as environments from "../../../../../../environments";
 import { handleNonStatusCodeError } from "../../../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../../../errors/index";
@@ -23,7 +24,7 @@ export class TargetsClient {
     }
 
     /**
-     * Returns the fields of a specific target object on a connection.
+     * Returns the fields, modes, and properties of a target object on a connection.
      *
      * Pass the target object identifier to retrieve the fields available for
      * mapping on that object. These are the destination fields you can reference
@@ -37,10 +38,40 @@ export class TargetsClient {
      * [`POST /api/connections/{id}/schemas/refresh`](../../../../../../api-reference/schemas/refresh)
      * before calling this endpoint.
      *
+     * ## Fields for a target that hasn't been created yet
+     *
+     * Some connections support creating a new destination object as part of a
+     * model sync — for example, a Facebook Ads custom audience or a LinkedIn Ads
+     * contact list. In that case there is no existing target identifier to pass;
+     * instead, describe the new target with the same properties returned in the
+     * `target_creation` block of
+     * [`GET /api/connections/{id}/modelsync/targetobjects`](../../../../../../api-reference/model-sync/targets/list),
+     * and this endpoint will return the fields the new target will expose.
+     *
+     * Exactly one of `target` or `properties` must be supplied. Each input is
+     * sent as a separate `properties[key]=value` query parameter. For a Facebook
+     * Ads connection that requires an `account` and a `name`:
+     *
+     * ```
+     * GET /api/connections/{id}/modelsync/target/fields
+     *   ?properties[account]=act_1234567
+     *   &properties[name]=My%20new%20audience
+     * ```
+     *
+     * The response shape is identical to the existing-target form. For backends
+     * where the new target's field set is fixed (most ads platforms), `fields`
+     * contains those fields; for backends where the columns are user-defined
+     * (e.g. a SQL database), `fields` will be empty and the caller defines the
+     * columns at mapping time.
+     *
+     * When `properties` is supplied, the `refresh` parameter is ignored — a
+     * not-yet-created target has no cached schema to refresh.
+     *
      * @param {string} id - Unique identifier of the connection.
      * @param {Polytomic.modelSync.TargetsGetTargetFieldsRequest} request
      * @param {TargetsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
@@ -53,7 +84,7 @@ export class TargetsClient {
      */
     public getTargetFields(
         id: string,
-        request: Polytomic.modelSync.TargetsGetTargetFieldsRequest,
+        request: Polytomic.modelSync.TargetsGetTargetFieldsRequest = {},
         requestOptions?: TargetsClient.RequestOptions,
     ): core.HttpResponsePromise<Polytomic.TargetResponseEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__getTargetFields(id, request, requestOptions));
@@ -61,13 +92,14 @@ export class TargetsClient {
 
     private async __getTargetFields(
         id: string,
-        request: Polytomic.modelSync.TargetsGetTargetFieldsRequest,
+        request: Polytomic.modelSync.TargetsGetTargetFieldsRequest = {},
         requestOptions?: TargetsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.TargetResponseEnvelope>> {
-        const { target, refresh } = request;
+        const { target, refresh, properties } = request;
         const _queryParams: Record<string, unknown> = {
             target,
             refresh,
+            properties: properties != null ? toJson(properties) : undefined,
         };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
@@ -104,6 +136,11 @@ export class TargetsClient {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 403:
                     throw new Polytomic.ForbiddenError(
                         _response.error.body as Polytomic.ApiError,
@@ -147,7 +184,9 @@ export class TargetsClient {
      * the property has a fixed set of valid values. When `enum` is `true`, the [Target
      * Creation Property
      * Values](../../../../../api-reference/model-sync/targets/get-create-property)
-     * endpoint can be used to retrieve the valid values.
+     * endpoint can be used to retrieve the valid values. Alternatively, pass
+     * `include_target_creation_values=true` to inline the `values` array for each
+     * enum property directly in this response.
      *
      * ## Sync modes
      *
@@ -156,6 +195,7 @@ export class TargetsClient {
      * what operations the mode supports.
      *
      * @param {string} id
+     * @param {Polytomic.modelSync.TargetsListRequest} request
      * @param {TargetsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -164,19 +204,27 @@ export class TargetsClient {
      * @throws {@link Polytomic.InternalServerError}
      *
      * @example
-     *     await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d")
+     *     await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         include_target_creation_values: true
+     *     })
      */
     public list(
         id: string,
+        request: Polytomic.modelSync.TargetsListRequest = {},
         requestOptions?: TargetsClient.RequestOptions,
     ): core.HttpResponsePromise<Polytomic.TargetObjectsResponseEnvelope> {
-        return core.HttpResponsePromise.fromPromise(this.__list(id, requestOptions));
+        return core.HttpResponsePromise.fromPromise(this.__list(id, request, requestOptions));
     }
 
     private async __list(
         id: string,
+        request: Polytomic.modelSync.TargetsListRequest = {},
         requestOptions?: TargetsClient.RequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.TargetObjectsResponseEnvelope>> {
+        const { include_target_creation_values: includeTargetCreationValues } = request;
+        const _queryParams: Record<string, unknown> = {
+            include_target_creation_values: includeTargetCreationValues,
+        };
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -195,7 +243,11 @@ export class TargetsClient {
             ),
             method: "GET",
             headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,

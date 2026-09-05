@@ -35,7 +35,7 @@ export class JobsClient {
      * Only specific job types are supported by this endpoint. Passing an unknown
      * `type` returns `400`.
      *
-     * @param {string} type - Job type. One of: createmodel, updatemodel, previewmodel, samplemodel, exportlogs.
+     * @param {string} type - Job type. One of: createmodel, updatemodel, previewmodel, samplemodel, exportlogs, connectionproxy.
      * @param {string} id - Unique identifier of the job (usually returned by whichever endpoint started the job).
      * @param {JobsClient.RequestOptions} requestOptions - Request-specific configuration.
      *

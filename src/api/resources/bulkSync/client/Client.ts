@@ -8,6 +8,7 @@ import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
 import * as Polytomic from "../../../index";
+import { ErrorHandlingClient } from "../resources/errorHandling/client/Client";
 import { ExecutionsClient } from "../resources/executions/client/Client";
 import { SchedulesClient } from "../resources/schedules/client/Client";
 import { SchemasClient } from "../resources/schemas/client/Client";
@@ -23,6 +24,7 @@ export declare namespace BulkSyncClient {
 export class BulkSyncClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<BulkSyncClient.Options>;
     protected _executions: ExecutionsClient | undefined;
+    protected _errorHandling: ErrorHandlingClient | undefined;
     protected _schemas: SchemasClient | undefined;
     protected _schedules: SchedulesClient | undefined;
 
@@ -32,6 +34,10 @@ export class BulkSyncClient {
 
     public get executions(): ExecutionsClient {
         return (this._executions ??= new ExecutionsClient(this._options));
+    }
+
+    public get errorHandling(): ErrorHandlingClient {
+        return (this._errorHandling ??= new ErrorHandlingClient(this._options));
     }
 
     public get schemas(): SchemasClient {

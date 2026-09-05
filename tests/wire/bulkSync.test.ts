@@ -251,6 +251,7 @@ describe("BulkSyncClient", () => {
                             schema: "contact",
                             started_at: "2023-04-25T12:00:00Z",
                             updated_at: "2023-04-25T12:00:00Z",
+                            version: "rel2026.08.05.06~1a2b3c4",
                             warning_count: 0,
                         },
                     ],
@@ -259,6 +260,7 @@ describe("BulkSyncClient", () => {
                     status_message: "status_message",
                     type: "scheduled",
                     updated_at: "2023-04-25T12:00:00Z",
+                    version: "rel2026.08.05.06~1a2b3c4",
                     warning_count: 0,
                 },
                 ingestion_status: {
@@ -292,6 +294,7 @@ describe("BulkSyncClient", () => {
                             schema: "contact",
                             started_at: "2023-04-25T12:00:00Z",
                             updated_at: "2023-04-25T12:00:00Z",
+                            version: "rel2026.08.05.06~1a2b3c4",
                             warning_count: 0,
                         },
                     ],
@@ -300,6 +303,7 @@ describe("BulkSyncClient", () => {
                     status_message: "status_message",
                     type: "scheduled",
                     updated_at: "2023-04-25T12:00:00Z",
+                    version: "rel2026.08.05.06~1a2b3c4",
                     warning_count: 0,
                 },
                 next_execution_time: "2023-04-25T12:00:00Z",
@@ -377,7 +381,7 @@ describe("BulkSyncClient", () => {
 
         const rawResponseBody = {
             data: {
-                capabilities: { supports_tracking_fields: true },
+                capabilities: { supports_namespaces: true, supports_tracking_fields: true },
                 configuration: { key: "value" },
                 schemas: [
                     {

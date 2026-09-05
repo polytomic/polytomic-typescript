@@ -11,4 +11,6 @@ export interface GetExecutionResponseSchema {
     started_at?: string | undefined;
     status?: Polytomic.UtilExecutionStatus | undefined;
     type?: string | undefined;
+    /** Polytomic version which last ran this execution. */
+    version?: string | undefined;
 }

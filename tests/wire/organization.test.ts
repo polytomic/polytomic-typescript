@@ -84,6 +84,107 @@ describe("OrganizationClient", () => {
         }).rejects.toThrow(Polytomic.NotFoundError);
     });
 
+    test("GetRecordLogging (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: {
+                deliveryConnectionId: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                deliveryConnectionName: "deliveryConnectionName",
+                enabled: true,
+            },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/organization/record-logging")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.organization.getRecordLogging();
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("GetRecordLogging (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/organization/record-logging")
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.organization.getRecordLogging();
+        }).rejects.toThrow(Polytomic.UnauthorizedError);
+    });
+
+    test("GetRecordLogging (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/organization/record-logging")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.organization.getRecordLogging();
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("GetRecordLogging (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/organization/record-logging")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.organization.getRecordLogging();
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
     test("List (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({

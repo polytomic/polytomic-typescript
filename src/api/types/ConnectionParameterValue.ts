@@ -2,5 +2,6 @@
 
 export interface ConnectionParameterValue {
     label?: string | undefined;
+    path?: string | undefined;
     value?: unknown | undefined;
 }

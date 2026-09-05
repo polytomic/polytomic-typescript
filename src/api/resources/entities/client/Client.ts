@@ -28,8 +28,9 @@ export class EntitiesClient {
      * Looks up a UUID within the caller's current organization and returns the
      * resource type plus enough context to fetch the canonical resource.
      *
-     * This endpoint is useful when you have an execution, sync, model, connection,
-     * organization, or user UUID and need to determine what it refers to.
+     * This endpoint is useful when you have an execution, sync, model, Connection,
+     * Harbor, Harbor context, Organization, or user UUID and need to determine what
+     * it refers to.
      *
      * The response always includes:
      *
@@ -55,6 +56,8 @@ export class EntitiesClient {
      * - `sync_execution`
      * - `bulk_sync`
      * - `bulk_sync_execution`
+     * - `harbor`
+     * - `harbor_context`
      *
      * Examples:
      *
@@ -62,6 +65,8 @@ export class EntitiesClient {
      *   relationship.
      * - A bulk sync execution resolves to a `bulk_sync_execution`, includes a
      *   `bulk_sync` relationship, and may include `context.schema_ids`.
+     * - A Harbor context resolves to a `harbor_context` and includes a `harbor`
+     *   relationship.
      *
      * If the UUID does not exist, or exists outside the caller's scoped
      * organization, the endpoint returns `404`.
@@ -183,6 +188,8 @@ export class EntitiesClient {
      * - `sync_execution`
      * - `bulk_sync`
      * - `bulk_sync_execution`
+     * - `harbor`
+     * - `harbor_context`
      *
      * Examples:
      *
@@ -190,6 +197,8 @@ export class EntitiesClient {
      *   relationship.
      * - A bulk sync execution resolves to a `bulk_sync_execution`, includes a
      *   `bulk_sync` relationship, and may include `context.schema_ids`.
+     * - A Harbor context resolves to a `harbor_context` and includes a `harbor`
+     *   relationship.
      *
      * If the UUID does not exist, the endpoint returns `404`.
      *

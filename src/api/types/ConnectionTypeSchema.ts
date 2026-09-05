@@ -2,6 +2,7 @@
 
 export interface ConnectionTypeSchema {
     id?: string | undefined;
+    logo_dark_url?: string | undefined;
     logo_url?: string | undefined;
     name?: string | undefined;
     operations?: string[] | undefined;

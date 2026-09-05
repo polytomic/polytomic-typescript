@@ -3,10 +3,15 @@
 import type * as Polytomic from "../index";
 
 export interface TargetResponse {
+    /** Fields available for mapping on this target. Empty for backends where the new target's columns are user-defined (e.g. SQL databases). */
     fields?: Polytomic.TargetField[] | undefined;
+    /** Backend-specific identifier of the target object. For not-yet-created targets, this is an internal placeholder identifier that callers should not rely on. */
     id?: string | undefined;
+    /** Sync modes the target supports (e.g. create, update, upsert). The chosen mode determines which operations the sync may perform. */
     modes?: Polytomic.Mode[] | undefined;
+    /** Human-readable name of the target object. */
     name?: string | undefined;
     properties?: Polytomic.SyncDestinationProperties | undefined;
+    /** Timestamp the target's cached schema was last refreshed. Zero for targets that do not have a cached schema (including not-yet-created targets). */
     refreshed_at?: string | undefined;
 }

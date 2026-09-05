@@ -17,10 +17,17 @@ describe("ConnectionsClient", () => {
         const rawResponseBody = {
             data: [
                 {
-                    capabilities: { destination: true, enrichment: false, orchestration: false, source: true },
+                    capabilities: {
+                        destination: true,
+                        enrichment: false,
+                        logging: false,
+                        orchestration: false,
+                        source: true,
+                    },
                     envConfig: { key: "value" },
                     id: "postgresql",
                     initialConfiguration: { key: "value" },
+                    logo_dark_url: "https://connect-assets.polytomic.com/logos/dark/postgresql.svg",
                     logo_url: "https://connect-assets.polytomic.com/logos/postgresql.svg",
                     name: "PostgreSQL",
                     use_oauth: true,
@@ -205,6 +212,7 @@ describe("ConnectionsClient", () => {
                     status_error: "error message",
                     type: {
                         id: "postgresql",
+                        logo_dark_url: "https://connect-assets.polytomic.com/logos/dark/postgresql.svg",
                         logo_url: "https://connect-assets.polytomic.com/logos/postgresql.svg",
                         name: "PostgreSQL",
                     },
@@ -238,6 +246,66 @@ describe("ConnectionsClient", () => {
         }).rejects.toThrow(Polytomic.InternalServerError);
     });
 
+    test("GetConnectSession (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: {
+                connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                dark: true,
+                expires_at: "2024-01-15T09:30:00Z",
+                id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                logo: "logo",
+                name: "name",
+                organization_name: "organization_name",
+                redirect_url: "redirect_url",
+                type: "type",
+                whitelist: ["whitelist"],
+            },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/connect/session")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.connections.getConnectSession();
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("GetConnectSession (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/connect/session")
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.connections.getConnectSession();
+        }).rejects.toThrow(Polytomic.UnauthorizedError);
+    });
+
     test("Get (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
@@ -269,6 +337,7 @@ describe("ConnectionsClient", () => {
                 status_error: "error message",
                 type: {
                     id: "postgresql",
+                    logo_dark_url: "https://connect-assets.polytomic.com/logos/dark/postgresql.svg",
                     logo_url: "https://connect-assets.polytomic.com/logos/postgresql.svg",
                     name: "PostgreSQL",
                     operations: ["operations"],
@@ -348,7 +417,12 @@ describe("ConnectionsClient", () => {
         });
 
         const rawResponseBody = {
-            data: { key: { allows_creation: true, values: [{ label: "Label", value: "value" }] } },
+            data: {
+                key: {
+                    allows_creation: true,
+                    values: [{ label: "Label", path: "customer.1971410641.6769520656.7420316652", value: "value" }],
+                },
+            },
         };
 
         server
@@ -411,7 +485,7 @@ describe("ConnectionsClient", () => {
         }).rejects.toThrow(Polytomic.InternalServerError);
     });
 
-    test("GetProxyInfo (1)", async () => {
+    test("GetUsage (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
             maxRetries: 0,
@@ -422,48 +496,26 @@ describe("ConnectionsClient", () => {
 
         const rawResponseBody = {
             data: {
-                backendType: "backendType",
+                bySync: [{ syncId: "248df4b7-aa70-47b8-a036-33ac447e668d" }],
+                callsLast24h: 1,
                 connectionId: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                inheritedBase: { baseUrl: "baseUrl", lockedHeaders: [{}], lockedQuery: { key: "value" } },
-                mergeRules: { headers: "headers", query: "query" },
-                requestContract: {
-                    allowedMethods: ["allowedMethods"],
-                    blockedRequestHeaders: ["blockedRequestHeaders"],
-                    blockedResponseHeaders: ["blockedResponseHeaders"],
-                    bodyTypes: ["bodyTypes"],
-                    maxRequestBodyBytes: 1,
-                    maxResponseBodyBytes: 1,
-                    pathRule: "pathRule",
-                    queryModes: ["queryModes"],
-                    queryValueTypes: ["queryValueTypes"],
-                    rateLimitPerMinute: 1,
-                    rawQueryRule: "rawQueryRule",
-                    timeoutMs: 1,
-                },
-                stats: {
-                    callsLast24h: 1,
-                    lastProxyCallAt: "2024-01-15T09:30:00Z",
-                    proxy2xxLast24h: 1,
-                    proxy4xxLast24h: 1,
-                    proxy5xxLast24h: 1,
-                    proxyCallsLast24h: 1,
-                },
+                reportsSyncStats: true,
             },
         };
 
         server
             .mockEndpoint()
-            .get("/api/connections/248df4b7-aa70-47b8-a036-33ac447e668d/proxy/info")
+            .get("/api/connections/248df4b7-aa70-47b8-a036-33ac447e668d/usage")
             .respondWith()
             .statusCode(200)
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.connections.getProxyInfo("248df4b7-aa70-47b8-a036-33ac447e668d");
+        const response = await client.connections.getUsage("248df4b7-aa70-47b8-a036-33ac447e668d");
         expect(response).toEqual(rawResponseBody);
     });
 
-    test("GetProxyInfo (2)", async () => {
+    test("GetUsage (2)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
             maxRetries: 0,
@@ -476,42 +528,18 @@ describe("ConnectionsClient", () => {
 
         server
             .mockEndpoint()
-            .get("/api/connections/id/proxy/info")
-            .respondWith()
-            .statusCode(400)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.getProxyInfo("id");
-        }).rejects.toThrow(Polytomic.BadRequestError);
-    });
-
-    test("GetProxyInfo (3)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/connections/id/proxy/info")
+            .get("/api/connections/id/usage")
             .respondWith()
             .statusCode(401)
             .jsonBody(rawResponseBody)
             .build();
 
         await expect(async () => {
-            return await client.connections.getProxyInfo("id");
+            return await client.connections.getUsage("id");
         }).rejects.toThrow(Polytomic.UnauthorizedError);
     });
 
-    test("GetProxyInfo (4)", async () => {
+    test("GetUsage (3)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
             maxRetries: 0,
@@ -524,42 +552,18 @@ describe("ConnectionsClient", () => {
 
         server
             .mockEndpoint()
-            .get("/api/connections/id/proxy/info")
-            .respondWith()
-            .statusCode(403)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.getProxyInfo("id");
-        }).rejects.toThrow(Polytomic.ForbiddenError);
-    });
-
-    test("GetProxyInfo (5)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/connections/id/proxy/info")
+            .get("/api/connections/id/usage")
             .respondWith()
             .statusCode(404)
             .jsonBody(rawResponseBody)
             .build();
 
         await expect(async () => {
-            return await client.connections.getProxyInfo("id");
+            return await client.connections.getUsage("id");
         }).rejects.toThrow(Polytomic.NotFoundError);
     });
 
-    test("GetProxyInfo (6)", async () => {
+    test("GetUsage (4)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
             maxRetries: 0,
@@ -572,317 +576,14 @@ describe("ConnectionsClient", () => {
 
         server
             .mockEndpoint()
-            .get("/api/connections/id/proxy/info")
+            .get("/api/connections/id/usage")
             .respondWith()
             .statusCode(500)
             .jsonBody(rawResponseBody)
             .build();
 
         await expect(async () => {
-            return await client.connections.getProxyInfo("id");
-        }).rejects.toThrow(Polytomic.InternalServerError);
-    });
-
-    test("ListSharedConnections (1)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {
-            data: [
-                {
-                    api_calls_last_24_hours: 2021,
-                    configuration: {
-                        database: "example",
-                        hostname: "postgres.example.com",
-                        password: "********",
-                        port: 5432,
-                        username: "user",
-                    },
-                    created_at: "2024-01-15T09:30:00Z",
-                    created_by: { id: "12345678-1234-1234-1234-123456789012", name: "John Doe", type: "user" },
-                    id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    name: "My Postgres Connection",
-                    organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    parent_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    policies: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-                    saved: true,
-                    status: "healthy",
-                    status_error: "error message",
-                    type: {
-                        id: "postgresql",
-                        logo_url: "https://connect-assets.polytomic.com/logos/postgresql.svg",
-                        name: "PostgreSQL",
-                    },
-                    updated_at: "2024-01-15T09:30:00Z",
-                    updated_by: { id: "12345678-1234-1234-1234-123456789012", name: "John Doe", type: "user" },
-                },
-            ],
-        };
-
-        server
-            .mockEndpoint()
-            .get("/api/connections/248df4b7-aa70-47b8-a036-33ac447e668d/shared")
-            .respondWith()
-            .statusCode(200)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        const response = await client.connections.listSharedConnections("248df4b7-aa70-47b8-a036-33ac447e668d");
-        expect(response).toEqual(rawResponseBody);
-    });
-
-    test("ListSharedConnections (2)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/connections/id/shared")
-            .respondWith()
-            .statusCode(403)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnections("id");
-        }).rejects.toThrow(Polytomic.ForbiddenError);
-    });
-
-    test("ListSharedConnections (3)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/connections/id/shared")
-            .respondWith()
-            .statusCode(404)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnections("id");
-        }).rejects.toThrow(Polytomic.NotFoundError);
-    });
-
-    test("ListSharedConnections (4)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/connections/id/shared")
-            .respondWith()
-            .statusCode(422)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnections("id");
-        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
-    });
-
-    test("ListSharedConnections (5)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/connections/id/shared")
-            .respondWith()
-            .statusCode(500)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnections("id");
-        }).rejects.toThrow(Polytomic.InternalServerError);
-    });
-
-    test("ListSharedConnectionsForPartner (1)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {
-            data: [
-                {
-                    api_calls_last_24_hours: 2021,
-                    configuration: {
-                        database: "example",
-                        hostname: "postgres.example.com",
-                        password: "********",
-                        port: 5432,
-                        username: "user",
-                    },
-                    created_at: "2024-01-15T09:30:00Z",
-                    created_by: { id: "12345678-1234-1234-1234-123456789012", name: "John Doe", type: "user" },
-                    id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    name: "My Postgres Connection",
-                    organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    parent_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    policies: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-                    saved: true,
-                    status: "healthy",
-                    status_error: "error message",
-                    type: {
-                        id: "postgresql",
-                        logo_url: "https://connect-assets.polytomic.com/logos/postgresql.svg",
-                        name: "PostgreSQL",
-                    },
-                    updated_at: "2024-01-15T09:30:00Z",
-                    updated_by: { id: "12345678-1234-1234-1234-123456789012", name: "John Doe", type: "user" },
-                },
-            ],
-        };
-
-        server
-            .mockEndpoint()
-            .get(
-                "/api/organizations/248df4b7-aa70-47b8-a036-33ac447e668d/connections/248df4b7-aa70-47b8-a036-33ac447e668d/shared",
-            )
-            .respondWith()
-            .statusCode(200)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        const response = await client.connections.listSharedConnectionsForPartner(
-            "248df4b7-aa70-47b8-a036-33ac447e668d",
-            "248df4b7-aa70-47b8-a036-33ac447e668d",
-        );
-        expect(response).toEqual(rawResponseBody);
-    });
-
-    test("ListSharedConnectionsForPartner (2)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/organizations/org_id/connections/connection_id/shared")
-            .respondWith()
-            .statusCode(403)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnectionsForPartner("org_id", "connection_id");
-        }).rejects.toThrow(Polytomic.ForbiddenError);
-    });
-
-    test("ListSharedConnectionsForPartner (3)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/organizations/org_id/connections/connection_id/shared")
-            .respondWith()
-            .statusCode(404)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnectionsForPartner("org_id", "connection_id");
-        }).rejects.toThrow(Polytomic.NotFoundError);
-    });
-
-    test("ListSharedConnectionsForPartner (4)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/organizations/org_id/connections/connection_id/shared")
-            .respondWith()
-            .statusCode(422)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnectionsForPartner("org_id", "connection_id");
-        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
-    });
-
-    test("ListSharedConnectionsForPartner (5)", async () => {
-        const server = mockServerPool.createServer();
-        const client = new PolytomicClient({
-            maxRetries: 0,
-            token: "test",
-            version: "test",
-            environment: server.baseUrl,
-        });
-
-        const rawResponseBody = {};
-
-        server
-            .mockEndpoint()
-            .get("/api/organizations/org_id/connections/connection_id/shared")
-            .respondWith()
-            .statusCode(500)
-            .jsonBody(rawResponseBody)
-            .build();
-
-        await expect(async () => {
-            return await client.connections.listSharedConnectionsForPartner("org_id", "connection_id");
+            return await client.connections.getUsage("id");
         }).rejects.toThrow(Polytomic.InternalServerError);
     });
 });

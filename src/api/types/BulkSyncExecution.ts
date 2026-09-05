@@ -19,5 +19,7 @@ export interface BulkSyncExecution {
     status_message?: string | undefined;
     type?: string | undefined;
     updated_at?: string | undefined;
+    /** Polytomic version which last ran this execution. */
+    version?: string | undefined;
     warning_count?: number | undefined;
 }

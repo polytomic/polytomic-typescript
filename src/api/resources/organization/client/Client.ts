@@ -113,6 +113,201 @@ export class OrganizationClient {
     }
 
     /**
+     * Returns the organization's record logging settings, including the connection record logs are delivered to.
+     *
+     * @param {OrganizationClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await client.organization.getRecordLogging()
+     */
+    public getRecordLogging(
+        requestOptions?: OrganizationClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.RecordLoggingSettingsEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getRecordLogging(requestOptions));
+    }
+
+    private async __getRecordLogging(
+        requestOptions?: OrganizationClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.RecordLoggingSettingsEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/organization/record-logging",
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.RecordLoggingSettingsEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/organization/record-logging",
+        );
+    }
+
+    /**
+     * Replaces the organization's record logging settings. `deliveryConnectionId` is replaced, not merged: omitting it, or sending null, removes any destination previously configured.
+     *
+     * @param {Polytomic.UpdateRecordLoggingSettingsRequest} request
+     * @param {OrganizationClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await client.organization.updateRecordLogging({
+     *         enabled: true
+     *     })
+     */
+    public updateRecordLogging(
+        request: Polytomic.UpdateRecordLoggingSettingsRequest,
+        requestOptions?: OrganizationClient.IdempotentRequestOptions,
+    ): core.HttpResponsePromise<Polytomic.RecordLoggingSettingsEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__updateRecordLogging(request, requestOptions));
+    }
+
+    private async __updateRecordLogging(
+        request: Polytomic.UpdateRecordLoggingSettingsRequest,
+        requestOptions?: OrganizationClient.IdempotentRequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.RecordLoggingSettingsEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "Idempotency-Key": requestOptions?.idempotencyKey,
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/organization/record-logging",
+            ),
+            method: "PUT",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.RecordLoggingSettingsEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "PUT",
+            "/api/organization/record-logging",
+        );
+    }
+
+    /**
      * Lists every organization accessible to the calling partner, with the partner's owner organization first.
      *
      * In `2025-09-18`, this endpoint is partner-scoped rather than a general

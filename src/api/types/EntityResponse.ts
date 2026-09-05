@@ -11,8 +11,8 @@ export interface EntityResponse {
     id?: string | undefined;
     /** Organization that owns the resolved resource. Omitted from responses on the user-scoped endpoint. */
     organization_id?: string | undefined;
-    /** Parent resources needed to address nested resources, keyed by relationship name (e.g. "sync", "bulk_sync"). */
+    /** Parent resources needed to address nested resources, keyed by relationship name (e.g. "sync", "bulk_sync", "harbor"). */
     relationships?: Record<string, Polytomic.EntityRelationship> | undefined;
-    /** Resolved entity type. One of: organization, user, connection, model, sync, sync_execution, bulk_sync, bulk_sync_execution. */
+    /** Resolved entity type. One of: organization, user, connection, model, sync, sync_execution, bulk_sync, bulk_sync_execution, harbor, harbor_context. */
     type?: string | undefined;
 }

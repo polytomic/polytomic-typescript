@@ -4,7 +4,7 @@ import type * as Polytomic from "../index";
 
 export interface TargetCreator {
     /** The properties that are required for target creation. */
-    properties?: Polytomic.TargetCreateInput[] | undefined;
+    properties?: Polytomic.TargetPropertyValues[] | undefined;
     /** True if the connection supports target creation. */
     supported?: boolean | undefined;
 }

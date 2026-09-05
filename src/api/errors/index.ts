@@ -6,6 +6,7 @@ export * from "./GatewayTimeoutError";
 export * from "./InternalServerError";
 export * from "./NotFoundError";
 export * from "./RequestTimeoutError";
+export * from "./ServiceUnavailableError";
 export * from "./TooManyRequestsError";
 export * from "./UnauthorizedError";
 export * from "./UnprocessableEntityError";

@@ -39,13 +39,13 @@ export class UsersClient {
      */
     public listCurrentOrgUsers(
         requestOptions?: UsersClient.RequestOptions,
-    ): core.HttpResponsePromise<Polytomic.ListUsersEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.CurrentOrgListUsersEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__listCurrentOrgUsers(requestOptions));
     }
 
     private async __listCurrentOrgUsers(
         requestOptions?: UsersClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.ListUsersEnvelope>> {
+    ): Promise<core.WithRawResponse<Polytomic.CurrentOrgListUsersEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -72,7 +72,10 @@ export class UsersClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Polytomic.ListUsersEnvelope, rawResponse: _response.rawResponse };
+            return {
+                data: _response.body as Polytomic.CurrentOrgListUsersEnvelope,
+                rawResponse: _response.rawResponse,
+            };
         }
 
         if (_response.error.reason === "status-code") {
@@ -206,14 +209,14 @@ export class UsersClient {
     public getCurrentOrgUser(
         id: string,
         requestOptions?: UsersClient.RequestOptions,
-    ): core.HttpResponsePromise<Polytomic.UserEnvelope> {
+    ): core.HttpResponsePromise<Polytomic.CurrentOrgUserEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__getCurrentOrgUser(id, requestOptions));
     }
 
     private async __getCurrentOrgUser(
         id: string,
         requestOptions?: UsersClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.UserEnvelope>> {
+    ): Promise<core.WithRawResponse<Polytomic.CurrentOrgUserEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
@@ -240,7 +243,7 @@ export class UsersClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return { data: _response.body as Polytomic.UserEnvelope, rawResponse: _response.rawResponse };
+            return { data: _response.body as Polytomic.CurrentOrgUserEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {

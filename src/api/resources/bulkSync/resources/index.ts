@@ -1,3 +1,5 @@
+export * as errorHandling from "./errorHandling";
+export * from "./errorHandling/client/requests";
 export * as executions from "./executions";
 export * from "./executions/client/requests";
 export * as schedules from "./schedules";

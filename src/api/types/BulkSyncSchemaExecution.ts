@@ -13,5 +13,7 @@ export interface BulkSyncSchemaExecution {
     status?: Polytomic.BulkSchemaExecutionStatus | undefined;
     status_message?: string | undefined;
     updated_at?: string | undefined;
+    /** Polytomic version which last ran this schema execution. */
+    version?: string | undefined;
     warning_count?: number | undefined;
 }

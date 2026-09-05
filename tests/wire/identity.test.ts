@@ -16,6 +16,22 @@ describe("IdentityClient", () => {
 
         const rawResponseBody = {
             data: {
+                credential: {
+                    api_key_profile: {
+                        capabilities: {
+                            query: { connection_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"] },
+                            schemas: { connection_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"] },
+                        },
+                        id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                        kind: "scoped_data",
+                        name: "Sales ops agent",
+                    },
+                    harbor: { id: "248df4b7-aa70-47b8-a036-33ac447e668d", name: "Sales ops Harbor" },
+                    method: "api_key",
+                    mode: "read_only",
+                    oauth_client_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    oauth_resource: "oauth_resource",
+                },
                 email: "mail@example.com",
                 id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 is_organization: false,

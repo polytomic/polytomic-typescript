@@ -4,6 +4,7 @@ import { BulkSyncClient } from "./api/resources/bulkSync/client/Client";
 import { ConnectionsClient } from "./api/resources/connections/client/Client";
 import { EntitiesClient } from "./api/resources/entities/client/Client";
 import { EventsClient } from "./api/resources/events/client/Client";
+import { HarborsClient } from "./api/resources/harbors/client/Client";
 import { IdentityClient } from "./api/resources/identity/client/Client";
 import { JobsClient } from "./api/resources/jobs/client/Client";
 import { ModelSyncClient } from "./api/resources/modelSync/client/Client";
@@ -12,7 +13,9 @@ import { NotificationsClient } from "./api/resources/notifications/client/Client
 import { OrganizationClient } from "./api/resources/organization/client/Client";
 import { PermissionsClient } from "./api/resources/permissions/client/Client";
 import { QueryRunnerClient } from "./api/resources/queryRunner/client/Client";
+import { RecordViewLinksClient } from "./api/resources/recordViewLinks/client/Client";
 import { SchemasClient } from "./api/resources/schemas/client/Client";
+import { TemporaryCredentialsClient } from "./api/resources/temporaryCredentials/client/Client";
 import { UsersClient } from "./api/resources/users/client/Client";
 import { WebhooksClient } from "./api/resources/webhooks/client/Client";
 import type { BaseClientOptions, BaseRequestOptions } from "./BaseClient";
@@ -35,11 +38,14 @@ export class PolytomicClient {
     protected _modelSync: ModelSyncClient | undefined;
     protected _entities: EntitiesClient | undefined;
     protected _events: EventsClient | undefined;
+    protected _harbors: HarborsClient | undefined;
     protected _jobs: JobsClient | undefined;
     protected _identity: IdentityClient | undefined;
     protected _notifications: NotificationsClient | undefined;
     protected _organization: OrganizationClient | undefined;
     protected _users: UsersClient | undefined;
+    protected _recordViewLinks: RecordViewLinksClient | undefined;
+    protected _temporaryCredentials: TemporaryCredentialsClient | undefined;
     protected _webhooks: WebhooksClient | undefined;
     protected _permissions: PermissionsClient | undefined;
 
@@ -79,6 +85,10 @@ export class PolytomicClient {
         return (this._events ??= new EventsClient(this._options));
     }
 
+    public get harbors(): HarborsClient {
+        return (this._harbors ??= new HarborsClient(this._options));
+    }
+
     public get jobs(): JobsClient {
         return (this._jobs ??= new JobsClient(this._options));
     }
@@ -97,6 +107,14 @@ export class PolytomicClient {
 
     public get users(): UsersClient {
         return (this._users ??= new UsersClient(this._options));
+    }
+
+    public get recordViewLinks(): RecordViewLinksClient {
+        return (this._recordViewLinks ??= new RecordViewLinksClient(this._options));
+    }
+
+    public get temporaryCredentials(): TemporaryCredentialsClient {
+        return (this._temporaryCredentials ??= new TemporaryCredentialsClient(this._options));
     }
 
     public get webhooks(): WebhooksClient {

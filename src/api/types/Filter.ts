@@ -3,14 +3,15 @@
 import type * as Polytomic from "../index";
 
 /**
- * Either `field` or `field_id` must be provided. If `field` is provided, `field_id` is ignored.
+ * A filter on this sync. Either `field` or `field_id` must be provided; if `field_id` is provided, `field` is ignored. `field` names a model field by model and source name. `field_id` is a model field's UUID when `field_type` is `Model`, and the destination's own field identifier when it is `Target`.
  */
 export interface Filter {
     field?: Polytomic.Source | undefined;
-    /** Model or Target field name to filter on. */
+    /** Identifier of the field to filter on: a model field's UUID when 'field_type' is 'Model', or the destination's own field identifier when it is 'Target'. */
     field_id?: string | undefined;
     field_type?: Polytomic.FilterFieldReferenceType | undefined;
     function: Polytomic.FilterFunction;
     label?: string | undefined;
     value?: unknown | undefined;
+    value_field?: Polytomic.Source | undefined;
 }

@@ -8,6 +8,8 @@ import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
 import * as Polytomic from "../../../index";
+import { ProxyClient } from "../resources/proxy/client/Client";
+import { SharedConnectionsClient } from "../resources/sharedConnections/client/Client";
 
 export declare namespace ConnectionsClient {
     export type Options = BaseClientOptions;
@@ -19,9 +21,19 @@ export declare namespace ConnectionsClient {
 
 export class ConnectionsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<ConnectionsClient.Options>;
+    protected _proxy: ProxyClient | undefined;
+    protected _sharedConnections: SharedConnectionsClient | undefined;
 
     constructor(options: ConnectionsClient.Options = {}) {
         this._options = normalizeClientOptionsWithAuth(options);
+    }
+
+    public get proxy(): ProxyClient {
+        return (this._proxy ??= new ProxyClient(this._options));
+    }
+
+    public get sharedConnections(): SharedConnectionsClient {
+        return (this._sharedConnections ??= new SharedConnectionsClient(this._options));
     }
 
     /**
@@ -490,7 +502,13 @@ export class ConnectionsClient {
     }
 
     /**
-     * Creates a Polytomic Connect session and returns a redirect URL that embeds the Connect modal.
+     * Creates a Polytomic Connect session and returns a URL for creating or reconnecting a Connection.
+     *
+     * Open the returned URL, or send it to the person who will set up the Connection.
+     * Polytomic Connect guides them through authentication and configuration, then
+     * redirects them to `redirect_url`.
+     *
+     * Each session can create or reconnect one Connection.
      *
      * See also:
      *
@@ -501,6 +519,8 @@ export class ConnectionsClient {
      *
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      *
@@ -569,6 +589,16 @@ export class ConnectionsClient {
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 422:
                     throw new Polytomic.UnprocessableEntityError(
                         _response.error.body as Polytomic.ApiError,
@@ -589,6 +619,85 @@ export class ConnectionsClient {
         }
 
         return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/api/connections/connect/");
+    }
+
+    /**
+     * Returns trusted metadata for the authenticated Polytomic Connect session.
+     *
+     * Returns the trusted metadata stored for a Polytomic Connect session. Authenticate with the opaque Connect token in the `token` query parameter.
+     *
+     * The response includes the server-enforced connection name, fixed type or whitelist, bound connection ID, completion redirect, branding, and absolute expiration time.
+     *
+     * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.UnauthorizedError}
+     *
+     * @example
+     *     await client.connections.getConnectSession()
+     */
+    public getConnectSession(
+        requestOptions?: ConnectionsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.ConnectSessionResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getConnectSession(requestOptions));
+    }
+
+    private async __getConnectSession(
+        requestOptions?: ConnectionsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ConnectSessionResponseEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                "api/connections/connect/session",
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.ConnectSessionResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 401:
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/connections/connect/session",
+        );
     }
 
     /**
@@ -1115,71 +1224,48 @@ export class ConnectionsClient {
     }
 
     /**
-     * Proxies an HTTP request to a connection's underlying API using the connection's stored credentials, subject to per-connection rate limits and size caps.
+     * Returns the connection's API consumption over the last 24 hours, broken down by sync when the backend supports it.
      *
-     * This endpoint is intended for controlled passthrough use, not as a general
-     * replacement for Polytomic's modeled endpoints. The request is executed with the
-     * connection's stored credentials and inherited base URL, headers, and query
-     * parameters.
+     * Not all integrations support usage reporting.
      *
-     * Before building requests dynamically, call
-     * [`GET /api/connections/{id}/proxy/info`](../../../../api-reference/connections/get-proxy-info)
-     * to inspect the inherited base URL, blocked headers, accepted body types, and
-     * size and rate limits.
+     * - `callsLast24h` is null when the backend does not expose a usage count.
+     * - `reportsSyncStats` is `false`, and `bySync` is empty, when the backend
+     *   reports a total but cannot attribute calls to individual syncs.
      *
-     * ## Important behavior
+     * When per-sync stats are available, each entry in `bySync` carries a
+     * `categories` breakdown. **Category keys and labels are integration-specific.**
+     * For example, Salesforce reports `rest` and `bulk` categories
+     * (collapsing Bulk API v1 and v2 into a single `bulk` bucket), while another
+     * integration may report an entirely different set or none at all. Treat `key`
+     * as an opaque, backend-defined identifier and use `label` for display; do not
+     * assume a fixed vocabulary across connection types.
      *
-     * - `request.path` must be relative and start with `/`.
-     * - Use either `request.query` or `request.rawQuery`, not both.
-     * - Caller-supplied headers are merged with inherited headers, but inherited auth
-     *   headers cannot be overridden.
-     * - The proxy strips a fixed set of request and response headers for safety.
-     * - Response bodies larger than the configured maximum are truncated, and
-     *   `truncated` is set to `true`.
+     * @param {string} id - Unique identifier of the connection whose API consumption should be returned.
+     * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
-     * The response includes `proxyCallId`, which you can use to correlate the call
-     * with audit logs.
-     *
-     * @param {string} id - Unique identifier of the connection to proxy the request through.
-     * @param {Polytomic.ExecuteConnectionProxyRequest} request
-     * @param {ConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.UnauthorizedError}
-     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
-     * @throws {@link Polytomic.TooManyRequestsError}
      * @throws {@link Polytomic.InternalServerError}
-     * @throws {@link Polytomic.BadGatewayError}
-     * @throws {@link Polytomic.GatewayTimeoutError}
      *
      * @example
-     *     await client.connections.executeProxy("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         request: {
-     *             method: "GET",
-     *             path: "/v1/objects"
-     *         }
-     *     })
+     *     await client.connections.getUsage("248df4b7-aa70-47b8-a036-33ac447e668d")
      */
-    public executeProxy(
+    public getUsage(
         id: string,
-        request: Polytomic.ExecuteConnectionProxyRequest,
-        requestOptions?: ConnectionsClient.IdempotentRequestOptions,
-    ): core.HttpResponsePromise<Polytomic.ExecuteConnectionProxyEnvelope> {
-        return core.HttpResponsePromise.fromPromise(this.__executeProxy(id, request, requestOptions));
+        requestOptions?: ConnectionsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.GetConnectionUsageEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getUsage(id, requestOptions));
     }
 
-    private async __executeProxy(
+    private async __getUsage(
         id: string,
-        request: Polytomic.ExecuteConnectionProxyRequest,
-        requestOptions?: ConnectionsClient.IdempotentRequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.ExecuteConnectionProxyEnvelope>> {
+        requestOptions?: ConnectionsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.GetConnectionUsageEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
             mergeOnlyDefinedHeaders({
-                "Idempotency-Key": requestOptions?.idempotencyKey,
                 "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
             }),
             requestOptions?.headers,
@@ -1189,14 +1275,11 @@ export class ConnectionsClient {
                 (await core.Supplier.get(this._options.baseUrl)) ??
                     (await core.Supplier.get(this._options.environment)) ??
                     environments.PolytomicEnvironment.Default,
-                `api/connections/${core.url.encodePathParam(id)}/proxy`,
+                `api/connections/${core.url.encodePathParam(id)}/usage`,
             ),
-            method: "POST",
+            method: "GET",
             headers: _headers,
-            contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
-            requestType: "json",
-            body: request,
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -1204,155 +1287,16 @@ export class ConnectionsClient {
             logging: this._options.logging,
         });
         if (_response.ok) {
-            return {
-                data: _response.body as Polytomic.ExecuteConnectionProxyEnvelope,
-                rawResponse: _response.rawResponse,
-            };
+            return { data: _response.body as Polytomic.GetConnectionUsageEnvelope, rawResponse: _response.rawResponse };
         }
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
-                case 400:
-                    throw new Polytomic.BadRequestError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
                 case 401:
                     throw new Polytomic.UnauthorizedError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
-                case 403:
-                    throw new Polytomic.ForbiddenError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 404:
-                    throw new Polytomic.NotFoundError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 429:
-                    throw new Polytomic.TooManyRequestsError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 500:
-                    throw new Polytomic.InternalServerError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 502:
-                    throw new Polytomic.BadGatewayError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 504:
-                    throw new Polytomic.GatewayTimeoutError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                default:
-                    throw new errors.PolytomicError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                        rawResponse: _response.rawResponse,
-                    });
-            }
-        }
-
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "POST", "/api/connections/{id}/proxy");
-    }
-
-    /**
-     * Returns the proxy contract for a connection.
-     *
-     * Use this endpoint before calling
-     * [`POST /api/connections/{id}/proxy`](../../../../../api-reference/connections/execute-proxy)
-     * when you need to build requests programmatically. The response shows:
-     *
-     * - the inherited base URL that all proxied requests are sent to
-     * - locked headers and query parameters that are attached automatically
-     * - blocked request and response headers
-     * - allowed HTTP methods and body shapes
-     * - timeout, rate-limit, and payload-size limits
-     *
-     * Sensitive inherited header and query values are redacted in the response. The
-     * contract is still useful for discovering which keys are fixed by the
-     * connection, even though their raw values are not exposed.
-     *
-     * @param {string} id - Unique identifier of the connection whose proxy contract should be returned.
-     * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @throws {@link Polytomic.BadRequestError}
-     * @throws {@link Polytomic.UnauthorizedError}
-     * @throws {@link Polytomic.ForbiddenError}
-     * @throws {@link Polytomic.NotFoundError}
-     * @throws {@link Polytomic.InternalServerError}
-     *
-     * @example
-     *     await client.connections.getProxyInfo("248df4b7-aa70-47b8-a036-33ac447e668d")
-     */
-    public getProxyInfo(
-        id: string,
-        requestOptions?: ConnectionsClient.RequestOptions,
-    ): core.HttpResponsePromise<Polytomic.GetConnectionProxyInfoEnvelope> {
-        return core.HttpResponsePromise.fromPromise(this.__getProxyInfo(id, requestOptions));
-    }
-
-    private async __getProxyInfo(
-        id: string,
-        requestOptions?: ConnectionsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.GetConnectionProxyInfoEnvelope>> {
-        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
-        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            _authRequest.headers,
-            this._options?.headers,
-            mergeOnlyDefinedHeaders({
-                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
-            }),
-            requestOptions?.headers,
-        );
-        const _response = await core.fetcher({
-            url: core.url.join(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${core.url.encodePathParam(id)}/proxy/info`,
-            ),
-            method: "GET",
-            headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
-            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
-            abortSignal: requestOptions?.abortSignal,
-            fetchFn: this._options?.fetch,
-            logging: this._options.logging,
-        });
-        if (_response.ok) {
-            return {
-                data: _response.body as Polytomic.GetConnectionProxyInfoEnvelope,
-                rawResponse: _response.rawResponse,
-            };
-        }
-
-        if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 400:
-                    throw new Polytomic.BadRequestError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 401:
-                    throw new Polytomic.UnauthorizedError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 403:
-                    throw new Polytomic.ForbiddenError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
                 case 404:
                     throw new Polytomic.NotFoundError(
                         _response.error.body as Polytomic.ApiError,
@@ -1372,323 +1316,6 @@ export class ConnectionsClient {
             }
         }
 
-        return handleNonStatusCodeError(
-            _response.error,
-            _response.rawResponse,
-            "GET",
-            "/api/connections/{id}/proxy/info",
-        );
-    }
-
-    /**
-     * Lists shared copies of a connection that the caller's organization owns.
-     *
-     * The returned connections are the child copies, not the parent connection
-     * itself. This is useful when a partner workflow needs to confirm which
-     * downstream organizations have already received a shared copy.
-     *
-     * Creating a new shared copy is a separate operation. Use
-     * [`POST /api/organizations/{org_id}/connections/{connection_id}/share`](../../../../api-reference/connections/create-shared-connection)
-     * for the v5 partner-scoped flow.
-     *
-     * @param {string} id - Unique identifier of the parent connection whose shared copies should be listed.
-     * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @throws {@link Polytomic.ForbiddenError}
-     * @throws {@link Polytomic.NotFoundError}
-     * @throws {@link Polytomic.UnprocessableEntityError}
-     * @throws {@link Polytomic.InternalServerError}
-     *
-     * @example
-     *     await client.connections.listSharedConnections("248df4b7-aa70-47b8-a036-33ac447e668d")
-     */
-    public listSharedConnections(
-        id: string,
-        requestOptions?: ConnectionsClient.RequestOptions,
-    ): core.HttpResponsePromise<Polytomic.ConnectionListResponseEnvelope> {
-        return core.HttpResponsePromise.fromPromise(this.__listSharedConnections(id, requestOptions));
-    }
-
-    private async __listSharedConnections(
-        id: string,
-        requestOptions?: ConnectionsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.ConnectionListResponseEnvelope>> {
-        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
-        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            _authRequest.headers,
-            this._options?.headers,
-            mergeOnlyDefinedHeaders({
-                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
-            }),
-            requestOptions?.headers,
-        );
-        const _response = await core.fetcher({
-            url: core.url.join(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/connections/${core.url.encodePathParam(id)}/shared`,
-            ),
-            method: "GET",
-            headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
-            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
-            abortSignal: requestOptions?.abortSignal,
-            fetchFn: this._options?.fetch,
-            logging: this._options.logging,
-        });
-        if (_response.ok) {
-            return {
-                data: _response.body as Polytomic.ConnectionListResponseEnvelope,
-                rawResponse: _response.rawResponse,
-            };
-        }
-
-        if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 403:
-                    throw new Polytomic.ForbiddenError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 404:
-                    throw new Polytomic.NotFoundError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 422:
-                    throw new Polytomic.UnprocessableEntityError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 500:
-                    throw new Polytomic.InternalServerError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                default:
-                    throw new errors.PolytomicError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                        rawResponse: _response.rawResponse,
-                    });
-            }
-        }
-
-        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/api/connections/{id}/shared");
-    }
-
-    /**
-     * Lists shared copies of a connection owned by a specific organization in the partner account.
-     *
-     * The `org_id` must match the organization that owns the parent connection. If it
-     * does not, the endpoint returns `404` rather than exposing information about the
-     * parent connection.
-     *
-     * This endpoint is useful in partner workflows where the parent connection is in
-     * the partner owner organization and the caller needs to audit which child
-     * organizations already have a shared copy.
-     *
-     * @param {string} org_id - Unique identifier of the organization that owns the parent connection.
-     * @param {string} connection_id - Unique identifier of the parent connection whose shared copies should be listed.
-     * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @throws {@link Polytomic.ForbiddenError}
-     * @throws {@link Polytomic.NotFoundError}
-     * @throws {@link Polytomic.UnprocessableEntityError}
-     * @throws {@link Polytomic.InternalServerError}
-     *
-     * @example
-     *     await client.connections.listSharedConnectionsForPartner("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
-     */
-    public listSharedConnectionsForPartner(
-        org_id: string,
-        connection_id: string,
-        requestOptions?: ConnectionsClient.RequestOptions,
-    ): core.HttpResponsePromise<Polytomic.ConnectionListResponseEnvelope> {
-        return core.HttpResponsePromise.fromPromise(
-            this.__listSharedConnectionsForPartner(org_id, connection_id, requestOptions),
-        );
-    }
-
-    private async __listSharedConnectionsForPartner(
-        org_id: string,
-        connection_id: string,
-        requestOptions?: ConnectionsClient.RequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.ConnectionListResponseEnvelope>> {
-        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
-        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            _authRequest.headers,
-            this._options?.headers,
-            mergeOnlyDefinedHeaders({
-                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
-            }),
-            requestOptions?.headers,
-        );
-        const _response = await core.fetcher({
-            url: core.url.join(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/organizations/${core.url.encodePathParam(org_id)}/connections/${core.url.encodePathParam(connection_id)}/shared`,
-            ),
-            method: "GET",
-            headers: _headers,
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
-            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
-            abortSignal: requestOptions?.abortSignal,
-            fetchFn: this._options?.fetch,
-            logging: this._options.logging,
-        });
-        if (_response.ok) {
-            return {
-                data: _response.body as Polytomic.ConnectionListResponseEnvelope,
-                rawResponse: _response.rawResponse,
-            };
-        }
-
-        if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 403:
-                    throw new Polytomic.ForbiddenError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 404:
-                    throw new Polytomic.NotFoundError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 422:
-                    throw new Polytomic.UnprocessableEntityError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 500:
-                    throw new Polytomic.InternalServerError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                default:
-                    throw new errors.PolytomicError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                        rawResponse: _response.rawResponse,
-                    });
-            }
-        }
-
-        return handleNonStatusCodeError(
-            _response.error,
-            _response.rawResponse,
-            "GET",
-            "/api/organizations/{org_id}/connections/{connection_id}/shared",
-        );
-    }
-
-    /**
-     * Shares a connection with another organization in the caller's partner account.
-     *
-     * @param {string} org_id - Unique identifier of the organization that owns the parent connection.
-     * @param {string} connection_id - Unique identifier of the parent connection to share.
-     * @param {Polytomic.PartnerCreateSharedConnectionRequestSchema} request
-     * @param {ConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
-     *
-     * @throws {@link Polytomic.ForbiddenError}
-     * @throws {@link Polytomic.NotFoundError}
-     * @throws {@link Polytomic.InternalServerError}
-     *
-     * @example
-     *     await client.connections.createSharedConnection("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         child_organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
-     *     })
-     */
-    public createSharedConnection(
-        org_id: string,
-        connection_id: string,
-        request: Polytomic.PartnerCreateSharedConnectionRequestSchema,
-        requestOptions?: ConnectionsClient.IdempotentRequestOptions,
-    ): core.HttpResponsePromise<Polytomic.CreateSharedConnectionResponseEnvelope> {
-        return core.HttpResponsePromise.fromPromise(
-            this.__createSharedConnection(org_id, connection_id, request, requestOptions),
-        );
-    }
-
-    private async __createSharedConnection(
-        org_id: string,
-        connection_id: string,
-        request: Polytomic.PartnerCreateSharedConnectionRequestSchema,
-        requestOptions?: ConnectionsClient.IdempotentRequestOptions,
-    ): Promise<core.WithRawResponse<Polytomic.CreateSharedConnectionResponseEnvelope>> {
-        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
-        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
-            _authRequest.headers,
-            this._options?.headers,
-            mergeOnlyDefinedHeaders({
-                "Idempotency-Key": requestOptions?.idempotencyKey,
-                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
-            }),
-            requestOptions?.headers,
-        );
-        const _response = await core.fetcher({
-            url: core.url.join(
-                (await core.Supplier.get(this._options.baseUrl)) ??
-                    (await core.Supplier.get(this._options.environment)) ??
-                    environments.PolytomicEnvironment.Default,
-                `api/organizations/${core.url.encodePathParam(org_id)}/connections/${core.url.encodePathParam(connection_id)}/shared`,
-            ),
-            method: "POST",
-            headers: _headers,
-            contentType: "application/json",
-            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
-            requestType: "json",
-            body: request,
-            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
-            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
-            abortSignal: requestOptions?.abortSignal,
-            fetchFn: this._options?.fetch,
-            logging: this._options.logging,
-        });
-        if (_response.ok) {
-            return {
-                data: _response.body as Polytomic.CreateSharedConnectionResponseEnvelope,
-                rawResponse: _response.rawResponse,
-            };
-        }
-
-        if (_response.error.reason === "status-code") {
-            switch (_response.error.statusCode) {
-                case 403:
-                    throw new Polytomic.ForbiddenError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 404:
-                    throw new Polytomic.NotFoundError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                case 500:
-                    throw new Polytomic.InternalServerError(
-                        _response.error.body as Polytomic.ApiError,
-                        _response.rawResponse,
-                    );
-                default:
-                    throw new errors.PolytomicError({
-                        statusCode: _response.error.statusCode,
-                        body: _response.error.body,
-                        rawResponse: _response.rawResponse,
-                    });
-            }
-        }
-
-        return handleNonStatusCodeError(
-            _response.error,
-            _response.rawResponse,
-            "POST",
-            "/api/organizations/{org_id}/connections/{connection_id}/shared",
-        );
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/api/connections/{id}/usage");
     }
 }

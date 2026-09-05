@@ -321,7 +321,7 @@ export class ExecutionsClient {
     }
 
     /**
-     * Fetch the latest console log entries for a sync execution. Returns at most the most recent 50 entries retained in Redis.
+     * Fetch the latest console log entries for a sync execution. Returns the most recent 50 entries.
      *
      * @param {string} sync_id
      * @param {string} id
@@ -435,6 +435,90 @@ export class ExecutionsClient {
     }
 
     /**
+     * Returns an index of the record-log types produced by this model sync execution, with the per-type endpoint to retrieve signed URLs for each type's segment files.
+     *
+     * @param {string} sync_id - Unique identifier of the model sync.
+     * @param {string} id - Unique identifier of the execution whose logs are being indexed.
+     * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await client.modelSync.executions.getLogsIndex("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public getLogsIndex(
+        sync_id: string,
+        id: string,
+        requestOptions?: ExecutionsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.LogsIndexResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getLogsIndex(sync_id, id, requestOptions));
+    }
+
+    private async __getLogsIndex(
+        sync_id: string,
+        id: string,
+        requestOptions?: ExecutionsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.LogsIndexResponseEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/syncs/${core.url.encodePathParam(sync_id)}/executions/${core.url.encodePathParam(id)}/logs`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Polytomic.LogsIndexResponseEnvelope, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/syncs/{sync_id}/executions/{id}/logs",
+        );
+    }
+
+    /**
      * Returns signed URLs for every log file of a given type on a model sync execution.
      *
      * `{type}` identifies the log category, such as `errors` or `warnings`. The
@@ -538,10 +622,12 @@ export class ExecutionsClient {
     }
 
     /**
-     * Returns a signed URL for a specific log file produced by a model sync execution.
+     * Redirects to a signed URL for a specific log file produced by a model sync execution.
      *
-     * The URL is signed and expires after a short period. If it has expired before
-     * you download the file, call this endpoint again to obtain a fresh URL.
+     * This endpoint responds with a `302 Found` redirect; the signed URL is returned
+     * in the `Location` header, and the response body is empty. The URL expires
+     * after a short period, so call this endpoint again to obtain a fresh URL if it
+     * expires before you download the file.
      *
      * @param {string} sync_id
      * @param {string} id

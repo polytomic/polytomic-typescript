@@ -17,8 +17,12 @@ export interface ConnectCardRequest {
     organization_id?: string;
     /** URL to redirect to after connection is created. */
     redirect_url: string;
+    /** Connect session lifetime in seconds. Defaults to 300 and cannot exceed 604800. */
+    ttl?: number;
     /** Connection type to create. */
     type?: string;
+    /** Whether to display the target organization name instead of the partner name in the Connect modal. Defaults to false; organizations without a partner always display their organization name. */
+    use_organization_name?: boolean;
     /** List of connection types which are allowed to be created. Ignored if type is set. */
     whitelist?: string[];
 }

@@ -18,6 +18,8 @@ describe("UsersClient", () => {
             data: [
                 {
                     email: "mail@example.com",
+                    harbor_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+                    harbor_only: true,
                     id: "id",
                     organization_id: "organization_id",
                     role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
@@ -97,6 +99,8 @@ describe("UsersClient", () => {
         const rawResponseBody = {
             data: {
                 email: "mail@example.com",
+                harbor_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+                harbor_only: true,
                 id: "id",
                 organization_id: "organization_id",
                 role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"],

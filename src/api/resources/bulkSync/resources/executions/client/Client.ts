@@ -418,7 +418,7 @@ export class ExecutionsClient {
     }
 
     /**
-     * Fetch the latest console log entries for a bulk sync execution. Returns at most the most recent 50 entries retained in Redis.
+     * Fetch the latest console log entries for a bulk sync execution. Returns the most recent 50 entries.
      *
      * @param {string} sync_id
      * @param {string} execution_id
@@ -740,7 +740,7 @@ export class ExecutionsClient {
     }
 
     /**
-     * Fetch the latest console log entries for a schema within a bulk sync execution. Returns at most the most recent 50 entries retained in Redis.
+     * Fetch the latest console log entries for a schema within a bulk sync execution. Returnst the most recent 50 entries.
      *
      * @param {string} sync_id
      * @param {string} execution_id
@@ -855,6 +855,121 @@ export class ExecutionsClient {
             _response.rawResponse,
             "GET",
             "/api/bulk/syncs/{sync_id}/executions/{execution_id}/schemas/{schema_id}/consolelog",
+        );
+    }
+
+    /**
+     * Fetch the latest console log entries for ingestion scoped by connection and optional bulk sync. Returns the most recent 50 entries.
+     *
+     * @param {string} connection_id
+     * @param {Polytomic.bulkSync.ExecutionsGetIngestConsoleLogsRequest} request
+     * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.RequestTimeoutError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await client.bulkSync.executions.getIngestConsoleLogs("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         sync_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+     *         limit: 50,
+     *         after: "1744311099250-0"
+     *     })
+     */
+    public getIngestConsoleLogs(
+        connection_id: string,
+        request: Polytomic.bulkSync.ExecutionsGetIngestConsoleLogsRequest = {},
+        requestOptions?: ExecutionsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.ExecutionConsoleLogsResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(
+            this.__getIngestConsoleLogs(connection_id, request, requestOptions),
+        );
+    }
+
+    private async __getIngestConsoleLogs(
+        connection_id: string,
+        request: Polytomic.bulkSync.ExecutionsGetIngestConsoleLogsRequest = {},
+        requestOptions?: ExecutionsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.ExecutionConsoleLogsResponseEnvelope>> {
+        const { sync_id: syncId, limit, after } = request;
+        const _queryParams: Record<string, unknown> = {
+            sync_id: syncId,
+            limit,
+            after,
+        };
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/connections/${core.url.encodePathParam(connection_id)}/ingest/consolelog`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.ExecutionConsoleLogsResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 408:
+                    throw new Polytomic.RequestTimeoutError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/connections/{connection_id}/ingest/consolelog",
         );
     }
 }

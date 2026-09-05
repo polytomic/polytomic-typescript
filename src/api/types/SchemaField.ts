@@ -5,12 +5,16 @@ import type * as Polytomic from "../index";
 export interface SchemaField {
     association?: Polytomic.SchemaAssociation | undefined;
     id?: string | undefined;
-    /** Whether this field is part of the schema's primary key. */
+    /** Whether this field is part of the schema's primary key, including any user override. */
     is_primary_key?: boolean | undefined;
     name?: string | undefined;
+    /** JSONPath used to extract the field from each source record; only meaningful for document-style backends. */
+    path?: string | undefined;
     /** The type of the field from the remote system. */
     remote_type?: string | undefined;
     type?: Polytomic.UtilFieldType | undefined;
     type_spec?: Polytomic.TypesType | undefined;
+    /** True when the field's effective definition came from a user override. */
+    user_managed?: boolean | undefined;
     values?: Polytomic.PickValue[] | undefined;
 }

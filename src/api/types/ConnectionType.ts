@@ -8,6 +8,7 @@ export interface ConnectionType {
     envConfig?: Record<string, unknown> | undefined;
     id?: string | undefined;
     initialConfiguration?: Record<string, unknown> | undefined;
+    logo_dark_url?: string | undefined;
     logo_url?: string | undefined;
     name?: string | undefined;
     oauth_prompt?: Polytomic.BackendOAuthPrompt | undefined;

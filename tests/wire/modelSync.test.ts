@@ -444,16 +444,6 @@ describe("ModelSyncClient", () => {
                         target: "name",
                     },
                 ],
-                filter_logic: "filter_logic",
-                filters: [
-                    {
-                        field: { field: "id", model_id: "248df4b7-aa70-47b8-a036-33ac447e668d" },
-                        field_id: "field1",
-                        function: "Equality",
-                        label: "A",
-                        value: "value",
-                    },
-                ],
                 id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 identity: {
                     function: "Equality",
@@ -463,18 +453,22 @@ describe("ModelSyncClient", () => {
                     target: "name",
                 },
                 mode: "create",
+                model_filters: {
+                    conditions: [
+                        {
+                            function: "Equality",
+                            label: "A",
+                            source: { field: "id", model_id: "248df4b7-aa70-47b8-a036-33ac447e668d" },
+                            value: "value",
+                        },
+                    ],
+                    logic: "A and B or C",
+                },
                 model_ids: ["model_ids"],
                 name: "Users Sync",
                 only_enrich_updates: false,
                 organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                override_fields: [
-                    {
-                        override_value: "fixed_value",
-                        source: { field: "id", model_id: "248df4b7-aa70-47b8-a036-33ac447e668d" },
-                        sync_mode: "create",
-                        target: "name",
-                    },
-                ],
+                override_fields: [{ override_value: "fixed_value", sync_mode: "create", target: "name" }],
                 overrides: [
                     {
                         field: { field: "id", model_id: "248df4b7-aa70-47b8-a036-33ac447e668d" },
@@ -505,8 +499,19 @@ describe("ModelSyncClient", () => {
                     configuration: { key: "value" },
                     connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     create: { name: "value" },
-                    filter_logic: "filter_logic",
                     object: "Users",
+                },
+                target_filters: {
+                    conditions: [
+                        {
+                            field: "Email",
+                            function: "Equality",
+                            label: "A",
+                            value: "value",
+                            value_source: { field: "id", model_id: "248df4b7-aa70-47b8-a036-33ac447e668d" },
+                        },
+                    ],
+                    logic: "A and B",
                 },
                 updated_at: "2024-01-15T09:30:00Z",
                 updated_by: { id: "12345678-1234-1234-1234-123456789012", name: "John Doe", type: "user" },
@@ -581,6 +586,7 @@ describe("ModelSyncClient", () => {
                     started_at: "2024-01-01T00:00:00Z",
                     status: "created",
                     type: "scheduled",
+                    version: "rel2026.08.05.06~1a2b3c4",
                 },
                 last_execution: {
                     completed_at: "2024-01-01T00:00:00Z",
@@ -591,6 +597,7 @@ describe("ModelSyncClient", () => {
                     started_at: "2024-01-01T00:00:00Z",
                     status: "created",
                     type: "scheduled",
+                    version: "rel2026.08.05.06~1a2b3c4",
                 },
                 next_execution_time: "2024-01-01T00:00:00Z",
             },

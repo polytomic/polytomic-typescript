@@ -25,6 +25,7 @@ describe("ExecutionsClient", () => {
                     started_at: "2024-01-01T00:00:00Z",
                     status: "created",
                     type: "scheduled",
+                    version: "rel2026.08.05.06~1a2b3c4",
                 },
             ],
             pagination: { next_page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==" },
@@ -89,6 +90,7 @@ describe("ExecutionsClient", () => {
                 started_at: "2024-01-01T00:00:00Z",
                 status: "created",
                 type: "scheduled",
+                version: "rel2026.08.05.06~1a2b3c4",
             },
         };
 
@@ -292,6 +294,107 @@ describe("ExecutionsClient", () => {
 
         await expect(async () => {
             return await client.modelSync.executions.getConsoleLogs("sync_id", "id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("GetLogsIndex (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: {
+                deletes: {
+                    count: 12450,
+                    url: "https://app.polytomic.com/api/syncs/0b155265-c537-44c9-9359-a3ceb468a4da/executions/0ecd09c1-b901-4d27-9053-f0367c427254/records",
+                },
+                errors: {
+                    count: 12450,
+                    url: "https://app.polytomic.com/api/syncs/0b155265-c537-44c9-9359-a3ceb468a4da/executions/0ecd09c1-b901-4d27-9053-f0367c427254/records",
+                },
+                inserts: {
+                    count: 12450,
+                    url: "https://app.polytomic.com/api/syncs/0b155265-c537-44c9-9359-a3ceb468a4da/executions/0ecd09c1-b901-4d27-9053-f0367c427254/records",
+                },
+                records: {
+                    count: 12450,
+                    url: "https://app.polytomic.com/api/syncs/0b155265-c537-44c9-9359-a3ceb468a4da/executions/0ecd09c1-b901-4d27-9053-f0367c427254/records",
+                },
+                updates: {
+                    count: 12450,
+                    url: "https://app.polytomic.com/api/syncs/0b155265-c537-44c9-9359-a3ceb468a4da/executions/0ecd09c1-b901-4d27-9053-f0367c427254/records",
+                },
+                warnings: {
+                    count: 12450,
+                    url: "https://app.polytomic.com/api/syncs/0b155265-c537-44c9-9359-a3ceb468a4da/executions/0ecd09c1-b901-4d27-9053-f0367c427254/records",
+                },
+            },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/syncs/248df4b7-aa70-47b8-a036-33ac447e668d/executions/248df4b7-aa70-47b8-a036-33ac447e668d/logs")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.modelSync.executions.getLogsIndex(
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+        );
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("GetLogsIndex (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/syncs/sync_id/executions/id/logs")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.modelSync.executions.getLogsIndex("sync_id", "id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("GetLogsIndex (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/syncs/sync_id/executions/id/logs")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.modelSync.executions.getLogsIndex("sync_id", "id");
         }).rejects.toThrow(Polytomic.InternalServerError);
     });
 

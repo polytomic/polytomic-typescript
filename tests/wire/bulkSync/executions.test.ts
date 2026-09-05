@@ -107,6 +107,7 @@ describe("ExecutionsClient", () => {
                             schema: "contact",
                             started_at: "2023-04-25T12:00:00Z",
                             updated_at: "2023-04-25T12:00:00Z",
+                            version: "rel2026.08.05.06~1a2b3c4",
                             warning_count: 0,
                         },
                     ],
@@ -115,6 +116,7 @@ describe("ExecutionsClient", () => {
                     status_message: "status_message",
                     type: "scheduled",
                     updated_at: "2023-04-25T12:00:00Z",
+                    version: "rel2026.08.05.06~1a2b3c4",
                     warning_count: 0,
                 },
             ],
@@ -193,6 +195,7 @@ describe("ExecutionsClient", () => {
                         schema: "contact",
                         started_at: "2023-04-25T12:00:00Z",
                         updated_at: "2023-04-25T12:00:00Z",
+                        version: "rel2026.08.05.06~1a2b3c4",
                         warning_count: 0,
                     },
                 ],
@@ -201,6 +204,7 @@ describe("ExecutionsClient", () => {
                 status_message: "status_message",
                 type: "scheduled",
                 updated_at: "2023-04-25T12:00:00Z",
+                version: "rel2026.08.05.06~1a2b3c4",
                 warning_count: 0,
             },
         };
@@ -574,6 +578,141 @@ describe("ExecutionsClient", () => {
 
         await expect(async () => {
             return await client.bulkSync.executions.getSchemaConsoleLogs("sync_id", "execution_id", "schema_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("GetIngestConsoleLogs (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: {
+                entries: [
+                    {
+                        id: "1744311099250-0",
+                        level: "INFO",
+                        message: "Started sync",
+                        timestamp: "2024-01-01T00:00:00Z",
+                    },
+                ],
+                next_cursor: "next_cursor",
+            },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/248df4b7-aa70-47b8-a036-33ac447e668d/ingest/consolelog")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.bulkSync.executions.getIngestConsoleLogs("248df4b7-aa70-47b8-a036-33ac447e668d", {
+            sync_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+            limit: 50,
+            after: "1744311099250-0",
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("GetIngestConsoleLogs (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/connection_id/ingest/consolelog")
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.bulkSync.executions.getIngestConsoleLogs("connection_id");
+        }).rejects.toThrow(Polytomic.BadRequestError);
+    });
+
+    test("GetIngestConsoleLogs (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/connection_id/ingest/consolelog")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.bulkSync.executions.getIngestConsoleLogs("connection_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("GetIngestConsoleLogs (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/connection_id/ingest/consolelog")
+            .respondWith()
+            .statusCode(408)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.bulkSync.executions.getIngestConsoleLogs("connection_id");
+        }).rejects.toThrow(Polytomic.RequestTimeoutError);
+    });
+
+    test("GetIngestConsoleLogs (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/connections/connection_id/ingest/consolelog")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.bulkSync.executions.getIngestConsoleLogs("connection_id");
         }).rejects.toThrow(Polytomic.InternalServerError);
     });
 });

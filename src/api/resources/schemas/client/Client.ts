@@ -239,6 +239,111 @@ export class SchemasClient {
     }
 
     /**
+     * Edits a single field on a schema, creating an override for a detected field if needed.
+     *
+     * @param {string} connection_id - Connection holding the schema.
+     * @param {string} schema_id - Schema identifier.
+     * @param {string} field_id - Field identifier within the schema.
+     * @param {Polytomic.PatchSchemaFieldRequest} request
+     * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.InternalServerError}
+     *
+     * @example
+     *     await client.schemas.patchField("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id", "field_id")
+     */
+    public patchField(
+        connection_id: string,
+        schema_id: string,
+        field_id: string,
+        request: Polytomic.PatchSchemaFieldRequest = {},
+        requestOptions?: SchemasClient.IdempotentRequestOptions,
+    ): core.HttpResponsePromise<Polytomic.SchemaFieldResponseEnvelope> {
+        return core.HttpResponsePromise.fromPromise(
+            this.__patchField(connection_id, schema_id, field_id, request, requestOptions),
+        );
+    }
+
+    private async __patchField(
+        connection_id: string,
+        schema_id: string,
+        field_id: string,
+        request: Polytomic.PatchSchemaFieldRequest = {},
+        requestOptions?: SchemasClient.IdempotentRequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.SchemaFieldResponseEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "Idempotency-Key": requestOptions?.idempotencyKey,
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/connections/${core.url.encodePathParam(connection_id)}/schemas/${core.url.encodePathParam(schema_id)}/fields/${core.url.encodePathParam(field_id)}`,
+            ),
+            method: "PATCH",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: request,
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.SchemaFieldResponseEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "PATCH",
+            "/api/connections/{connection_id}/schemas/{schema_id}/fields/{field_id}",
+        );
+    }
+
+    /**
      * Overrides the primary key detected on a schema.
      *
      * This is a full replacement: the keys you supply become the complete override

@@ -3,17 +3,32 @@
 import type * as Polytomic from "../index";
 
 export interface TargetField {
+    /** True if this field is an association (foreign key) to another object rather than a value column. */
     association?: boolean | undefined;
+    /** True if this field can be written when creating a new record. */
     createable?: boolean | undefined;
+    /** Description of the field, when the backend provides one. */
     description?: string | undefined;
+    /** True if this field supports field-level encryption. */
     encryptable?: boolean | undefined;
+    /** True if this field can be used in a target filter. */
     filterable?: boolean | undefined;
+    /** Backend-specific identifier of the field; use this value when configuring field mappings. */
     id?: string | undefined;
+    /** Identity match functions supported when this field is used as the sync identity (e.g. exact match, hashed match). */
     identity_functions?: Polytomic.IdentityFunction[] | undefined;
+    /** True if this association field holds a set of references rather than one; every value mapped to it is a member of the set. False for a field that is not an association, and for one whose destination has not declared how many references the relationship holds. */
+    multiple_associations?: boolean | undefined;
+    /** Human-readable name of the field. */
     name?: string | undefined;
+    /** True if a model sync must map a value to this field for records to be accepted. */
     required?: boolean | undefined;
+    /** Native type reported by the destination system. */
     source_type?: string | undefined;
+    /** True if this field may be used as the identity (match key) for syncs that require one. */
     supports_identity?: boolean | undefined;
+    /** Polytomic-normalized type used when mapping values to this field. */
     type?: string | undefined;
+    /** True if this field can be written when updating an existing record. */
     updateable?: boolean | undefined;
 }
