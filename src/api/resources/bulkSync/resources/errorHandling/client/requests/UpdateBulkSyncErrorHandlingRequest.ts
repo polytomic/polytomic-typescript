@@ -5,6 +5,8 @@
  *     {}
  */
 export interface UpdateBulkSyncErrorHandlingRequest {
+    /** How far behind ingestion may fall before a terminal execution is failed, in the unit this sync's source reports: seconds for a source carrying event timestamps, outstanding items for a queue-backed source such as S3. Send 0 to clear this sync's own threshold, after which a source reporting seconds follows the deployment-wide default and a queue-backed source is left unchecked. Omit to leave unchanged. */
+    ingestion_failure_threshold?: number;
     /** Email addresses notified when this sync fails. Replaces the current list; pass an empty list to unsubscribe everyone. Omit to leave the list unchanged. */
     subscribers?: string[];
 }

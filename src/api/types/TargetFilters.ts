@@ -8,6 +8,6 @@ import type * as Polytomic from "../index";
 export interface TargetFilters {
     /** Conditions a destination record must satisfy to be written. An empty list writes every matched record. */
     conditions?: Polytomic.TargetFilterCondition[] | undefined;
-    /** Expression combining the conditions in this object by their labels; 'and', 'or', and parentheses are supported. An empty expression means every condition must be satisfied. */
+    /** Expression combining the conditions in this object by their labels; 'and', 'or', and parentheses are supported. The operators are not case-sensitive but the labels are, and the expression has to name every condition in this object -- a condition may be repeated, as in '(A and B) or (A and C)' -- and an expression which leaves one out is rejected. An empty expression means every condition must be satisfied. */
     logic?: string | undefined;
 }

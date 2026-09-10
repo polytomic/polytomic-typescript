@@ -1594,6 +1594,10 @@ await client.connections.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 Updates a connection's configuration.
 
+Connections owned by a managed Harbor return `409 Conflict`. To rename the
+Connection, [update its Harbor](../../../api-reference/harbors/update). Customer-managed
+Harbor backing Connections remain independently editable.
+
 Updating a connection is a **full replacement** of its configuration. Any
 `configuration` field you omit is cleared. To make a partial change, fetch
 the current connection with
@@ -1686,6 +1690,12 @@ await client.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dd>
 
 Deletes a connection.
+
+A Connection that backs any active Harbor returns `409 Conflict`, including
+when you pass `force=true`. No dependent resources are deleted in this case.
+[Delete the Harbor](../../../api-reference/harbors/delete) first. Deleting a managed
+Harbor also deletes its managed Connection; deleting a customer-managed Harbor
+preserves its backing Connection.
 
 > 🚧 Deleting a connection that is referenced by fieldsets, syncs, bulk
 > syncs, or schedules returns `422 connection in use` unless you pass
@@ -1917,7 +1927,7 @@ Submits a query for asynchronous execution against the connection.
 
 This endpoint returns immediately with a query task ID. It does not wait for
 the query to finish. Poll [`GET /api/queries/{id}`](../../../../api-reference/query-runner/get-query) until `status`
-reaches `done` or `failed`.
+reaches `done`, `failed`, or `unknown`. These statuses are terminal.
 
 Only the user who created the query can fetch its results later. Query results
 are stored temporarily and may expire; use the `expires` field from the result
@@ -2005,6 +2015,10 @@ opaque `links.next` and `links.previous` URLs exactly as returned. Do not try to
 construct the `page` token yourself.
 
 If the query is still running, the response may include only status metadata.
+The terminal statuses are `done`, `failed`, and `unknown`. An `unknown` status
+means execution started, but its durable terminal result was lost or expired.
+Stop polling when you receive any terminal status.
+
 If the task is complete but the caller is not the same user that created it,
 the endpoint returns `404`.
 </dd>
@@ -5396,6 +5410,10 @@ await client.harbors.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 Updates a Harbor's name and description.
 
+Renaming a managed Harbor also renames its backing Connection. Both names
+change together; a name conflict returns `409 Conflict` and leaves both
+unchanged. Renaming a customer-managed Harbor preserves its Connection's name.
+
 This operation does not change `backing_mode` or `backing_connection_id`.
 </dd>
 </dl>
@@ -8110,6 +8128,278 @@ await client.organization.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dd>
 
 **requestOptions:** `OrganizationClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Activity
+<details><summary><code>client.activity.<a href="/src/api/resources/activity/client/Client.ts">list</a>({ ...params }) -> Polytomic.HarborActivityListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists Harbor Activity recorded for the caller's organization.
+
+You must be an active Organization administrator to use this endpoint.
+
+`start_time` is inclusive and `end_time` is exclusive. Both filter the time at
+which Polytomic recorded each event, which can differ from `occurred_at`. A
+single request can cover at most 90 days.
+
+Results are ordered from newest to oldest by default. Set `order` to `asc` to
+retrieve the oldest events first. A page contains at most 100 events. Pass
+`next_page_token` from the response as `page_token` with the same time range,
+filters, order, and limit to retrieve the next page. The token expires 24 hours
+after the first page. Pagination uses a live descending cursor, so an event from
+a transaction that commits between pages can require a fresh traversal.
+
+Responses include stable identities, bounded resource snapshots, schema label
+snapshots with truncation state, field counts, and row counts when available.
+They do not include internal recorded-order values, submitted SQL, raw field
+names, detailed provider errors, result rows, or raw pagination tokens.
+
+> ℹ️ Activity retention
+>
+> Polytomic retains Activity events for at least 90 days. Pagination tokens
+> expire 24 hours after the first page.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.activity.list({
+    start_time: "2024-01-15T09:30:00Z",
+    end_time: "2024-01-15T09:30:00Z",
+    limit: 1,
+    page_token: "page_token",
+    order: "asc",
+    harbor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    event_type: ["event_type"],
+    outcome: ["outcome"],
+    operation_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    session_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    actor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    credential_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    connection_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.ActivityListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActivityClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.activity.<a href="/src/api/resources/activity/client/Client.ts">getSession</a>(session_id, { ...params }) -> Polytomic.HarborActivitySessionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one Harbor Activity session and its events.
+
+You must be an active Organization administrator to use this endpoint. The
+session must belong to the Organization against which you authenticated.
+
+Events are ordered from oldest to newest by default. Set `order` to `desc` to
+retrieve the newest events first. A page contains at most 100 events. Pass
+`next_page_token` from the response as `page_token` with the same order and
+limit to retrieve the next page.
+
+`history_truncated` is `true` when Activity retention removed events from the
+beginning of the session. The lifecycle summary remains available while the
+session itself is retained.
+
+The response uses the same event allowlist as the Activity list and detail
+endpoints. It does not include session tokens, submitted SQL, raw field names,
+detailed provider errors, result rows, or raw pagination tokens.
+
+> ℹ️ Activity retention
+>
+> Polytomic retains Activity events for at least 90 days. Pagination tokens
+> expire 24 hours after the first page.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.activity.getSession("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 1,
+    page_token: "page_token",
+    order: "asc"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**session_id:** `string` — Harbor Activity session ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.ActivityGetSessionRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActivityClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.activity.<a href="/src/api/resources/activity/client/Client.ts">get</a>(event_id) -> Polytomic.HarborActivityEventEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one Harbor Activity event from the caller's organization.
+
+You must be an active Organization administrator to use this endpoint. The
+event must belong to the Organization against which you authenticated.
+
+The response can include stable identities, bounded resource snapshots, schema
+label snapshots with truncation state, field counts, and row counts. It does
+not include internal recorded-order values, submitted SQL, raw field names,
+detailed provider errors, result rows, or raw pagination tokens.
+
+> ℹ️ Activity retention
+>
+> Polytomic retains Activity events for at least 90 days.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.activity.get("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**event_id:** `string` — Activity event ID.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActivityClient.RequestOptions` 
     
 </dd>
 </dl>

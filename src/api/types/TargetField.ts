@@ -11,6 +11,8 @@ export interface TargetField {
     description?: string | undefined;
     /** True if this field supports field-level encryption. */
     encryptable?: boolean | undefined;
+    /** Comparisons this field accepts in a target filter. A condition whose function is absent from this list is rejected when the sync is saved. Empty when the destination publishes no per-field list, in which case any comparison is accepted. */
+    filter_functions?: Polytomic.SupportedFilterFunction[] | undefined;
     /** True if this field can be used in a target filter. */
     filterable?: boolean | undefined;
     /** Backend-specific identifier of the field; use this value when configuring field mappings. */

@@ -14,7 +14,7 @@ describe("ErrorHandlingClient", () => {
             environment: server.baseUrl,
         });
 
-        const rawResponseBody = { data: { subscribers: ["alerts@example.com"] } };
+        const rawResponseBody = { data: { ingestion_failure_threshold: 1000000, subscribers: ["alerts@example.com"] } };
 
         server
             .mockEndpoint()

@@ -117,7 +117,16 @@ describe("SchemasClient", () => {
 
         const rawResponseBody = {
             data: {
-                fields: [{ id: "email", is_primary_key: true, name: "Email", remote_type: "varchar(255)" }],
+                fields: [
+                    {
+                        id: "email",
+                        is_primary_key: true,
+                        name: "Email",
+                        primary_key_override: true,
+                        remote_type: "varchar(255)",
+                        source_primary_key: false,
+                    },
+                ],
                 id: "contact",
                 name: "Contact",
             },

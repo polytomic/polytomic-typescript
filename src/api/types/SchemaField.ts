@@ -10,8 +10,12 @@ export interface SchemaField {
     name?: string | undefined;
     /** JSONPath used to extract the field from each source record; only meaningful for document-style backends. */
     path?: string | undefined;
+    /** The user-set primary key status for this field, which takes precedence over source_primary_key; omitted when no override is set. */
+    primary_key_override?: boolean | undefined;
     /** The type of the field from the remote system. */
     remote_type?: string | undefined;
+    /** Whether the source system reports this field as part of the schema's primary key. */
+    source_primary_key?: boolean | undefined;
     type?: Polytomic.UtilFieldType | undefined;
     type_spec?: Polytomic.TypesType | undefined;
     /** True when the field's effective definition came from a user override. */

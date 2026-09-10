@@ -11,9 +11,9 @@ export interface RunQueryResult {
     expires?: string | undefined;
     /** The names of the fields returned by the query. This will not be returned until the query completes. */
     fields?: string[] | undefined;
-    /** The ID of the query task. Poll GET /api/queries/{id} until the task reaches done or failed to retrieve results. */
+    /** The ID of the query task. Poll GET /api/queries/{id} until the task reaches the terminal status done, failed, or unknown. */
     id?: string | undefined;
     /** The query results, returned as an array of objects. */
     results?: Record<string, unknown>[] | undefined;
-    status?: Polytomic.WorkTaskStatus | undefined;
+    status?: Polytomic.QueryStatus | undefined;
 }

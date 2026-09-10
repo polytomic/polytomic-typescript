@@ -82,7 +82,16 @@ describe("HarborsClient", () => {
 
         const rawResponseBody = {
             data: {
-                fields: [{ id: "email", is_primary_key: true, name: "Email", remote_type: "varchar(255)" }],
+                fields: [
+                    {
+                        id: "email",
+                        is_primary_key: true,
+                        name: "Email",
+                        primary_key_override: true,
+                        remote_type: "varchar(255)",
+                        source_primary_key: false,
+                    },
+                ],
                 id: "contact",
                 name: "Contact",
             },
@@ -117,7 +126,7 @@ describe("HarborsClient", () => {
                     created_at: "2024-01-15T09:30:00Z",
                     description: "description",
                     id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    mcp_server_url: "https://mcp.polytomic.com/mcp/harbors/revenue_operations",
+                    mcp_server_url: "https://mcp.polytomic.com/mcp/harbor/revenue_operations",
                     name: "Revenue Operations",
                     organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     updated_at: "2024-01-15T09:30:00Z",
@@ -205,7 +214,7 @@ describe("HarborsClient", () => {
                 created_at: "2024-01-15T09:30:00Z",
                 description: "description",
                 id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                mcp_server_url: "https://mcp.polytomic.com/mcp/harbors/revenue_operations",
+                mcp_server_url: "https://mcp.polytomic.com/mcp/harbor/revenue_operations",
                 name: "Revenue Operations",
                 organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 updated_at: "2024-01-15T09:30:00Z",

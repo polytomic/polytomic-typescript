@@ -22,6 +22,7 @@ describe("TargetsClient", () => {
                         createable: true,
                         description: "Field description",
                         encryptable: false,
+                        filter_functions: [{ label: "equals", multi_value: false, requires_value: true }],
                         filterable: true,
                         id: "field1",
                         identity_functions: [{ id: "Equality", label: "Equality" }],

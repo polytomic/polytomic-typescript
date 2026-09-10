@@ -907,6 +907,10 @@ export class ConnectionsClient {
     /**
      * Updates a connection's configuration.
      *
+     * Connections owned by a managed Harbor return `409 Conflict`. To rename the
+     * Connection, [update its Harbor](../../../api-reference/harbors/update). Customer-managed
+     * Harbor backing Connections remain independently editable.
+     *
      * Updating a connection is a **full replacement** of its configuration. Any
      * `configuration` field you omit is cleared. To make a partial change, fetch
      * the current connection with
@@ -928,6 +932,7 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
@@ -1016,6 +1021,11 @@ export class ConnectionsClient {
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 422:
                     throw new Polytomic.UnprocessableEntityError(
                         _response.error.body as Polytomic.ApiError,
@@ -1041,6 +1051,12 @@ export class ConnectionsClient {
     /**
      * Deletes a connection.
      *
+     * A Connection that backs any active Harbor returns `409 Conflict`, including
+     * when you pass `force=true`. No dependent resources are deleted in this case.
+     * [Delete the Harbor](../../../api-reference/harbors/delete) first. Deleting a managed
+     * Harbor also deletes its managed Connection; deleting a customer-managed Harbor
+     * preserves its backing Connection.
+     *
      * > 🚧 Deleting a connection that is referenced by fieldsets, syncs, bulk
      * > syncs, or schedules returns `422 connection in use` unless you pass
      * > `force=true`. With `force=true`, the API deletes those dependent
@@ -1053,6 +1069,7 @@ export class ConnectionsClient {
      * @throws {@link Polytomic.UnauthorizedError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.UnprocessableEntityError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
@@ -1128,6 +1145,11 @@ export class ConnectionsClient {
                     );
                 case 404:
                     throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );

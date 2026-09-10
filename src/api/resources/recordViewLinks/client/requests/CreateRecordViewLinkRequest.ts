@@ -10,6 +10,8 @@
  *     }
  */
 export interface CreateRecordViewLinkRequest {
+    "X-Polytomic-Harbor-Session"?: string;
+    "X-Polytomic-Activity-Request-ID"?: string;
     /** Connection containing the record. */
     connection_id: string;
     /** Optional expiry timestamp. Defaults to 72 hours and cannot exceed 7 days. */

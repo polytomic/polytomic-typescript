@@ -9,4 +9,6 @@
 export interface QueryRunnerGetQueryRequest {
     /** Opaque pagination token returned in the links.next or links.previous URL of the previous response. */
     page?: string;
+    "X-Polytomic-Harbor-Session"?: string;
+    "X-Polytomic-Activity-Request-ID"?: string;
 }

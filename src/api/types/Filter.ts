@@ -13,5 +13,6 @@ export interface Filter {
     function: Polytomic.FilterFunction;
     label?: string | undefined;
     value?: unknown | undefined;
+    /** Model field whose value this filter compares against, resolved separately for each record. Only valid on a target filter, mutually exclusive with 'value', and accepted only by destinations reporting 'supports_filter_value_fields'. */
     value_field?: Polytomic.Source | undefined;
 }

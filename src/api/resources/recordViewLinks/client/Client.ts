@@ -34,7 +34,9 @@ export class RecordViewLinksClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
      *
@@ -57,11 +59,18 @@ export class RecordViewLinksClient {
         request: Polytomic.CreateRecordViewLinkRequest,
         requestOptions?: RecordViewLinksClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.CreateRecordViewLinkEnvelope>> {
+        const {
+            "X-Polytomic-Harbor-Session": polytomicHarborSession,
+            "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
+            ..._body
+        } = request;
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
         const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
             _authRequest.headers,
             this._options?.headers,
             mergeOnlyDefinedHeaders({
+                "X-Polytomic-Harbor-Session": polytomicHarborSession,
+                "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
                 "Idempotency-Key": requestOptions?.idempotencyKey,
                 "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
             }),
@@ -79,7 +88,7 @@ export class RecordViewLinksClient {
             contentType: "application/json",
             queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
             requestType: "json",
-            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
             timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
             maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
             abortSignal: requestOptions?.abortSignal,
@@ -110,8 +119,18 @@ export class RecordViewLinksClient {
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
                     throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );

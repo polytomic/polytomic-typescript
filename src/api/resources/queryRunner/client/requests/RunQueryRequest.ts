@@ -9,4 +9,6 @@
 export interface RunQueryRequest {
     /** The query to execute against the connection. */
     query?: string;
+    "X-Polytomic-Harbor-Session"?: string;
+    "X-Polytomic-Activity-Request-ID"?: string;
 }

@@ -7,10 +7,10 @@ export interface TargetFilterCondition {
     field: string;
     /** Comparison this condition applies to the field's value. */
     function: Polytomic.FilterFunction;
-    /** Handle naming this condition in 'logic'. Labels are scoped to this object, so a model condition and a target condition may share one. Optional: label every condition in the object or none of them, and an unlabelled object is labelled by position -- A, B, C -- which is how labels are always reported back. */
+    /** Handle naming this condition in 'logic'. A label starts with a letter or underscore and continues with letters, digits and underscores. Labels are scoped to this object, so a model condition and a target condition may share one. Optional: label every condition in the object or none of them, and an unlabelled object is labelled by position -- A, B, C -- which is how labels are always reported back. */
     label?: string | undefined;
     /** Value the field is compared against. Omitted for functions which take no value, such as 'IsNotNull'. */
     value?: unknown | undefined;
-    /** Model field whose value the destination field is compared against, resolved separately for every record, named the way a model condition names its source. Mutually exclusive with 'value', and accepted only by destinations whose mode reports 'supports_filter_value_fields'. */
+    /** Model field whose value the destination field is compared against, resolved separately for every record, named the way a model condition names its source. Mutually exclusive with 'value', and accepted only by destinations reporting 'supports_filter_value_fields'. */
     value_source?: Polytomic.Source | undefined;
 }

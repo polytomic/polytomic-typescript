@@ -70,6 +70,24 @@ describe("QueryRunnerClient", () => {
 
         const rawResponseBody = {};
 
+        server.mockEndpoint().get("/api/queries/id").respondWith().statusCode(403).jsonBody(rawResponseBody).build();
+
+        await expect(async () => {
+            return await client.queryRunner.getQuery("id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("GetQuery (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
         server.mockEndpoint().get("/api/queries/id").respondWith().statusCode(404).jsonBody(rawResponseBody).build();
 
         await expect(async () => {
@@ -77,7 +95,25 @@ describe("QueryRunnerClient", () => {
         }).rejects.toThrow(Polytomic.NotFoundError);
     });
 
-    test("GetQuery (4)", async () => {
+    test("GetQuery (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server.mockEndpoint().get("/api/queries/id").respondWith().statusCode(409).jsonBody(rawResponseBody).build();
+
+        await expect(async () => {
+            return await client.queryRunner.getQuery("id");
+        }).rejects.toThrow(Polytomic.ConflictError);
+    });
+
+    test("GetQuery (6)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
             maxRetries: 0,
@@ -93,5 +129,23 @@ describe("QueryRunnerClient", () => {
         await expect(async () => {
             return await client.queryRunner.getQuery("id");
         }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("GetQuery (7)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server.mockEndpoint().get("/api/queries/id").respondWith().statusCode(503).jsonBody(rawResponseBody).build();
+
+        await expect(async () => {
+            return await client.queryRunner.getQuery("id");
+        }).rejects.toThrow(Polytomic.ServiceUnavailableError);
     });
 });

@@ -30,7 +30,7 @@ export class QueryRunnerClient {
      *
      * This endpoint returns immediately with a query task ID. It does not wait for
      * the query to finish. Poll [`GET /api/queries/{id}`](../../../../api-reference/query-runner/get-query) until `status`
-     * reaches `done` or `failed`.
+     * reaches `done`, `failed`, or `unknown`. These statuses are terminal.
      *
      * Only the user who created the query can fetch its results later. Query results
      * are stored temporarily and may expire; use the `expires` field from the result
@@ -41,8 +41,11 @@ export class QueryRunnerClient {
      * @param {QueryRunnerClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
      *
@@ -64,7 +67,12 @@ export class QueryRunnerClient {
         request: Polytomic.RunQueryRequest = {},
         requestOptions?: QueryRunnerClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.RunQueryEnvelope>> {
-        const { query, ..._body } = request;
+        const {
+            query,
+            "X-Polytomic-Harbor-Session": polytomicHarborSession,
+            "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
+            ..._body
+        } = request;
         const _queryParams: Record<string, unknown> = {
             query,
         };
@@ -73,6 +81,8 @@ export class QueryRunnerClient {
             _authRequest.headers,
             this._options?.headers,
             mergeOnlyDefinedHeaders({
+                "X-Polytomic-Harbor-Session": polytomicHarborSession,
+                "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
                 "Idempotency-Key": requestOptions?.idempotencyKey,
                 "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
             }),
@@ -112,13 +122,28 @@ export class QueryRunnerClient {
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Polytomic.NotFoundError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
                     throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
@@ -151,6 +176,10 @@ export class QueryRunnerClient {
      * construct the `page` token yourself.
      *
      * If the query is still running, the response may include only status metadata.
+     * The terminal statuses are `done`, `failed`, and `unknown`. An `unknown` status
+     * means execution started, but its durable terminal result was lost or expired.
+     * Stop polling when you receive any terminal status.
+     *
      * If the task is complete but the caller is not the same user that created it,
      * the endpoint returns `404`.
      *
@@ -159,8 +188,11 @@ export class QueryRunnerClient {
      * @param {QueryRunnerClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
      *
@@ -182,7 +214,11 @@ export class QueryRunnerClient {
         request: Polytomic.QueryRunnerGetQueryRequest = {},
         requestOptions?: QueryRunnerClient.RequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.QueryResultsEnvelope>> {
-        const { page } = request;
+        const {
+            page,
+            "X-Polytomic-Harbor-Session": polytomicHarborSession,
+            "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
+        } = request;
         const _queryParams: Record<string, unknown> = {
             page,
         };
@@ -191,6 +227,8 @@ export class QueryRunnerClient {
             _authRequest.headers,
             this._options?.headers,
             mergeOnlyDefinedHeaders({
+                "X-Polytomic-Harbor-Session": polytomicHarborSession,
+                "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
                 "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
             }),
             requestOptions?.headers,
@@ -226,13 +264,28 @@ export class QueryRunnerClient {
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Polytomic.NotFoundError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 500:
                     throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
