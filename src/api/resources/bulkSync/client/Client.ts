@@ -406,11 +406,13 @@ export class BulkSyncClient {
      * - `normalize_names` resets to enabled.
      *
      * Send the existing values explicitly if you want to preserve a non-default or
-     * non-empty setting, including schema and field selections.
+     * non-empty setting.
      *
      * > 📘 Updating schemas
      * >
-     * > Schema updates are not performed through this endpoint. Use the
+     * > When `schemas` is present, it replaces the sync's schema selection: schemas
+     * > not in the list are disabled. When `schemas` is omitted or empty, the sync's
+     * > schemas are left unchanged. Use the
      * > [Update Bulk Sync Schemas](../../../../api-reference/bulk-sync/schemas/patch)
      * > endpoint to change a subset of schemas, or
      * > [Update Bulk Sync Schema](../../../../api-reference/bulk-sync/schemas/update)

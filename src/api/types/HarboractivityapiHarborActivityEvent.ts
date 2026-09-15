@@ -21,6 +21,7 @@ export interface HarboractivityapiHarborActivityEvent {
     outcome?: string | undefined;
     profile?: Polytomic.HarboractivityapiHarborActivityIdentitySnapshot | undefined;
     provenance?: string | undefined;
+    query_source?: Polytomic.HarboractivityapiHarborActivityQuerySource | undefined;
     recorded_at?: string | undefined;
     session_id?: string | undefined;
     targets?: Polytomic.HarboractivityapiHarborActivityTarget[] | undefined;

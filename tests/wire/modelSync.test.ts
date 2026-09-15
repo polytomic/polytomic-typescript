@@ -445,6 +445,17 @@ describe("ModelSyncClient", () => {
                     },
                 ],
                 id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                identities: {
+                    mappings: [
+                        {
+                            function: "Equality",
+                            remote_field_type_id: "string",
+                            source: { field: "id", model_id: "248df4b7-aa70-47b8-a036-33ac447e668d" },
+                            target: "name",
+                        },
+                    ],
+                    strategy: "priority",
+                },
                 identity: {
                     function: "Equality",
                     new_field: true,
@@ -478,6 +489,7 @@ describe("ModelSyncClient", () => {
                     },
                 ],
                 policies: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+                problems: [{ code: "unknown_target_field", path: "target_filters.conditions[1].field" }],
                 schedule: {
                     connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     day_of_month: "1",

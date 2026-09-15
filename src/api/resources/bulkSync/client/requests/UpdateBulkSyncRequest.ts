@@ -44,7 +44,7 @@ export interface UpdateBulkSyncRequest {
     policies?: string[];
     /** Override the default resync concurrency limit for this sync. */
     resync_concurrency_limit?: number;
-    /** List of schemas to sync; if omitted, all schemas will be selected for syncing. */
+    /** Schemas to sync. Schemas not in the list are disabled; if omitted or empty, the sync's schemas are left unchanged. */
     schemas?: UpdateBulkSyncRequest.Schemas.Item[];
     /** Source-specific bulk sync configuration (e.g. replication slot name, sync lookback). The accepted keys depend on the source connection type. */
     source_configuration?: Record<string, unknown>;

@@ -26,6 +26,9 @@ export interface HarboractivityapiHarborActivityMetadata {
     reason?: string | undefined;
     record_id?: string | undefined;
     row_count?: number | undefined;
+    saved_query_id?: string | undefined;
+    saved_query_revision_id?: string | undefined;
+    saved_query_version?: number | undefined;
     schema_id?: string | undefined;
     statement_category?: string | undefined;
     supported?: boolean | undefined;

@@ -13,6 +13,9 @@ export interface ModelSyncV5Response {
     /** Deprecated. Use 'model_filters.conditions' and 'target_filters.conditions'. Reports the same filters, with the two kinds interleaved and told apart by 'field_type'. */
     filters?: Polytomic.Filter[] | undefined;
     id?: string | undefined;
+    /** Identity mappings for the sync and the strategy combining them. */
+    identities?: Polytomic.ModelSyncIdentities | undefined;
+    /** Deprecated. Use 'identities'. Reports the first identity mapping only. */
     identity?: Polytomic.Identity | undefined;
     mode?: Polytomic.ModelsyncSyncTargetMode | undefined;
     model_filters?: Polytomic.ModelFilters | undefined;
@@ -24,6 +27,8 @@ export interface ModelSyncV5Response {
     override_fields?: Polytomic.OverrideField[] | undefined;
     overrides?: Polytomic.Override[] | undefined;
     policies?: string[] | undefined;
+    /** Parts of this configuration which could not be resolved when it was read. The configuration is reported unchanged, references included, so it can be corrected and written back; this property is ignored on input. */
+    problems?: Polytomic.ModelSyncProblem[] | undefined;
     schedule?: Polytomic.Schedule | undefined;
     skip_initial_backfill?: boolean | undefined;
     sync_all_records?: boolean | undefined;

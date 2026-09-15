@@ -27,6 +27,9 @@ export interface CreateModelSyncV5Request {
     filter_logic?: string;
     /** Deprecated. Use 'model_filters.conditions' and 'target_filters.conditions', which say which kind each condition is rather than inferring it. Ignored when either of those is present, except that a request carrying both shapes is rejected if they describe different filters. */
     filters?: Polytomic.Filter[];
+    /** Identity mappings for the sync and the strategy combining them, replacing any the sync has. When this is omitted, 'identity' is used instead; updating a sync with more than one mapping requires this property. */
+    identities?: Polytomic.ModelSyncIdentities;
+    /** Deprecated. Use 'identities'. Reports and accepts the first identity mapping only. */
     identity?: Polytomic.Identity;
     mode: Polytomic.ModelsyncSyncTargetMode;
     model_filters?: Polytomic.ModelFilters;

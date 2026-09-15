@@ -23,6 +23,8 @@ export interface SyncDestinationProperties {
     supports_filter_value_fields?: boolean | undefined;
     /** True if a sync may create a new field on this target to use as the sync identity. */
     supports_identity_field_creation?: boolean | undefined;
+    /** True if the destination can match records on more than one identity mapping. */
+    supports_multiple_identities?: boolean | undefined;
     /** True if target filters are supported on this destination; the chosen sync mode may further constrain availability. */
     supports_target_filters?: boolean | undefined;
     /** True if writing to this target will create a new object in the destination system rather than write to an existing one. */

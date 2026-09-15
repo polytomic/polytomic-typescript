@@ -59,6 +59,7 @@ describe("TargetsClient", () => {
                     supports_field_type_selection: true,
                     supports_filter_value_fields: true,
                     supports_identity_field_creation: true,
+                    supports_multiple_identities: true,
                     supports_target_filters: true,
                     target_creator: true,
                     use_field_names_as_labels: true,

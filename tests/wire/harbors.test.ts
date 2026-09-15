@@ -129,6 +129,7 @@ describe("HarborsClient", () => {
                     mcp_server_url: "https://mcp.polytomic.com/mcp/harbor/revenue_operations",
                     name: "Revenue Operations",
                     organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    status: "provisioning",
                     updated_at: "2024-01-15T09:30:00Z",
                 },
             ],
@@ -217,6 +218,7 @@ describe("HarborsClient", () => {
                 mcp_server_url: "https://mcp.polytomic.com/mcp/harbor/revenue_operations",
                 name: "Revenue Operations",
                 organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                status: "provisioning",
                 updated_at: "2024-01-15T09:30:00Z",
             },
         };
@@ -1193,6 +1195,569 @@ describe("HarborsClient", () => {
         await expect(async () => {
             return await client.harbors.listKeys("harbor_id");
         }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("ListSavedQueries (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [
+                {
+                    description: "description",
+                    expected_columns: ["expected_columns"],
+                    id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    name: "name",
+                    owner: "owner",
+                    published_at: "2024-01-15T09:30:00Z",
+                    revision_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    updated_at: "2024-01-15T09:30:00Z",
+                    version: 1,
+                },
+            ],
+            pagination: { next_page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==" },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/248df4b7-aa70-47b8-a036-33ac447e668d/saved-queries")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.harbors.listSavedQueries("248df4b7-aa70-47b8-a036-33ac447e668d", {
+            limit: 1,
+            page_token: "page_token",
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("ListSavedQueries (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries")
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueries("harbor_id");
+        }).rejects.toThrow(Polytomic.BadRequestError);
+    });
+
+    test("ListSavedQueries (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueries("harbor_id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("ListSavedQueries (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueries("harbor_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("ListSavedQueries (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries")
+            .respondWith()
+            .statusCode(409)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueries("harbor_id");
+        }).rejects.toThrow(Polytomic.ConflictError);
+    });
+
+    test("ListSavedQueries (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueries("harbor_id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("ListSavedQueries (7)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueries("harbor_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("ListSavedQueries (8)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries")
+            .respondWith()
+            .statusCode(503)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueries("harbor_id");
+        }).rejects.toThrow(Polytomic.ServiceUnavailableError);
+    });
+
+    test("ListSavedQueryDrafts (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [
+                {
+                    change_note: "change_note",
+                    created_at: "2024-01-15T09:30:00Z",
+                    created_by: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    created_by_type: "created_by_type",
+                    description: "description",
+                    id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    name: "name",
+                    owner: "owner",
+                    parameters: [{ name: "start_date", type: "string" }],
+                    saved_query_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    sql_template: "sql_template",
+                    updated_at: "2024-01-15T09:30:00Z",
+                    updated_by: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    updated_by_type: "updated_by_type",
+                    validation_values: { key: "value" },
+                },
+            ],
+            pagination: { next_page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==" },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/248df4b7-aa70-47b8-a036-33ac447e668d/saved-queries/drafts")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.harbors.listSavedQueryDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
+            limit: 1,
+            page_token: "page_token",
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("ListSavedQueryDrafts (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/drafts")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueryDrafts("harbor_id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("ListSavedQueryDrafts (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/drafts")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueryDrafts("harbor_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("ListSavedQueryDrafts (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/drafts")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueryDrafts("harbor_id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("ListSavedQueryDrafts (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/drafts")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listSavedQueryDrafts("harbor_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("GetSavedQuery (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: {
+                change_note: "change_note",
+                description: "description",
+                expected_columns: ["expected_columns"],
+                id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                name: "name",
+                owner: "owner",
+                parameters: [{ name: "start_date", type: "string" }],
+                published_at: "2024-01-15T09:30:00Z",
+                published_by: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                published_by_type: "published_by_type",
+                revision_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                sql_template: "sql_template",
+                updated_at: "2024-01-15T09:30:00Z",
+                version: 1,
+            },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/248df4b7-aa70-47b8-a036-33ac447e668d/saved-queries/248df4b7-aa70-47b8-a036-33ac447e668d")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.harbors.getSavedQuery(
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+        );
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("GetSavedQuery (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/saved_query_id")
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getSavedQuery("harbor_id", "saved_query_id");
+        }).rejects.toThrow(Polytomic.BadRequestError);
+    });
+
+    test("GetSavedQuery (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/saved_query_id")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getSavedQuery("harbor_id", "saved_query_id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("GetSavedQuery (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/saved_query_id")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getSavedQuery("harbor_id", "saved_query_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("GetSavedQuery (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/saved_query_id")
+            .respondWith()
+            .statusCode(409)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getSavedQuery("harbor_id", "saved_query_id");
+        }).rejects.toThrow(Polytomic.ConflictError);
+    });
+
+    test("GetSavedQuery (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/saved_query_id")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getSavedQuery("harbor_id", "saved_query_id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("GetSavedQuery (7)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/saved_query_id")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getSavedQuery("harbor_id", "saved_query_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("GetSavedQuery (8)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/saved-queries/saved_query_id")
+            .respondWith()
+            .statusCode(503)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getSavedQuery("harbor_id", "saved_query_id");
+        }).rejects.toThrow(Polytomic.ServiceUnavailableError);
     });
 
     test("GetStatus (1)", async () => {

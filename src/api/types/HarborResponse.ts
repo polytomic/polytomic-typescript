@@ -17,6 +17,8 @@ export interface HarborResponse {
     name?: string | undefined;
     /** Organization that owns the Harbor. */
     organization_id?: string | undefined;
+    /** Storage lifecycle status. Wait for ready before using the Harbor; failed provisioning is retried automatically. */
+    status?: string | undefined;
     /** When the Harbor was last updated. */
     updated_at?: string | undefined;
 }

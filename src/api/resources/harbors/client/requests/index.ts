@@ -1,6 +1,8 @@
 export type { CreateHarborContextDraftRequest } from "./CreateHarborContextDraftRequest";
 export type { CreateHarborContextRequest } from "./CreateHarborContextRequest";
 export type { CreateHarborRequest } from "./CreateHarborRequest";
+export type { CreateHarborSavedQueryDraftRequest } from "./CreateHarborSavedQueryDraftRequest";
+export type { ExecuteHarborSavedQueryRequest } from "./ExecuteHarborSavedQueryRequest";
 export type { HarborsCloseSessionRequest } from "./HarborsCloseSessionRequest";
 export type { HarborsDeleteContextDraftRequest } from "./HarborsDeleteContextDraftRequest";
 export type { HarborsDeleteContextRequest } from "./HarborsDeleteContextRequest";
@@ -8,6 +10,7 @@ export type { HarborsGetAuthorizedSchemaRequest } from "./HarborsGetAuthorizedSc
 export type { HarborsGetContextDraftRequest } from "./HarborsGetContextDraftRequest";
 export type { HarborsGetContextRequest } from "./HarborsGetContextRequest";
 export type { HarborsGetContextVersionRequest } from "./HarborsGetContextVersionRequest";
+export type { HarborsGetSavedQueryRequest } from "./HarborsGetSavedQueryRequest";
 export type { HarborsListAuthorizedConnectionsRequest } from "./HarborsListAuthorizedConnectionsRequest";
 export type { HarborsListAuthorizedSchemasRequest } from "./HarborsListAuthorizedSchemasRequest";
 export type { HarborsListContextDraftsRequest } from "./HarborsListContextDraftsRequest";
@@ -15,6 +18,8 @@ export type { HarborsListContextsRequest } from "./HarborsListContextsRequest";
 export type { HarborsListContextVersionsRequest } from "./HarborsListContextVersionsRequest";
 export type { HarborsListKeysRequest } from "./HarborsListKeysRequest";
 export type { HarborsListRequest } from "./HarborsListRequest";
+export type { HarborsListSavedQueriesRequest } from "./HarborsListSavedQueriesRequest";
+export type { HarborsListSavedQueryDraftsRequest } from "./HarborsListSavedQueryDraftsRequest";
 export type { HarborsListUsersRequest } from "./HarborsListUsersRequest";
 export type { HarborsPromoteContextDraftRequest } from "./HarborsPromoteContextDraftRequest";
 export type { InviteHarborUserRequest } from "./InviteHarborUserRequest";
@@ -22,4 +27,5 @@ export type { RegisterHarborSessionRequest } from "./RegisterHarborSessionReques
 export type { ResolveHarborSourceMappingsRequest } from "./ResolveHarborSourceMappingsRequest";
 export type { SaveHarborContextDraftRequest } from "./SaveHarborContextDraftRequest";
 export type { SaveHarborContextRequest } from "./SaveHarborContextRequest";
+export type { SaveHarborSavedQueryDraftRequest } from "./SaveHarborSavedQueryDraftRequest";
 export type { UpdateHarborRequest } from "./UpdateHarborRequest";
