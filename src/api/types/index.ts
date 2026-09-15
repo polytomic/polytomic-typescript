@@ -245,6 +245,7 @@ export * from "./ModelSample";
 export * from "./ModelSampleResponseEnvelope";
 export * from "./ModelSyncIdentities";
 export * from "./ModelSyncProblem";
+export * from "./ModelSyncSourceIdentity";
 export * from "./ModelSyncV5Response";
 export * from "./ModelSyncV5ResponseEnvelope";
 export * from "./ModelSyncV5Target";

@@ -4399,7 +4399,7 @@ await client.modelSync.start("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**request:** `Polytomic.StartSyncRequest` 
+**request:** `Polytomic.StartModelSyncRequest` 
     
 </dd>
 </dl>
@@ -8689,7 +8689,7 @@ await client.organization.getRecordLogging();
 <dl>
 <dd>
 
-Replaces the organization's record logging settings. `deliveryConnectionId` is replaced, not merged: omitting it, or sending null, removes any destination previously configured.
+Replaces the organization's record logging settings. `deliveryConnectionId` and `deliveryPrefix` are replaced, not merged: omitting either, or sending null, removes what was previously configured.
 </dd>
 </dl>
 </dd>

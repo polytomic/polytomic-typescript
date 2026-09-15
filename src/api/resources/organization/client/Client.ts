@@ -205,7 +205,7 @@ export class OrganizationClient {
     }
 
     /**
-     * Replaces the organization's record logging settings. `deliveryConnectionId` is replaced, not merged: omitting it, or sending null, removes any destination previously configured.
+     * Replaces the organization's record logging settings. `deliveryConnectionId` and `deliveryPrefix` are replaced, not merged: omitting either, or sending null, removes what was previously configured.
      *
      * @param {Polytomic.UpdateRecordLoggingSettingsRequest} request
      * @param {OrganizationClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.

@@ -97,6 +97,7 @@ describe("OrganizationClient", () => {
             data: {
                 deliveryConnectionId: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 deliveryConnectionName: "deliveryConnectionName",
+                deliveryPrefix: "deliveryPrefix",
                 enabled: true,
             },
         };

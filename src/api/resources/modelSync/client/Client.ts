@@ -1160,7 +1160,7 @@ export class ModelSyncClient {
      * > Use caution when setting the `resync` parameter to `true`. This will force a full resync of the data from the source system. This can be a time-consuming operation and may impact the performance of the source system. It is recommended to only use this option when necessary.
      *
      * @param {string} id
-     * @param {Polytomic.StartSyncRequest} request
+     * @param {Polytomic.StartModelSyncRequest} request
      * @param {ModelSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -1176,7 +1176,7 @@ export class ModelSyncClient {
      */
     public start(
         id: string,
-        request: Polytomic.StartSyncRequest = {},
+        request: Polytomic.StartModelSyncRequest = {},
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<Polytomic.StartSyncResponseEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__start(id, request, requestOptions));
@@ -1184,7 +1184,7 @@ export class ModelSyncClient {
 
     private async __start(
         id: string,
-        request: Polytomic.StartSyncRequest = {},
+        request: Polytomic.StartModelSyncRequest = {},
         requestOptions?: ModelSyncClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.StartSyncResponseEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();

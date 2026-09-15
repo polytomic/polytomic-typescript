@@ -5,6 +5,8 @@ export interface RecordLoggingSettingsResponse {
     deliveryConnectionId?: string | undefined;
     /** Name of the destination connection, for display. Omitted when no destination is configured or the connection has been deleted. */
     deliveryConnectionName?: string | undefined;
+    /** Path record logs are delivered under, ahead of the organization ID, if one is set. */
+    deliveryPrefix?: string | undefined;
     /** True when record logging is enabled for the organization. */
     enabled?: boolean | undefined;
 }

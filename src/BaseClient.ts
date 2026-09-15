@@ -73,8 +73,8 @@ export function normalizeClientOptions<T extends BaseClientOptions = BaseClientO
         {
             "X-Fern-Language": "JavaScript",
             "X-Fern-SDK-Name": "polytomic",
-            "X-Fern-SDK-Version": "25.9.7",
-            "User-Agent": "polytomic/25.9.7",
+            "X-Fern-SDK-Version": "25.9.8",
+            "User-Agent": "polytomic/25.9.8",
             "X-Fern-Runtime": core.RUNTIME.type,
             "X-Fern-Runtime-Version": core.RUNTIME.version,
             "X-Polytomic-Version": options?.version ?? "2025-09-18",

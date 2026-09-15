@@ -9,6 +9,8 @@
 export interface UpdateRecordLoggingSettingsRequest {
     /** Blobstorage connection that receives record logs after each model sync execution. Omit or send null to deliver nowhere; this field is replaced, not merged. */
     deliveryConnectionId?: string;
+    /** Path record logs are delivered under, ahead of the organization ID. Omit or send null for none; this field is replaced, not merged. */
+    deliveryPrefix?: string;
     /** Whether record logging is enabled for the organization. */
     enabled: boolean;
 }
