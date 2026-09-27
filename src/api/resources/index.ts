@@ -18,6 +18,8 @@ export * as models from "./models";
 export * from "./models/client/requests";
 export * as notifications from "./notifications";
 export * from "./notifications/client/requests";
+export * as operations from "./operations";
+export * from "./operations/client/requests";
 export * as organization from "./organization";
 export * from "./organization/client/requests";
 export * as permissions from "./permissions";

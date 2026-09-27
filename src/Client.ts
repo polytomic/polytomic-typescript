@@ -11,6 +11,7 @@ import { JobsClient } from "./api/resources/jobs/client/Client";
 import { ModelSyncClient } from "./api/resources/modelSync/client/Client";
 import { ModelsClient } from "./api/resources/models/client/Client";
 import { NotificationsClient } from "./api/resources/notifications/client/Client";
+import { OperationsClient } from "./api/resources/operations/client/Client";
 import { OrganizationClient } from "./api/resources/organization/client/Client";
 import { PermissionsClient } from "./api/resources/permissions/client/Client";
 import { QueryRunnerClient } from "./api/resources/queryRunner/client/Client";
@@ -43,6 +44,7 @@ export class PolytomicClient {
     protected _jobs: JobsClient | undefined;
     protected _identity: IdentityClient | undefined;
     protected _notifications: NotificationsClient | undefined;
+    protected _operations: OperationsClient | undefined;
     protected _organization: OrganizationClient | undefined;
     protected _activity: ActivityClient | undefined;
     protected _users: UsersClient | undefined;
@@ -101,6 +103,10 @@ export class PolytomicClient {
 
     public get notifications(): NotificationsClient {
         return (this._notifications ??= new NotificationsClient(this._options));
+    }
+
+    public get operations(): OperationsClient {
+        return (this._operations ??= new OperationsClient(this._options));
     }
 
     public get organization(): OrganizationClient {

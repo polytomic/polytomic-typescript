@@ -29,6 +29,7 @@ describe("ActivityClient", () => {
                     harbor_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     metadata: {
+                        action_request_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                         saved_query_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                         saved_query_revision_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     },
@@ -239,6 +240,7 @@ describe("ActivityClient", () => {
                         harbor_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                         id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                         metadata: {
+                            action_request_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                             saved_query_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                             saved_query_revision_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                         },
@@ -457,6 +459,12 @@ describe("ActivityClient", () => {
                 harbor_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 metadata: {
+                    action_enabled: true,
+                    action_field_ids: ["action_field_ids"],
+                    action_id: "action_id",
+                    action_lookup_field_id: "action_lookup_field_id",
+                    action_lookup_field_ids: ["action_lookup_field_ids"],
+                    action_request_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     attempt_number: 1,
                     category: "category",
                     client_name: "client_name",
@@ -468,6 +476,7 @@ describe("ActivityClient", () => {
                     error_category: "error_category",
                     execution_duration_ms: 1,
                     external_run_id: "external_run_id",
+                    failure_code: "failure_code",
                     field_count: 1,
                     has_next_page: true,
                     label: "label",

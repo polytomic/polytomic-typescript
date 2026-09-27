@@ -6,4 +6,6 @@ export interface FieldConfiguration {
     id?: string | undefined;
     /** Whether the field should be obfuscated. */
     obfuscate?: boolean | undefined;
+    /** User-specified override for the destination field name. Omit to keep the current value; send an empty string to clear it. */
+    user_output_name?: string | undefined;
 }

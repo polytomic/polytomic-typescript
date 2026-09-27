@@ -425,6 +425,7 @@ export class BulkSyncClient {
      * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
@@ -502,6 +503,11 @@ export class BulkSyncClient {
                     );
                 case 404:
                     throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
@@ -644,6 +650,7 @@ export class BulkSyncClient {
      *
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
@@ -708,6 +715,11 @@ export class BulkSyncClient {
                     );
                 case 404:
                     throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );

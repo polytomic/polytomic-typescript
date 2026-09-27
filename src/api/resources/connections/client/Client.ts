@@ -320,6 +320,27 @@ export class ConnectionsClient {
      * [`POST /api/connections/{id}/schemas/refresh`](../../api-reference/schemas/refresh)
      * followed by [`GET /api/connections/{id}/schemas/status`](../../api-reference/schemas/get-status).
      *
+     * ## Observed rate limits
+     *
+     * You can use `rate_limit` to inspect observed rate limiting separately from
+     * Connection health. A Connection can be healthy while Polytomic has an active
+     * rate-limit marker. Shared Connections combine observations recorded for their
+     * own ID and their root Connection. Observations recorded only for another shared
+     * copy are not included.
+     *
+     * When these observed periods overlap or touch, `limited_since` reflects the start
+     * of the continuous period and `expires_at` reflects its latest expiry. An expired
+     * period separated from the active period by a gap does not extend that start.
+     *
+     * > ⚠️ Observation, not a capacity guarantee
+     * >
+     * > An active marker does not mean every endpoint or sync is blocked. No active
+     * > marker does not guarantee that the upstream service has capacity. The marker
+     * > expiry can be extended and is not a promised provider reset or exact retry time.
+     *
+     * If any required lookup is unavailable, `rate_limit` is `null`. This does not change
+     * `status` or `status_error`, and the Connection response is still returned.
+     *
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.InternalServerError}
@@ -828,6 +849,27 @@ export class ConnectionsClient {
      * [`POST /api/connections/{id}/schemas/refresh`](../../../api-reference/schemas/refresh) and
      * track progress via
      * [`GET /api/connections/{id}/schemas/status`](../../../api-reference/schemas/get-status).
+     *
+     * ## Observed rate limits
+     *
+     * You can use `rate_limit` to inspect observed rate limiting separately from
+     * Connection health. A Connection can be healthy while Polytomic has an active
+     * rate-limit marker. Shared Connections combine observations recorded for their
+     * own ID and their root Connection. Observations recorded only for another shared
+     * copy are not included.
+     *
+     * When these observed periods overlap or touch, `limited_since` reflects the start
+     * of the continuous period and `expires_at` reflects its latest expiry. An expired
+     * period separated from the active period by a gap does not extend that start.
+     *
+     * > ⚠️ Observation, not a capacity guarantee
+     * >
+     * > An active marker does not mean every endpoint or sync is blocked. No active
+     * > marker does not guarantee that the upstream service has capacity. The marker
+     * > expiry can be extended and is not a promised provider reset or exact retry time.
+     *
+     * If any required lookup is unavailable, `rate_limit` is `null`. This does not change
+     * `status` or `status_error`, and the Connection response is still returned.
      *
      * @param {string} id
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.

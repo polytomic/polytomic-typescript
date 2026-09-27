@@ -332,6 +332,11 @@ describe("ConnectionsClient", () => {
                 organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 parent_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 policies: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+                rate_limit: {
+                    currently_limited: true,
+                    expires_at: "2024-01-15T09:30:00Z",
+                    limited_since: "2024-01-15T09:30:00Z",
+                },
                 saved: true,
                 status: "healthy",
                 status_error: "error message",

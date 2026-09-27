@@ -14,10 +14,26 @@ export interface ConnectionResponseSchema {
     /** For shared connections, the ID of the parent connection. */
     parent_connection_id?: string | undefined;
     policies?: string[] | undefined;
+    /** Observed connection-wide rate limiting, independent of connection health. Null when any required lookup is unavailable. Shared connections combine their own marker with their root connection's marker. */
+    rate_limit?: ConnectionResponseSchema.RateLimit | undefined;
     saved?: boolean | undefined;
     status?: string | undefined;
     status_error?: string | undefined;
     type?: Polytomic.ConnectionTypeSchema | undefined;
     updated_at?: string | undefined;
     updated_by?: Polytomic.OutputActor | undefined;
+}
+
+export namespace ConnectionResponseSchema {
+    /**
+     * Observed connection-wide rate limiting, independent of connection health. Null when any required lookup is unavailable. Shared connections combine their own marker with their root connection's marker.
+     */
+    export interface RateLimit {
+        /** Whether Polytomic has an unexpired connection-wide rate-limit marker. False means no active observed limit, not guaranteed upstream capacity. */
+        currently_limited?: boolean | undefined;
+        /** Marker expiry unless extended. Not a promised provider reset or exact retry time. Null when no active marker exists. */
+        expires_at?: string | undefined;
+        /** Start of the continuous rate-limited period. Null when no active marker exists. */
+        limited_since?: string | undefined;
+    }
 }

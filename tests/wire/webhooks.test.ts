@@ -19,6 +19,8 @@ describe("WebhooksClient", () => {
                 {
                     created_at: "2024-01-01T00:00:00Z",
                     disabled: true,
+                    disabled_at: "2024-01-15T09:30:00Z",
+                    disabled_reason: "disabled_reason",
                     endpoint: "https://example.com/webhook",
                     id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
@@ -64,6 +66,8 @@ describe("WebhooksClient", () => {
             data: {
                 created_at: "2024-01-01T00:00:00Z",
                 disabled: true,
+                disabled_at: "2024-01-15T09:30:00Z",
+                disabled_reason: "disabled_reason",
                 endpoint: "https://example.com/webhook",
                 id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",

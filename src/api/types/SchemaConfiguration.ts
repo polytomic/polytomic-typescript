@@ -13,6 +13,8 @@ export interface SchemaConfiguration {
     id?: string | undefined;
     partition_key?: string | undefined;
     tracking_field?: string | undefined;
+    /** User-specified override for the destination object name. Omit to keep the current value; send an empty string to clear it. */
+    user_output_name?: string | undefined;
 }
 
 export namespace SchemaConfiguration {

@@ -3,6 +3,8 @@
 export interface Webhook {
     created_at?: string | undefined;
     disabled?: boolean | undefined;
+    disabled_at?: string | undefined;
+    disabled_reason?: string | undefined;
     endpoint?: string | undefined;
     id?: string | undefined;
     organization_id?: string | undefined;

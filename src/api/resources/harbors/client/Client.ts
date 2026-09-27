@@ -9,6 +9,7 @@ import * as environments from "../../../../environments";
 import { handleNonStatusCodeError } from "../../../../errors/handleNonStatusCodeError";
 import * as errors from "../../../../errors/index";
 import * as Polytomic from "../../../index";
+import { ActionsClient } from "../resources/actions/client/Client";
 
 export declare namespace HarborsClient {
     export type Options = BaseClientOptions;
@@ -20,9 +21,14 @@ export declare namespace HarborsClient {
 
 export class HarborsClient {
     protected readonly _options: NormalizedClientOptionsWithAuth<HarborsClient.Options>;
+    protected _actions: ActionsClient | undefined;
 
     constructor(options: HarborsClient.Options = {}) {
         this._options = normalizeClientOptionsWithAuth(options);
+    }
+
+    public get actions(): ActionsClient {
+        return (this._actions ??= new ActionsClient(this._options));
     }
 
     /**
