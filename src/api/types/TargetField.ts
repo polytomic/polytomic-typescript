@@ -33,4 +33,6 @@ export interface TargetField {
     type?: string | undefined;
     /** True if this field can be written when updating an existing record. */
     updateable?: boolean | undefined;
+    /** Stored field options as value and label pairs. Use value when configuring mappings. Omitted when no options are available; enumeration fields may still omit options. */
+    values?: Polytomic.PickValue[] | undefined;
 }

@@ -3,5 +3,6 @@
 export const BulkSyncTargetMode = {
     Snapshot: "snapshot",
     Replicate: "replicate",
+    Append: "append",
 } as const;
 export type BulkSyncTargetMode = (typeof BulkSyncTargetMode)[keyof typeof BulkSyncTargetMode];

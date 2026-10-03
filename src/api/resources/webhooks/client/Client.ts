@@ -470,6 +470,129 @@ export class WebhooksClient {
     }
 
     /**
+     * Lists delivery attempts for a webhook, newest first.
+     *
+     * Use `success`, `event_id`, `start`, and `end` to narrow the results.
+     * Results are ordered by attempt time, newest first. Pass the returned
+     * `next_page_token` as `page_token` to fetch the next page. An empty token means
+     * there are no more results. Response bodies contain content returned by your
+     * webhook endpoint. Attempts are listed only while their event is retained.
+     *
+     * @param {string} id
+     * @param {Polytomic.WebhooksListDeliveriesRequest} request
+     * @param {WebhooksClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.webhooks.listDeliveries("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         success: true,
+     *         event_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+     *         start: "2024-01-15T09:30:00Z",
+     *         end: "2024-01-15T09:30:00Z",
+     *         page_token: "page_token"
+     *     })
+     */
+    public listDeliveries(
+        id: string,
+        request: Polytomic.WebhooksListDeliveriesRequest = {},
+        requestOptions?: WebhooksClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.WebhookDeliveriesEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__listDeliveries(id, request, requestOptions));
+    }
+
+    private async __listDeliveries(
+        id: string,
+        request: Polytomic.WebhooksListDeliveriesRequest = {},
+        requestOptions?: WebhooksClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.WebhookDeliveriesEnvelope>> {
+        const { success, event_id: eventId, start, end, page_token: pageToken } = request;
+        const _queryParams: Record<string, unknown> = {
+            success,
+            event_id: eventId,
+            start: start != null ? start : undefined,
+            end: end != null ? end : undefined,
+            page_token: pageToken,
+        };
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/webhooks/${core.url.encodePathParam(id)}/deliveries`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Polytomic.WebhookDeliveriesEnvelope, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 401:
+                    throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(_response.error, _response.rawResponse, "GET", "/api/webhooks/{id}/deliveries");
+    }
+
+    /**
      * Disables a webhook without deleting it.
      *
      * > 📘 One webhook per organization

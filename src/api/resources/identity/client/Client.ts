@@ -38,6 +38,7 @@ export class IdentityClient {
      * @param {IdentityClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
@@ -88,6 +89,11 @@ export class IdentityClient {
             switch (_response.error.statusCode) {
                 case 401:
                     throw new Polytomic.UnauthorizedError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );

@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectionProxyInfoResponse {
+    /** Upstream APIs this connection exposes through the proxy, when there is more than one. Select one by passing its name as request.api; requests without request.api use the default. */
+    apis?: Polytomic.ConnectionProxyApi[] | undefined;
     /** Connection backend identifier (e.g. hubspot, salesforce). */
     backendType?: string | undefined;
     /** Unique identifier of the connection the proxy contract applies to. */

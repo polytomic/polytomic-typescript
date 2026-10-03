@@ -104,4 +104,169 @@ describe("WebhooksClient", () => {
             return await client.webhooks.get("id");
         }).rejects.toThrow(Polytomic.NotFoundError);
     });
+
+    test("ListDeliveries (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [
+                {
+                    attempted_at: "2024-01-15T09:30:00Z",
+                    duration_ms: 1,
+                    error: "error",
+                    error_kind: "error_kind",
+                    event_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    event_type: "event_type",
+                    id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    response_body: "response_body",
+                    status_code: 1,
+                    success: true,
+                },
+            ],
+            pagination: { next_page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==" },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/webhooks/248df4b7-aa70-47b8-a036-33ac447e668d/deliveries")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.webhooks.listDeliveries("248df4b7-aa70-47b8-a036-33ac447e668d", {
+            success: true,
+            event_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+            start: "2024-01-15T09:30:00Z",
+            end: "2024-01-15T09:30:00Z",
+            page_token: "page_token",
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("ListDeliveries (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/webhooks/id/deliveries")
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.webhooks.listDeliveries("id");
+        }).rejects.toThrow(Polytomic.BadRequestError);
+    });
+
+    test("ListDeliveries (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/webhooks/id/deliveries")
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.webhooks.listDeliveries("id");
+        }).rejects.toThrow(Polytomic.UnauthorizedError);
+    });
+
+    test("ListDeliveries (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/webhooks/id/deliveries")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.webhooks.listDeliveries("id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("ListDeliveries (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/webhooks/id/deliveries")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.webhooks.listDeliveries("id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("ListDeliveries (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/webhooks/id/deliveries")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.webhooks.listDeliveries("id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
 });

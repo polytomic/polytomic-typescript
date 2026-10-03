@@ -3,10 +3,14 @@
 export interface BulkSchemaListItem {
     /** Per-schema cutoff. Records older than this timestamp are excluded from sync runs. */
     data_cutoff_timestamp?: string | undefined;
+    /** Name of the companion history table. Present only when history is enabled on a destination that supports it. */
+    destination_history_output_name?: string | undefined;
     /** When true, the sync ignores any configured data_cutoff_timestamp and syncs the full history of this schema. */
     disable_data_cutoff?: boolean | undefined;
     /** Whether this schema is included in sync runs. */
     enabled?: boolean | undefined;
+    /** Whether a companion history table is maintained beside this schema's output, recording every version observed on successive runs. */
+    history_enabled?: boolean | undefined;
     /** Source-side schema identifier (e.g. object name for SaaS sources, schema.table for databases). */
     id?: string | undefined;
     /** Effective name of the object written to the destination after any configured naming rules are applied. */

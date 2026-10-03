@@ -17,6 +17,8 @@ export interface UpdateBulkSchema {
     fields?: Polytomic.UpdateBulkField[];
     /** Row-level filters applied when reading from the source. */
     filters?: Polytomic.BulkFilter[];
+    /** Whether a companion history table is maintained beside this schema's output. Requires a replicate-mode sync to a destination reporting supports_history_mode. Omit to keep the current value. */
+    history_enabled?: boolean;
     /** Source field used to partition rows when writing to the destination. */
     partition_key?: string;
     /** Source field used to detect changes between incremental sync runs. */

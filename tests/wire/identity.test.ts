@@ -78,6 +78,24 @@ describe("IdentityClient", () => {
 
         const rawResponseBody = {};
 
+        server.mockEndpoint().get("/api/me").respondWith().statusCode(403).jsonBody(rawResponseBody).build();
+
+        await expect(async () => {
+            return await client.identity.get();
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("Get (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
         server.mockEndpoint().get("/api/me").respondWith().statusCode(500).jsonBody(rawResponseBody).build();
 
         await expect(async () => {

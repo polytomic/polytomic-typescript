@@ -7,4 +7,6 @@ export interface BulkSyncDest {
     modes?: Polytomic.SupportedBulkMode[] | undefined;
     /** Resync modes supported by this destination (refetch, resync, rebuild). */
     supported_resync_modes?: Polytomic.BulkResyncMode[] | undefined;
+    /** True if this destination can maintain a companion history table per schema (history_enabled) in replicate mode. */
+    supports_history_mode?: boolean | undefined;
 }

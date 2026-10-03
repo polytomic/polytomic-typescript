@@ -2810,6 +2810,141 @@ export class HarborsClient {
     }
 
     /**
+     * Submits a query against the Harbor backing connection for asynchronous execution.
+     *
+     * Use a scoped credential bound to this Harbor. The query runs only against the
+     * Harbor's backing connection; you cannot select another connection on this route.
+     * Send a unique `X-Polytomic-Activity-Request-ID` UUID with each submission. The
+     * `X-Polytomic-Harbor-Session` header is optional; if you send one, it must be
+     * valid for this Harbor.
+     *
+     * The response contains a query ID and an initial `created` status. Poll
+     * [`GET /api/queries/{id}`](../../../../api-reference/query-runner/get-query) with that ID
+     * until the status is `done`, `failed`, or `unknown`. Follow the result endpoint's
+     * pagination links for additional rows. Results are temporary; check `expires`
+     * on the completed query.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor whose backing connection runs the query.
+     * @param {Polytomic.RunHarborQueryRequest} request
+     * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         query: "SELECT 1 AS n"
+     *     })
+     */
+    public runQuery(
+        harbor_id: string,
+        request: Polytomic.RunHarborQueryRequest,
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): core.HttpResponsePromise<Polytomic.RunQueryEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__runQuery(harbor_id, request, requestOptions));
+    }
+
+    private async __runQuery(
+        harbor_id: string,
+        request: Polytomic.RunHarborQueryRequest,
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.RunQueryEnvelope>> {
+        const {
+            "X-Polytomic-Harbor-Session": polytomicHarborSession,
+            "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
+            ..._body
+        } = request;
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Harbor-Session": polytomicHarborSession,
+                "X-Polytomic-Activity-Request-ID": polytomicActivityRequestId,
+                "Idempotency-Key": requestOptions?.idempotencyKey,
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/query`,
+            ),
+            method: "POST",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: mergeAdditionalBodyParameters(_body, requestOptions?.additionalBodyParameters),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return { data: _response.body as Polytomic.RunQueryEnvelope, rawResponse: _response.rawResponse };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "POST",
+            "/api/harbors/{harbor_id}/query",
+        );
+    }
+
+    /**
      * Lists current published saved queries for a Harbor.
      *
      * Saved queries are supported only for Polytomic-managed Harbors whose backing

@@ -10,6 +10,8 @@ export interface SchemaConfiguration {
     enabled?: boolean | undefined;
     fields?: SchemaConfiguration.Fields.Item[] | undefined;
     filters?: Polytomic.BulkFilter[] | undefined;
+    /** Whether a companion history table is maintained beside this schema's output, recording every version observed on successive runs. Requires a replicate-mode sync to a destination reporting supports_history_mode. Omit to keep the current value. */
+    history_enabled?: boolean | undefined;
     id?: string | undefined;
     partition_key?: string | undefined;
     tracking_field?: string | undefined;

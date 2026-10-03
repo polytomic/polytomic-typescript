@@ -514,6 +514,7 @@ describe("BulkSyncClient", () => {
                     },
                 ],
                 supported_resync_modes: ["refetch"],
+                supports_history_mode: false,
             },
         };
 

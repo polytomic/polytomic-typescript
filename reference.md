@@ -1973,9 +1973,11 @@ This endpoint returns immediately with a query task ID. It does not wait for
 the query to finish. Poll [`GET /api/queries/{id}`](../../../../api-reference/query-runner/get-query) until `status`
 reaches `done`, `failed`, or `unknown`. These statuses are terminal.
 
-Only the user who created the query can fetch its results later. Query results
-are stored temporarily and may expire; use the `expires` field from the result
-endpoint to understand how long they will remain available.
+A Harbor-bound scoped credential can submit freeform SQL only against its
+Harbor's backing connection, even if its profile allows other connections.
+Other credentials retain their existing connection access. Query results are
+stored temporarily and may expire; use the `expires` field from the result
+endpoint to understand how long they remain available.
 </dd>
 </dl>
 </dd>
@@ -6917,6 +6919,91 @@ await client.harbors.deleteKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7
 </dl>
 </details>
 
+<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">runQuery</a>(harbor_id, { ...params }) -> Polytomic.RunQueryEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Submits a query against the Harbor backing connection for asynchronous execution.
+
+Use a scoped credential bound to this Harbor. The query runs only against the
+Harbor's backing connection; you cannot select another connection on this route.
+Send a unique `X-Polytomic-Activity-Request-ID` UUID with each submission. The
+`X-Polytomic-Harbor-Session` header is optional; if you send one, it must be
+valid for this Harbor.
+
+The response contains a query ID and an initial `created` status. Poll
+[`GET /api/queries/{id}`](../../../../api-reference/query-runner/get-query) with that ID
+until the status is `done`, `failed`, or `unknown`. Follow the result endpoint's
+pagination links for additional rows. Results are temporary; check `expires`
+on the completed query.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    query: "SELECT 1 AS n"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor whose backing connection runs the query.
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.RunHarborQueryRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listSavedQueries</a>(harbor_id, { ...params }) -> Polytomic.HarborSavedQueryListEnvelope</code></summary>
 <dl>
 <dd>
@@ -10990,6 +11077,89 @@ await client.webhooks.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 </dl>
 </details>
 
+<details><summary><code>client.webhooks.<a href="/src/api/resources/webhooks/client/Client.ts">listDeliveries</a>(id, { ...params }) -> Polytomic.WebhookDeliveriesEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists delivery attempts for a webhook, newest first.
+
+Use `success`, `event_id`, `start`, and `end` to narrow the results.
+Results are ordered by attempt time, newest first. Pass the returned
+`next_page_token` as `page_token` to fetch the next page. An empty token means
+there are no more results. Response bodies contain content returned by your
+webhook endpoint. Attempts are listed only while their event is retained.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.webhooks.listDeliveries("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    success: true,
+    event_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+    start: "2024-01-15T09:30:00Z",
+    end: "2024-01-15T09:30:00Z",
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**id:** `string` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.WebhooksListDeliveriesRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `WebhooksClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 <details><summary><code>client.webhooks.<a href="/src/api/resources/webhooks/client/Client.ts">disable</a>(id) -> Polytomic.WebhookEnvelope</code></summary>
 <dl>
 <dd>
@@ -12850,6 +13020,10 @@ size and rate limits.
 
 ## Important behavior
 
+- For connections that expose more than one API (listed in `apis` in the proxy
+  info response), set `request.api` to the name of the API to call. Requests
+  without `request.api` go to the default API. `request.api` is rejected for
+  connections that expose a single API.
 - `request.path` must be relative and start with `/`.
 - Use either `request.query` or `request.rawQuery`, not both.
 - Caller-supplied headers are merged with inherited headers, but inherited auth
@@ -12857,6 +13031,9 @@ size and rate limits.
 - The proxy strips a fixed set of request and response headers for safety.
 - Response bodies larger than the configured maximum are truncated, and
   `truncated` is set to `true`.
+- A `429` means Polytomic's proxy rate limit was reached, or the connection's
+  upstream quota, which the proxy shares with the connection's syncs, is
+  exhausted.
 
 To run a `GET` request asynchronously, set `async` to `true`. The initial
 response returns `status: 202`, `jobId`, `jobStatus`, and `jobUrl`. Poll
@@ -12954,6 +13131,12 @@ when you need to build requests programmatically. The response shows:
 - blocked request and response headers
 - allowed HTTP methods and body shapes
 - timeout, rate-limit, and payload-size limits
+
+Some connections reach more than one upstream API, each with its own base URL
+and quota. For these, the response includes `apis`: one entry per API with its
+`name`, `description`, whether it is the `default`, and its own
+`inheritedBase`. The top-level `inheritedBase` describes the default API.
+Connections with a single API omit `apis`.
 
 Sensitive inherited header and query values are redacted in the response. The
 contract is still useful for discovering which keys are fixed by the

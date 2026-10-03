@@ -18,8 +18,10 @@ describe("SchemasClient", () => {
             data: [
                 {
                     data_cutoff_timestamp: "2023-04-25T12:00:00Z",
+                    destination_history_output_name: "contact__history",
                     disable_data_cutoff: false,
                     enabled: true,
+                    history_enabled: false,
                     id: "Contact",
                     output_name: "contact",
                     partition_key: "email",
@@ -77,8 +79,10 @@ describe("SchemasClient", () => {
         const rawResponseBody = {
             data: {
                 data_cutoff_timestamp: "2023-04-25T12:00:00Z",
+                destination_history_output_name: "contact__history",
                 disable_data_cutoff: false,
                 enabled: true,
+                history_enabled: false,
                 id: "Contact",
                 output_name: "contact",
                 partition_key: "email",

@@ -25,6 +25,7 @@ export type { HarborsPromoteContextDraftRequest } from "./HarborsPromoteContextD
 export type { InviteHarborUserRequest } from "./InviteHarborUserRequest";
 export type { RegisterHarborSessionRequest } from "./RegisterHarborSessionRequest";
 export type { ResolveHarborSourceMappingsRequest } from "./ResolveHarborSourceMappingsRequest";
+export type { RunHarborQueryRequest } from "./RunHarborQueryRequest";
 export type { SaveHarborContextDraftRequest } from "./SaveHarborContextDraftRequest";
 export type { SaveHarborContextRequest } from "./SaveHarborContextRequest";
 export type { SaveHarborSavedQueryDraftRequest } from "./SaveHarborSavedQueryDraftRequest";

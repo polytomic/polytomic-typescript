@@ -16,6 +16,7 @@ describe("ProxyClient", () => {
 
         const rawResponseBody = {
             data: {
+                apis: [{ name: "reports" }],
                 backendType: "backendType",
                 connectionId: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 inheritedBase: { baseUrl: "baseUrl", lockedHeaders: [{}], lockedQuery: { key: "value" } },

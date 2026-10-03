@@ -4,12 +4,16 @@ import type * as Polytomic from "../index";
 
 export interface BulkSchema {
     data_cutoff_timestamp?: string | undefined;
+    /** Name of the companion history table. Present only when history is enabled on a destination that supports it. */
+    destination_history_output_name?: string | undefined;
     disable_data_cutoff?: boolean | undefined;
     enabled?: boolean | undefined;
     /** fields is not populated on the list endpoint and will be removed in a future version; retrieve individual schemas for fields. */
     fields?: Polytomic.BulkField[] | undefined;
     /** filters is not populated on the list endpoint and will be removed in a future version; retrieve individual schemas for filters. */
     filters?: Polytomic.BulkFilter[] | undefined;
+    /** Whether a companion history table is maintained beside this schema's output, recording every version observed on successive runs. Requires a replicate-mode sync to a destination reporting supports_history_mode. Always present in responses; when patching, omit it to keep the current value. */
+    history_enabled?: boolean | undefined;
     id?: string | undefined;
     output_name?: string | undefined;
     partition_key?: string | undefined;
