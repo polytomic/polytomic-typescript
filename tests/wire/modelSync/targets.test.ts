@@ -49,6 +49,7 @@ describe("TargetsClient", () => {
                 name: "Table",
                 properties: {
                     does_not_report_operation_counts: true,
+                    identity_logics: ["identity_logics"],
                     mappings_not_required: true,
                     new_target_label: "new_target_label",
                     optional_target_mappings: true,

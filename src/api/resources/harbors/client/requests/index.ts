@@ -11,6 +11,7 @@ export type { HarborsGetContextDraftRequest } from "./HarborsGetContextDraftRequ
 export type { HarborsGetContextRequest } from "./HarborsGetContextRequest";
 export type { HarborsGetContextVersionRequest } from "./HarborsGetContextVersionRequest";
 export type { HarborsGetSavedQueryRequest } from "./HarborsGetSavedQueryRequest";
+export type { HarborsListActionConfigurationSchemasRequest } from "./HarborsListActionConfigurationSchemasRequest";
 export type { HarborsListAuthorizedConnectionsRequest } from "./HarborsListAuthorizedConnectionsRequest";
 export type { HarborsListAuthorizedSchemasRequest } from "./HarborsListAuthorizedSchemasRequest";
 export type { HarborsListContextDraftsRequest } from "./HarborsListContextDraftsRequest";
@@ -22,6 +23,7 @@ export type { HarborsListSavedQueriesRequest } from "./HarborsListSavedQueriesRe
 export type { HarborsListSavedQueryDraftsRequest } from "./HarborsListSavedQueryDraftsRequest";
 export type { HarborsListUsersRequest } from "./HarborsListUsersRequest";
 export type { HarborsPromoteContextDraftRequest } from "./HarborsPromoteContextDraftRequest";
+export type { HarborsRemoveActionConfigurationRequest } from "./HarborsRemoveActionConfigurationRequest";
 export type { InviteHarborUserRequest } from "./InviteHarborUserRequest";
 export type { RegisterHarborSessionRequest } from "./RegisterHarborSessionRequest";
 export type { ResolveHarborSourceMappingsRequest } from "./ResolveHarborSourceMappingsRequest";
@@ -29,4 +31,5 @@ export type { RunHarborQueryRequest } from "./RunHarborQueryRequest";
 export type { SaveHarborContextDraftRequest } from "./SaveHarborContextDraftRequest";
 export type { SaveHarborContextRequest } from "./SaveHarborContextRequest";
 export type { SaveHarborSavedQueryDraftRequest } from "./SaveHarborSavedQueryDraftRequest";
+export type { SetHarborActionConfigurationRequest } from "./SetHarborActionConfigurationRequest";
 export type { UpdateHarborRequest } from "./UpdateHarborRequest";

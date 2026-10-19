@@ -307,6 +307,718 @@ describe("HarborsClient", () => {
         }).rejects.toThrow(Polytomic.InternalServerError);
     });
 
+    test("GetActionConfiguration (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [
+                {
+                    connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    created_at: "2024-01-15T09:30:00Z",
+                    grants: [{ operation_id: "operation_id", schema_id: "schema_id" }],
+                    revision: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    updated_at: "2024-01-15T09:30:00Z",
+                },
+            ],
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/248df4b7-aa70-47b8-a036-33ac447e668d/action-configuration")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.harbors.getActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d");
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("GetActionConfiguration (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getActionConfiguration("harbor_id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("GetActionConfiguration (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getActionConfiguration("harbor_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("GetActionConfiguration (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration")
+            .respondWith()
+            .statusCode(409)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getActionConfiguration("harbor_id");
+        }).rejects.toThrow(Polytomic.ConflictError);
+    });
+
+    test("GetActionConfiguration (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getActionConfiguration("harbor_id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("GetActionConfiguration (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getActionConfiguration("harbor_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("GetActionConfiguration (7)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration")
+            .respondWith()
+            .statusCode(503)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.getActionConfiguration("harbor_id");
+        }).rejects.toThrow(Polytomic.ServiceUnavailableError);
+    });
+
+    test("ListActionSourceConnections (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [{ connection_type: "connection_type", id: "248df4b7-aa70-47b8-a036-33ac447e668d", name: "name" }],
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/248df4b7-aa70-47b8-a036-33ac447e668d/action-configuration/connections")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.harbors.listActionSourceConnections("248df4b7-aa70-47b8-a036-33ac447e668d");
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("ListActionSourceConnections (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionSourceConnections("harbor_id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("ListActionSourceConnections (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionSourceConnections("harbor_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("ListActionSourceConnections (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections")
+            .respondWith()
+            .statusCode(409)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionSourceConnections("harbor_id");
+        }).rejects.toThrow(Polytomic.ConflictError);
+    });
+
+    test("ListActionSourceConnections (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionSourceConnections("harbor_id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("ListActionSourceConnections (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionSourceConnections("harbor_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("ListActionSourceConnections (7)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections")
+            .respondWith()
+            .statusCode(503)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionSourceConnections("harbor_id");
+        }).rejects.toThrow(Polytomic.ServiceUnavailableError);
+    });
+
+    test("ListActionConfigurationSchemas (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [{ id: "id", name: "name", operations: ["operations"] }],
+            pagination: { next_page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==" },
+        };
+
+        server
+            .mockEndpoint()
+            .get(
+                "/api/harbors/248df4b7-aa70-47b8-a036-33ac447e668d/action-configuration/connections/248df4b7-aa70-47b8-a036-33ac447e668d/schemas",
+            )
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.harbors.listActionConfigurationSchemas(
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+            {
+                search: "search",
+                limit: 1,
+                page_token: "page_token",
+            },
+        );
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("ListActionConfigurationSchemas (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationSchemas("harbor_id", "connection_id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("ListActionConfigurationSchemas (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationSchemas("harbor_id", "connection_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("ListActionConfigurationSchemas (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas")
+            .respondWith()
+            .statusCode(409)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationSchemas("harbor_id", "connection_id");
+        }).rejects.toThrow(Polytomic.ConflictError);
+    });
+
+    test("ListActionConfigurationSchemas (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationSchemas("harbor_id", "connection_id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("ListActionConfigurationSchemas (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationSchemas("harbor_id", "connection_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("ListActionConfigurationSchemas (7)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas")
+            .respondWith()
+            .statusCode(503)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationSchemas("harbor_id", "connection_id");
+        }).rejects.toThrow(Polytomic.ServiceUnavailableError);
+    });
+
+    test("ListActionConfigurationOperations (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [
+                {
+                    description: "description",
+                    effect: "mutating",
+                    input_fields: [{}],
+                    lookup_fields: [{}],
+                    name: "name",
+                    operation_id: "operation_id",
+                    output_fields: [{}],
+                    schema_id: "schema_id",
+                },
+            ],
+        };
+
+        server
+            .mockEndpoint()
+            .get(
+                "/api/harbors/248df4b7-aa70-47b8-a036-33ac447e668d/action-configuration/connections/248df4b7-aa70-47b8-a036-33ac447e668d/schemas/schema_id/operations",
+            )
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.harbors.listActionConfigurationOperations(
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+            "248df4b7-aa70-47b8-a036-33ac447e668d",
+            "schema_id",
+        );
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("ListActionConfigurationOperations (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas/schema_id/operations")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationOperations("harbor_id", "connection_id", "schema_id");
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("ListActionConfigurationOperations (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas/schema_id/operations")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationOperations("harbor_id", "connection_id", "schema_id");
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("ListActionConfigurationOperations (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas/schema_id/operations")
+            .respondWith()
+            .statusCode(409)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationOperations("harbor_id", "connection_id", "schema_id");
+        }).rejects.toThrow(Polytomic.ConflictError);
+    });
+
+    test("ListActionConfigurationOperations (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas/schema_id/operations")
+            .respondWith()
+            .statusCode(422)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationOperations("harbor_id", "connection_id", "schema_id");
+        }).rejects.toThrow(Polytomic.UnprocessableEntityError);
+    });
+
+    test("ListActionConfigurationOperations (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas/schema_id/operations")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationOperations("harbor_id", "connection_id", "schema_id");
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
+    test("ListActionConfigurationOperations (7)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/harbors/harbor_id/action-configuration/connections/connection_id/schemas/schema_id/operations")
+            .respondWith()
+            .statusCode(503)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.harbors.listActionConfigurationOperations("harbor_id", "connection_id", "schema_id");
+        }).rejects.toThrow(Polytomic.ServiceUnavailableError);
+    });
+
     test("ListContexts (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({

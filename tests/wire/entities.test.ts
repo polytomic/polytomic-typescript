@@ -5,6 +5,185 @@ import { PolytomicClient } from "../../src/Client";
 import { mockServerPool } from "../mock-server/MockServerPool";
 
 describe("EntitiesClient", () => {
+    test("Search (1)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {
+            data: [
+                {
+                    type: "model",
+                    links: {},
+                    matches: [
+                        {
+                            mapping: {
+                                kind: "field",
+                                source_field_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                                source_model_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                                target_field_id: "target_field_id",
+                            },
+                        },
+                    ],
+                    model_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    model_connection_name: "model_connection_name",
+                    model_connection_type: "model_connection_type",
+                    model_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                    model_name: "model_name",
+                },
+            ],
+            metadata: { model_fields_complete: true, truncated: true },
+        };
+
+        server
+            .mockEndpoint()
+            .get("/api/entities/search")
+            .respondWith()
+            .statusCode(200)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        const response = await client.entities.search({
+            search: "email",
+            limit: 50,
+        });
+        expect(response).toEqual(rawResponseBody);
+    });
+
+    test("Search (2)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/entities/search")
+            .respondWith()
+            .statusCode(400)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.entities.search({
+                search: "x",
+            });
+        }).rejects.toThrow(Polytomic.BadRequestError);
+    });
+
+    test("Search (3)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/entities/search")
+            .respondWith()
+            .statusCode(401)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.entities.search({
+                search: "x",
+            });
+        }).rejects.toThrow(Polytomic.UnauthorizedError);
+    });
+
+    test("Search (4)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/entities/search")
+            .respondWith()
+            .statusCode(403)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.entities.search({
+                search: "x",
+            });
+        }).rejects.toThrow(Polytomic.ForbiddenError);
+    });
+
+    test("Search (5)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/entities/search")
+            .respondWith()
+            .statusCode(404)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.entities.search({
+                search: "x",
+            });
+        }).rejects.toThrow(Polytomic.NotFoundError);
+    });
+
+    test("Search (6)", async () => {
+        const server = mockServerPool.createServer();
+        const client = new PolytomicClient({
+            maxRetries: 0,
+            token: "test",
+            version: "test",
+            environment: server.baseUrl,
+        });
+
+        const rawResponseBody = {};
+
+        server
+            .mockEndpoint()
+            .get("/api/entities/search")
+            .respondWith()
+            .statusCode(500)
+            .jsonBody(rawResponseBody)
+            .build();
+
+        await expect(async () => {
+            return await client.entities.search({
+                search: "x",
+            });
+        }).rejects.toThrow(Polytomic.InternalServerError);
+    });
+
     test("Get (1)", async () => {
         const server = mockServerPool.createServer();
         const client = new PolytomicClient({
@@ -27,7 +206,7 @@ describe("EntitiesClient", () => {
                         path: "/api/syncs/0ecd09c1-b901-4d27-9053-f0367c427254",
                     },
                 },
-                type: "sync_execution",
+                type: "model_sync_execution",
             },
         };
 
@@ -137,7 +316,7 @@ describe("EntitiesClient", () => {
                         path: "/api/syncs/0ecd09c1-b901-4d27-9053-f0367c427254",
                     },
                 },
-                type: "sync_execution",
+                type: "model_sync_execution",
             },
         };
 

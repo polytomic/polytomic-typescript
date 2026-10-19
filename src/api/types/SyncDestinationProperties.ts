@@ -3,6 +3,8 @@
 export interface SyncDestinationProperties {
     /** True if execution reports for this destination will not break record counts out by operation (insert vs. update); typical for upsert-only destinations. */
     does_not_report_operation_counts?: boolean | undefined;
+    /** How this destination can combine more than one identity mapping: 'priority', 'and', or both. Every combination is supported when empty. */
+    identity_logics?: string[] | undefined;
     /** True if a sync may be configured with only a target identity and no field mappings. */
     mappings_not_required?: boolean | undefined;
     /** Label to display when prompting for the name of a newly-created target (e.g. "Audience name", "Table name"). */

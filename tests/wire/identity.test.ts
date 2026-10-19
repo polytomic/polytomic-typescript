@@ -26,6 +26,7 @@ describe("IdentityClient", () => {
                         kind: "scoped_data",
                         name: "Sales ops agent",
                     },
+                    expires_at: "2024-01-15T09:30:00Z",
                     harbor: { id: "248df4b7-aa70-47b8-a036-33ac447e668d", name: "Sales ops Harbor" },
                     method: "api_key",
                     mode: "read_only",

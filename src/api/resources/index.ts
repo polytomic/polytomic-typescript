@@ -6,6 +6,7 @@ export * from "./bulkSync/client/requests";
 export * as connections from "./connections";
 export * from "./connections/client/requests";
 export * as entities from "./entities";
+export * from "./entities/client/requests";
 export * as events from "./events";
 export * from "./events/client/requests";
 export * as harbors from "./harbors";

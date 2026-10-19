@@ -448,7 +448,7 @@ export class SchemasClient {
     }
 
     /**
-     * Requests cancellation of any running executions for a specific schema on a bulk sync.
+     * Requests cancellation of any running executions for a specific schema on a bulk sync. A schema whose only running work is a backfill returns a conflict.
      *
      * Cancellation is asynchronous. A successful response means the cancellation
      * signal for this schema has been queued; the schema's in-flight work continues
@@ -463,6 +463,7 @@ export class SchemasClient {
      *
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
@@ -525,6 +526,11 @@ export class SchemasClient {
                     );
                 case 404:
                     throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );

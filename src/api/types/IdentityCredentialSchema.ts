@@ -4,6 +4,8 @@ import type * as Polytomic from "../index";
 
 export interface IdentityCredentialSchema {
     api_key_profile?: Polytomic.IdentityCredentialApiKeyProfileSchema | undefined;
+    /** Provider expiry of a temporary API key. */
+    expires_at?: string | undefined;
     harbor?: Polytomic.IdentityCredentialHarborSchema | undefined;
     /** Authentication method used for the request. */
     method?: string | undefined;

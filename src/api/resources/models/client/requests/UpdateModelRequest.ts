@@ -19,6 +19,7 @@ export interface UpdateModelRequest {
     configuration: Record<string, unknown>;
     connection_id: string;
     enricher?: Polytomic.Enrichment;
+    /** Technical/source field names to publish in the model. Use source names, not model-field UUIDs or display labels. For example, use dealname rather than Deal Name. Omit or pass an empty array to publish all standard source fields. */
     fields?: string[];
     identifier?: string;
     labels?: string[];

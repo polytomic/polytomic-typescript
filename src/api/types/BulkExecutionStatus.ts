@@ -12,5 +12,6 @@ export const BulkExecutionStatus = {
     Processing: "processing",
     Errors: "errors",
     Interrupted: "interrupted",
+    CompletedWithCancellations: "completed_with_cancellations",
 } as const;
 export type BulkExecutionStatus = (typeof BulkExecutionStatus)[keyof typeof BulkExecutionStatus];

@@ -993,6 +993,932 @@ export class HarborsClient {
     }
 
     /**
+     * Returns configured action grants and revisions for a Harbor.
+     *
+     * You must be an Organization administrator with permission to edit the Harbor.
+     * Use a writable API credential, not a Harbor profile credential. Read-only keys
+     * are denied because this endpoint requires Harbor edit permission.
+     *
+     * This response includes grants for Connections that no longer populate the
+     * Harbor. You can remove those stale grants without reattaching the Connection.
+     * Reading configuration does not require the Harbor Actions entitlement.
+     *
+     * Use each Connection's `revision` as `expected_revision` when replacing or
+     * removing its grants. Configuration responses contain metadata only, not provider
+     * credentials or record values.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.getActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public getActionConfiguration(
+        harbor_id: string,
+        requestOptions?: HarborsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.HarborActionConfigurationEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__getActionConfiguration(harbor_id, requestOptions));
+    }
+
+    private async __getActionConfiguration(
+        harbor_id: string,
+        requestOptions?: HarborsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.HarborActionConfigurationEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/action-configuration`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.HarborActionConfigurationEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/harbors/{harbor_id}/action-configuration",
+        );
+    }
+
+    /**
+     * Disables all configured actions for a Harbor.
+     *
+     * You must be an Organization administrator with permission to edit the Harbor.
+     * Use a normal writable API credential, not a Harbor profile credential. Your
+     * Organization must have the Harbor Actions entitlement.
+     *
+     * > 🚧 Disable all actions
+     * >
+     * > This removes every configured action grant from the Harbor, including grants
+     * > for detached Connections. There is no per-Connection revision check.
+     *
+     * The response contains the empty configuration. This request does not delete
+     * Connections, syncs, or provider records.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.disableActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public disableActionConfiguration(
+        harbor_id: string,
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): core.HttpResponsePromise<Polytomic.HarborActionConfigurationEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__disableActionConfiguration(harbor_id, requestOptions));
+    }
+
+    private async __disableActionConfiguration(
+        harbor_id: string,
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.HarborActionConfigurationEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "Idempotency-Key": requestOptions?.idempotencyKey,
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/action-configuration`,
+            ),
+            method: "DELETE",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.HarborActionConfigurationEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "DELETE",
+            "/api/harbors/{harbor_id}/action-configuration",
+        );
+    }
+
+    /**
+     * Lists action-capable source Connections that populate a Harbor.
+     *
+     * You must be an Organization administrator with permission to edit the Harbor.
+     * Use a writable API credential, not a Harbor profile credential. Read-only keys
+     * are denied because this endpoint requires Harbor edit permission. Discovery does
+     * not require the Harbor Actions entitlement.
+     *
+     * A Connection is eligible when it supports actions and is a source of a
+     * non-deleted Bulk Sync or Model Sync targeting the Harbor's backing Connection.
+     * Only saved, non-shared Connections in your Organization that you can query are
+     * included. Disabled syncs still establish source membership.
+     *
+     * Discover schemas and operations before choosing the grants to configure.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.listActionSourceConnections("248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public listActionSourceConnections(
+        harbor_id: string,
+        requestOptions?: HarborsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.HarborActionSourceConnectionsEnvelope> {
+        return core.HttpResponsePromise.fromPromise(this.__listActionSourceConnections(harbor_id, requestOptions));
+    }
+
+    private async __listActionSourceConnections(
+        harbor_id: string,
+        requestOptions?: HarborsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.HarborActionSourceConnectionsEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/action-configuration/connections`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.HarborActionSourceConnectionsEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/harbors/{harbor_id}/action-configuration/connections",
+        );
+    }
+
+    /**
+     * Creates or replaces action grants for an eligible Harbor source Connection.
+     *
+     * You must be an Organization administrator with permission to edit both the
+     * Harbor and the source Connection. Use a normal writable API credential, not a
+     * Harbor profile credential. Your Organization must have the Harbor Actions
+     * entitlement.
+     *
+     * The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
+     * Sync targeting its backing Connection. This requirement applies to new grants
+     * and replacements, even when you only remove fields from an existing grant.
+     *
+     * Submit the complete grant set for this Connection. Omit `expected_revision` to
+     * create it, or supply the current revision to replace it. A missing, stale, or
+     * unexpected revision returns `409 Conflict`; read configuration again before
+     * retrying. Successful replacement creates a new revision.
+     *
+     * For mutating operations, `field_ids` selects input fields and
+     * `lookup_field_ids` must be omitted. For read-only operations, `field_ids`
+     * selects output fields and `lookup_field_ids` selects allowed lookup fields.
+     * Duplicate operations or field IDs are invalid. An empty grant set is invalid;
+     * remove the Connection's grants instead.
+     *
+     * This request changes permissions only. It does not execute provider actions.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} connection_id - Source Connection whose action grants you want to manage.
+     * @param {Polytomic.SetHarborActionConfigurationRequest} request
+     * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.setActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d")
+     */
+    public setActionConfiguration(
+        harbor_id: string,
+        connection_id: string,
+        request: Polytomic.SetHarborActionConfigurationRequest = {},
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): core.HttpResponsePromise<Polytomic.HarborActionConfigurationEnvelope> {
+        return core.HttpResponsePromise.fromPromise(
+            this.__setActionConfiguration(harbor_id, connection_id, request, requestOptions),
+        );
+    }
+
+    private async __setActionConfiguration(
+        harbor_id: string,
+        connection_id: string,
+        request: Polytomic.SetHarborActionConfigurationRequest = {},
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.HarborActionConfigurationEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "Idempotency-Key": requestOptions?.idempotencyKey,
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/action-configuration/connections/${core.url.encodePathParam(connection_id)}`,
+            ),
+            method: "PUT",
+            headers: _headers,
+            contentType: "application/json",
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            requestType: "json",
+            body: mergeAdditionalBodyParameters(request, requestOptions?.additionalBodyParameters),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.HarborActionConfigurationEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "PUT",
+            "/api/harbors/{harbor_id}/action-configuration/connections/{connection_id}",
+        );
+    }
+
+    /**
+     * Removes a Connection's action grants from a Harbor.
+     *
+     * You must be an Organization administrator with permission to edit the Harbor.
+     * Use a normal writable API credential, not a Harbor profile credential. Your
+     * Organization must have the Harbor Actions entitlement.
+     *
+     * Supply the current `expected_revision` as a query parameter. A stale revision
+     * returns `409 Conflict`; read configuration again before retrying.
+     *
+     * You can remove grants after the Connection stops populating the Harbor, or after
+     * the Connection is deleted. The response contains the remaining configured action
+     * Connections. This request does not delete the Connection or provider records.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} connection_id - Source Connection whose action grants you want to manage.
+     * @param {Polytomic.HarborsRemoveActionConfigurationRequest} request
+     * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.removeActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         expected_revision: "248df4b7-aa70-47b8-a036-33ac447e668d"
+     *     })
+     */
+    public removeActionConfiguration(
+        harbor_id: string,
+        connection_id: string,
+        request: Polytomic.HarborsRemoveActionConfigurationRequest,
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): core.HttpResponsePromise<Polytomic.HarborActionConfigurationEnvelope> {
+        return core.HttpResponsePromise.fromPromise(
+            this.__removeActionConfiguration(harbor_id, connection_id, request, requestOptions),
+        );
+    }
+
+    private async __removeActionConfiguration(
+        harbor_id: string,
+        connection_id: string,
+        request: Polytomic.HarborsRemoveActionConfigurationRequest,
+        requestOptions?: HarborsClient.IdempotentRequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.HarborActionConfigurationEnvelope>> {
+        const { expected_revision: expectedRevision } = request;
+        const _queryParams: Record<string, unknown> = {
+            expected_revision: expectedRevision,
+        };
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "Idempotency-Key": requestOptions?.idempotencyKey,
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/action-configuration/connections/${core.url.encodePathParam(connection_id)}`,
+            ),
+            method: "DELETE",
+            headers: _headers,
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.HarborActionConfigurationEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "DELETE",
+            "/api/harbors/{harbor_id}/action-configuration/connections/{connection_id}",
+        );
+    }
+
+    /**
+     * Lists available action schemas for an eligible Harbor source Connection.
+     *
+     * You must be an Organization administrator with permission to edit the Harbor
+     * and query the source Connection. Use a writable API credential, not a Harbor
+     * profile credential. Read-only keys are denied because this endpoint requires
+     * Harbor edit permission. Discovery does not require the Harbor Actions entitlement.
+     *
+     * The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
+     * Sync targeting its backing Connection. The response lists action schemas, not
+     * records. Use the next page token with the same search filter to continue.
+     *
+     * Operation IDs in the catalog are hints. Operation discovery returns the current
+     * configurable fields for a schema.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} connection_id - Source Connection whose action grants you want to manage.
+     * @param {Polytomic.HarborsListActionConfigurationSchemasRequest} request
+     * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.listActionConfigurationSchemas("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+     *         search: "search",
+     *         limit: 1,
+     *         page_token: "page_token"
+     *     })
+     */
+    public listActionConfigurationSchemas(
+        harbor_id: string,
+        connection_id: string,
+        request: Polytomic.HarborsListActionConfigurationSchemasRequest = {},
+        requestOptions?: HarborsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.HarborActionConfigurationSchemasEnvelope> {
+        return core.HttpResponsePromise.fromPromise(
+            this.__listActionConfigurationSchemas(harbor_id, connection_id, request, requestOptions),
+        );
+    }
+
+    private async __listActionConfigurationSchemas(
+        harbor_id: string,
+        connection_id: string,
+        request: Polytomic.HarborsListActionConfigurationSchemasRequest = {},
+        requestOptions?: HarborsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.HarborActionConfigurationSchemasEnvelope>> {
+        const { search, limit, page_token: pageToken } = request;
+        const _queryParams: Record<string, unknown> = {
+            search,
+            limit,
+            page_token: pageToken,
+        };
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/action-configuration/connections/${core.url.encodePathParam(connection_id)}/schemas`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url
+                .queryBuilder()
+                .addMany(_queryParams)
+                .mergeAdditional(requestOptions?.queryParams)
+                .build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.HarborActionConfigurationSchemasEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/harbors/{harbor_id}/action-configuration/connections/{connection_id}/schemas",
+        );
+    }
+
+    /**
+     * Lists operations and configurable fields for an eligible Harbor action schema.
+     *
+     * You must be an Organization administrator with permission to edit the Harbor
+     * and query the source Connection. Use a writable API credential, not a Harbor
+     * profile credential. Read-only keys are denied because this endpoint requires
+     * Harbor edit permission. Discovery does not require the Harbor Actions entitlement.
+     *
+     * The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
+     * Sync targeting its backing Connection. This request returns operation metadata,
+     * not provider records, and does not execute an action.
+     *
+     * For a mutating operation, choose input field IDs. For a read-only operation,
+     * choose output field IDs and at least one lookup field ID. Required input fields
+     * must be included in the grant.
+     *
+     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} connection_id - Source Connection whose action grants you want to manage.
+     * @param {string} schema_id - Exact action schema ID returned by schema discovery.
+     * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
+     *
+     * @throws {@link Polytomic.ForbiddenError}
+     * @throws {@link Polytomic.NotFoundError}
+     * @throws {@link Polytomic.ConflictError}
+     * @throws {@link Polytomic.UnprocessableEntityError}
+     * @throws {@link Polytomic.InternalServerError}
+     * @throws {@link Polytomic.ServiceUnavailableError}
+     * @throws {@link errors.PolytomicError}
+     * @throws {@link errors.PolytomicTimeoutError}
+     *
+     * @example
+     *     await client.harbors.listActionConfigurationOperations("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id")
+     */
+    public listActionConfigurationOperations(
+        harbor_id: string,
+        connection_id: string,
+        schema_id: string,
+        requestOptions?: HarborsClient.RequestOptions,
+    ): core.HttpResponsePromise<Polytomic.HarborActionConfigurationOperationsEnvelope> {
+        return core.HttpResponsePromise.fromPromise(
+            this.__listActionConfigurationOperations(harbor_id, connection_id, schema_id, requestOptions),
+        );
+    }
+
+    private async __listActionConfigurationOperations(
+        harbor_id: string,
+        connection_id: string,
+        schema_id: string,
+        requestOptions?: HarborsClient.RequestOptions,
+    ): Promise<core.WithRawResponse<Polytomic.HarborActionConfigurationOperationsEnvelope>> {
+        const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
+        const _headers: core.Fetcher.Args["headers"] = mergeHeaders(
+            _authRequest.headers,
+            this._options?.headers,
+            mergeOnlyDefinedHeaders({
+                "X-Polytomic-Version": requestOptions?.version ?? this._options?.version ?? "2025-09-18",
+            }),
+            requestOptions?.headers,
+        );
+        const _response = await core.fetcher({
+            url: core.url.join(
+                (await core.Supplier.get(this._options.baseUrl)) ??
+                    (await core.Supplier.get(this._options.environment)) ??
+                    environments.PolytomicEnvironment.Default,
+                `api/harbors/${core.url.encodePathParam(harbor_id)}/action-configuration/connections/${core.url.encodePathParam(connection_id)}/schemas/${core.url.encodePathParam(schema_id)}/operations`,
+            ),
+            method: "GET",
+            headers: _headers,
+            queryString: core.url.queryBuilder().mergeAdditional(requestOptions?.queryParams).build(),
+            timeoutMs: (requestOptions?.timeoutInSeconds ?? this._options?.timeoutInSeconds ?? 60) * 1000,
+            maxRetries: requestOptions?.maxRetries ?? this._options?.maxRetries,
+            abortSignal: requestOptions?.abortSignal,
+            fetchFn: this._options?.fetch,
+            logging: this._options.logging,
+        });
+        if (_response.ok) {
+            return {
+                data: _response.body as Polytomic.HarborActionConfigurationOperationsEnvelope,
+                rawResponse: _response.rawResponse,
+            };
+        }
+
+        if (_response.error.reason === "status-code") {
+            switch (_response.error.statusCode) {
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 404:
+                    throw new Polytomic.NotFoundError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 409:
+                    throw new Polytomic.ConflictError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 422:
+                    throw new Polytomic.UnprocessableEntityError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 500:
+                    throw new Polytomic.InternalServerError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 503:
+                    throw new Polytomic.ServiceUnavailableError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                default:
+                    throw new errors.PolytomicError({
+                        statusCode: _response.error.statusCode,
+                        body: _response.error.body,
+                        rawResponse: _response.rawResponse,
+                    });
+            }
+        }
+
+        return handleNonStatusCodeError(
+            _response.error,
+            _response.rawResponse,
+            "GET",
+            "/api/harbors/{harbor_id}/action-configuration/connections/{connection_id}/schemas/{schema_id}/operations",
+        );
+    }
+
+    /**
      * Lists context document metadata for a Harbor without returning document content.
      *
      * Collection items include the current published `version` number and omit
