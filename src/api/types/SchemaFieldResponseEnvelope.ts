@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface SchemaFieldResponseEnvelope {
+    /** The updated schema field */
     data?: Polytomic.SchemaField | undefined;
 }

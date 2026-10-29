@@ -3,5 +3,6 @@
 export interface BulkSyncSourceCapabilities {
     /** When true, the portion of a schema ID before its last dot is that schema's namespace. */
     supports_namespaces?: boolean | undefined;
+    /** Whether the source supports a tracking field for detecting changes between sync runs */
     supports_tracking_fields?: boolean | undefined;
 }

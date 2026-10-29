@@ -5,7 +5,9 @@
  *     {}
  */
 export interface ExecuteHarborSavedQueryRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
     /** Named JSON scalar overrides for declared parameters. Omission uses published default_value, or SQL NULL for optional parameters without a default. Required parameters reject explicit null even with a default; without a default they also reject omission. Unknown names and invalid types are rejected. */
     parameters?: Record<string, unknown>;

@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncStatusEnvelope {
+    /** Status of the bulk sync */
     data?: Polytomic.BulkSyncStatusResponse | undefined;
 }

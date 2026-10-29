@@ -8,9 +8,11 @@
  *     }
  */
 export interface SaveHarborContextRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
-    /** Optional note describing this published change. */
+    /** Optional note describing this published change */
     change_note?: string;
     /** Plain-text context content. Maximum 20,000 characters. */
     content: string;

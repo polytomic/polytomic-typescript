@@ -6,12 +6,17 @@ import type * as Polytomic from "../index";
  * A filter on this sync. Either `field` or `field_id` must be provided; if `field_id` is provided, `field` is ignored. `field` names a model field by model and source name. `field_id` is a model field's UUID when `field_type` is `Model`, and the destination's own field identifier when it is `Target`.
  */
 export interface Filter {
+    /** Model field to filter on */
     field?: Polytomic.Source | undefined;
-    /** Identifier of the field to filter on: a model field's UUID when 'field_type' is 'Model', or the destination's own field identifier when it is 'Target'. */
+    /** Identifier of the field to filter on: a model field's UUID when 'field_type' is 'Model', or the destination's own field identifier when it is 'Target' */
     field_id?: string | undefined;
+    /** Type of field to filter on; required if the field name is ambiguous */
     field_type?: Polytomic.FilterFieldReferenceType | undefined;
+    /** Comparison the filter applies */
     function: Polytomic.FilterFunction;
+    /** Label naming this filter in filter_logic */
     label?: string | undefined;
+    /** Value the field is compared against */
     value?: unknown | undefined;
     /** Model field whose value this filter compares against, resolved separately for each record. Only valid on a target filter, mutually exclusive with 'value', and accepted only by destinations reporting 'supports_filter_value_fields'. */
     value_field?: Polytomic.Source | undefined;

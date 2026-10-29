@@ -3,12 +3,20 @@
 import type * as Polytomic from "../index";
 
 export interface EventingBulkSyncCompletedWithErrorEvent {
+    /** Destination connection ID */
     destination_connection_id?: string | undefined;
+    /** Execution ID */
     execution_id?: string | undefined;
+    /** Organization ID */
     organization_id?: string | undefined;
+    /** Schedule that started the execution */
     schedule?: Polytomic.EventingBulkSyncSchedule | undefined;
+    /** Source connection ID */
     source_connection_id?: string | undefined;
+    /** Bulk sync ID */
     sync_id?: string | undefined;
+    /** Name of the bulk sync */
     sync_name?: string | undefined;
+    /** What started the execution */
     trigger_source?: string | undefined;
 }

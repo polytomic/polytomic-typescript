@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface HarborConnectionListEnvelope {
+    /** Connections on this page */
     data?: Polytomic.HarborConnectionResponse[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
 }

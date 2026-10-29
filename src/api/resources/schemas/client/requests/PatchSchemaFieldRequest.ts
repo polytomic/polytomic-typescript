@@ -7,10 +7,11 @@ import type * as Polytomic from "../../../../index";
  *     {}
  */
 export interface PatchSchemaFieldRequest {
+    /** Detailed type of the field, such as "bigint" or ["decimal", {"precision": 10, "scale": 2}]; it must be consistent with the field's type. */
     definition?: Polytomic.TypesDefinition;
-    /** Sample value surfaced in the UI. */
+    /** Sample value surfaced in the UI */
     example?: unknown;
-    /** Human-readable label for the field. */
+    /** Human-readable label for the field */
     label?: string;
     /** JSONPath used to extract the field from each source record; only meaningful for document-style backends. Pass an empty string to clear an existing path. */
     path?: string;

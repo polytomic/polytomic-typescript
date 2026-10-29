@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActivityEventEnvelope {
+    /** The Activity event */
     data?: Polytomic.HarboractivityapiHarborActivityEvent | undefined;
 }

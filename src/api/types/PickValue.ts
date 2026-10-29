@@ -3,6 +3,8 @@
 export interface PickValue {
     /** Field IDs and internal values required for this option to apply. All entries must match. Omitted for independent options. */
     depends_on?: Record<string, string> | undefined;
+    /** Display label of the option */
     label?: string | undefined;
+    /** Value of the option */
     value?: string | undefined;
 }

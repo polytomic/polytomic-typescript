@@ -7,10 +7,10 @@
  *     }
  */
 export interface SearchOperationsRequest {
-    /** Maximum operations per task, from 1 to 10; defaults to 5. */
+    /** Maximum operations per task, from 1 to 10; defaults to 5 */
     limit?: number;
-    /** Optional nonempty list of unique stable operation IDs to rank; omitted to rank the full catalog. */
+    /** Optional nonempty list of unique stable operation IDs to rank; omitted to rank the full catalog */
     operationIds?: string[];
-    /** One to three plain-language tasks to find API operations for. */
+    /** One to three plain-language tasks to find API operations for */
     queries: string[];
 }

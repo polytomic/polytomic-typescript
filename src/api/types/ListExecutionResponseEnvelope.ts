@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ListExecutionResponseEnvelope {
+    /** Executions on this page */
     data?: Polytomic.GetExecutionResponseSchema[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
 }

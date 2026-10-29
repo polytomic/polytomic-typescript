@@ -12,7 +12,8 @@ import type * as Polytomic from "../../../../../../index";
  *     }
  */
 export interface ExecuteConnectionProxyRequest {
-    /** When true, submits a GET request for asynchronous execution and returns a job handle instead of a synchronous upstream response. */
+    /** When true, submits a GET request for asynchronous execution and returns a job handle instead of a synchronous upstream response */
     async?: boolean;
+    /** Details of the upstream HTTP request to perform */
     request: Polytomic.ConnectionProxyCall;
 }

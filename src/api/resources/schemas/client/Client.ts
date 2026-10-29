@@ -38,8 +38,8 @@ export class SchemasClient {
      * success response. Validate the response status and message rather than assuming
      * the whole batch was applied uniformly.
      *
-     * @param {string} connection_id - Unique identifier of the connection.
-     * @param {string} schema_id - Identifier of the schema the fields belong to.
+     * @param {string} connection_id - Unique identifier of the connection
+     * @param {string} schema_id - Identifier of the schema the fields belong to
      * @param {Polytomic.UpsertSchemaFieldRequest} request
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -148,9 +148,9 @@ export class SchemasClient {
      * > that sync to error on its next execution. Remove or update any dependent
      * > mappings before deleting the field.
      *
-     * @param {string} connection_id - Unique identifier of the connection.
-     * @param {string} schema_id - Identifier of the schema the field belongs to.
-     * @param {string} field_id - Identifier of the user-defined field to delete.
+     * @param {string} connection_id - Unique identifier of the connection
+     * @param {string} schema_id - Identifier of the schema the field belongs to
+     * @param {string} field_id - Identifier of the user-defined field to delete
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -246,9 +246,9 @@ export class SchemasClient {
     /**
      * Edits a single field on a schema, creating an override for a detected field if needed.
      *
-     * @param {string} connection_id - Connection holding the schema.
-     * @param {string} schema_id - Schema identifier.
-     * @param {string} field_id - Field identifier within the schema.
+     * @param {string} connection_id - Connection holding the schema
+     * @param {string} schema_id - Schema identifier
+     * @param {string} field_id - Field identifier within the schema
      * @param {Polytomic.PatchSchemaFieldRequest} request
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -364,8 +364,8 @@ export class SchemasClient {
      * > 📘 To revert to the source-detected primary keys and remove all overrides,
      * > use [`DELETE /api/connections/{connection_id}/schemas/{schema_id}/primary_keys`](../../../../../../api-reference/schemas/reset-primary-keys).
      *
-     * @param {string} connection_id - Unique identifier of the connection.
-     * @param {string} schema_id - Identifier of the schema whose primary keys are being overridden.
+     * @param {string} connection_id - Unique identifier of the connection
+     * @param {string} schema_id - Identifier of the schema whose primary keys are being overridden
      * @param {Polytomic.SetPrimaryKeysRequest} request
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -469,8 +469,8 @@ export class SchemasClient {
      * use [`PUT /api/connections/{connection_id}/schemas/{schema_id}/primary_keys`](../../../../../../api-reference/schemas/set-primary-keys)
      * instead.
      *
-     * @param {string} connection_id - Unique identifier of the connection.
-     * @param {string} schema_id - Identifier of the schema whose primary key override should be cleared.
+     * @param {string} connection_id - Unique identifier of the connection
+     * @param {string} schema_id - Identifier of the schema whose primary key override should be cleared
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -581,7 +581,7 @@ export class SchemasClient {
      * >
      * > Only connections whose current health status is healthy may be refreshed.
      *
-     * @param {string} id - Unique identifier of the connection whose schema cache should be refreshed.
+     * @param {string} id - Unique identifier of the connection whose schema cache should be refreshed
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -687,7 +687,7 @@ export class SchemasClient {
      * >
      * > Only connections whose current health status is healthy may be refreshed.
      *
-     * @param {string} id - Unique identifier of the connection whose schema cache status should be returned.
+     * @param {string} id - Unique identifier of the connection whose schema cache status should be returned
      * @param {SchemasClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -787,7 +787,7 @@ export class SchemasClient {
      * > and wait for it to complete before fetching this endpoint if you need
      * > up-to-date field definitions.
      *
-     * @param {string} id - Unique identifier of the connection.
+     * @param {string} id - Unique identifier of the connection
      * @param {string} schema_id - Identifier of the schema within the connection. Format depends on the connection type (e.g. schema.table for databases, object name for SaaS backends).
      * @param {SchemasClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -893,8 +893,8 @@ export class SchemasClient {
      * > [`POST /api/connections/{id}/schemas/refresh`](../../../../../../api-reference/schemas/refresh) to ensure
      * > the sample aligns with the current schema structure.
      *
-     * @param {string} id - Unique identifier of the connection.
-     * @param {string} schema_id - Identifier of the schema within the connection.
+     * @param {string} id - Unique identifier of the connection
+     * @param {string} schema_id - Identifier of the schema within the connection
      * @param {SchemasClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}

@@ -7,5 +7,6 @@
  *     }
  */
 export interface ModelsDeleteRequest {
+    /** Deprecated; has no effect */
     async?: boolean;
 }

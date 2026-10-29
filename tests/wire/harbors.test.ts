@@ -16,12 +16,7 @@ describe("HarborsClient", () => {
 
         const rawResponseBody = {
             data: [
-                {
-                    capabilities: ["capabilities"],
-                    id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    name: "name",
-                    type: "type",
-                },
+                { capabilities: ["schemas"], id: "248df4b7-aa70-47b8-a036-33ac447e668d", name: "name", type: "type" },
             ],
             pagination: { next_page_token: "AmkYh8v0jR5B3kls2Qcc9y8MjrPmvR4CvaK7H0F4rEwqvg76K==" },
         };

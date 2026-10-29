@@ -9,6 +9,6 @@ import type * as Polytomic from "../../../../index";
 export interface SetHarborActionConfigurationRequest {
     /** Current revision when replacing existing grants. Omit when creating grants for this Connection. */
     expected_revision?: string;
-    /** Complete replacement of this Connection's action grants. */
+    /** Complete replacement of this Connection's action grants */
     grants?: Polytomic.HarborActionGrantSchema[];
 }

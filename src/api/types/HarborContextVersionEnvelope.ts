@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborContextVersionEnvelope {
+    /** The context version */
     data?: Polytomic.HarborContextVersionResponse | undefined;
 }

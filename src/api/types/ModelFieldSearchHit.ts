@@ -3,16 +3,24 @@
 import type * as Polytomic from "../index";
 
 export interface ModelFieldSearchHit {
+    /** Model field ID */
     field_id: string;
+    /** Model field label */
     field_label: string;
-    /** Source or technical field name. */
+    /** Source or technical field name */
     field_name: string;
+    /** API paths of the field's model and its connection */
     links: Polytomic.SearchResultLinks;
-    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata. */
+    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata */
     matches?: Polytomic.SearchMatch[] | undefined;
+    /** Connection ID of the field's model */
     model_connection_id: string;
+    /** Name of the connection of the field's model */
     model_connection_name: string;
+    /** Connection type of the connection of the field's model */
     model_connection_type: string;
+    /** Model ID of the field's model */
     model_id: string;
+    /** Name of the field's model */
     model_name: string;
 }

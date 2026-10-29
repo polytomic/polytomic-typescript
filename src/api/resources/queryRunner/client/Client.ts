@@ -38,7 +38,7 @@ export class QueryRunnerClient {
      * stored temporarily and may expire; use the `expires` field from the result
      * endpoint to understand how long they remain available.
      *
-     * @param {string} connection_id - Unique identifier of the connection to run the query against.
+     * @param {string} connection_id - Unique identifier of the connection to run the query against
      * @param {Polytomic.RunQueryRequest} request
      * @param {QueryRunnerClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -185,7 +185,7 @@ export class QueryRunnerClient {
      * If the task is complete but the caller is not the same user that created it,
      * the endpoint returns `404`.
      *
-     * @param {string} id - Unique identifier of the query task, as returned by POST /api/connections/{connection_id}/query.
+     * @param {string} id - Unique identifier of the query task, as returned by POST /api/connections/{connection_id}/query
      * @param {Polytomic.QueryRunnerGetQueryRequest} request
      * @param {QueryRunnerClient.RequestOptions} requestOptions - Request-specific configuration.
      *

@@ -3,8 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface SearchMatch {
-    /** Indexed attributes contributing to this result, with matching query terms. */
+    /** Indexed attributes contributing to this result, with matching query terms */
     attributes?: Polytomic.SearchMatchAttribute[] | undefined;
+    /** Saved mapping context shared by these attributes; absent for resource metadata */
     mapping?: Polytomic.SearchMatchMapping | undefined;
+    /** Enabled Bulk Sync schema context shared by these attributes; absent for resource metadata */
     schema?: Polytomic.SearchMatchSchema | undefined;
 }

@@ -10,8 +10,10 @@
 export interface HarborsListContextsRequest {
     /** Maximum number of context documents to return. Defaults to 50 and cannot exceed 50. */
     limit?: number;
-    /** Opaque pagination cursor returned by the previous request. */
+    /** Opaque pagination cursor returned by the previous request */
     page_token?: string;
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
 }

@@ -3,7 +3,7 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectionResponseSchema {
-    /** API calls made to service in the last 24h (supported integrations only). */
+    /** API calls made to service in the last 24h (supported integrations only) */
     api_calls_last_24_hours?: number | undefined;
     configuration?: Record<string, unknown> | undefined;
     created_at?: string | undefined;
@@ -11,7 +11,7 @@ export interface ConnectionResponseSchema {
     id?: string | undefined;
     name?: string | undefined;
     organization_id?: string | undefined;
-    /** For shared connections, the ID of the parent connection. */
+    /** For shared connections, the ID of the parent connection */
     parent_connection_id?: string | undefined;
     policies?: string[] | undefined;
     /** Observed connection-wide rate limiting, independent of connection health. Null when any required lookup is unavailable. Shared connections combine their own marker with their root connection's marker. */

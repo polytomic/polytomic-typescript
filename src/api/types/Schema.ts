@@ -3,7 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface Schema {
+    /** Fields in the schema */
     fields?: Polytomic.SchemaField[] | undefined;
+    /** Schema ID */
     id?: string | undefined;
+    /** Display name of the schema */
     name?: string | undefined;
 }

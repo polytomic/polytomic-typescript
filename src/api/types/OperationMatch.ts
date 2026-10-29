@@ -3,16 +3,16 @@
 export interface OperationMatch {
     /** Authentication audience declared by the operation; a match does not grant access. */
     authAudience?: string | undefined;
-    /** Stable METHOD and path identifier. */
+    /** Stable METHOD and path identifier */
     id?: string | undefined;
-    /** HTTP method of the operation. */
+    /** HTTP method of the operation */
     method?: string | undefined;
-    /** JSON pointer into the public OpenAPI paths object. */
+    /** JSON pointer into the public OpenAPI paths object */
     openapiPointer?: string | undefined;
-    /** Templated public API path. */
+    /** Templated public API path */
     path?: string | undefined;
-    /** Relative probability of selection as the single best operation for this query, not an independent relevance score. */
+    /** Relative probability of selection as the single best operation for this query, not an independent relevance score */
     selectionProbability?: number | undefined;
-    /** Short description of the operation. */
+    /** Short description of the operation */
     summary?: string | undefined;
 }

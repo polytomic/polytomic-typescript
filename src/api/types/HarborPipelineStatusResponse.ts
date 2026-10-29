@@ -3,20 +3,20 @@
 import type * as Polytomic from "../index";
 
 export interface HarborPipelineStatusResponse {
-    /** Dataset refresh evidence keyed by the effective destination name visible to Harbor queries. */
+    /** Dataset refresh evidence keyed by the effective destination name visible to Harbor queries */
     datasets?: Record<string, Polytomic.HarborDatasetStatusResponse | undefined> | undefined;
-    /** Unique identifier of the Polytomic pipeline. */
+    /** Unique identifier of the Polytomic pipeline */
     id: string;
-    /** Whether this pipeline is enabled. */
+    /** Whether this pipeline is enabled */
     refresh_enabled: boolean;
-    /** Exact Polytomic schedules that can select datasets in this pipeline. */
+    /** Exact Polytomic schedules that can select datasets in this pipeline */
     schedules: Polytomic.HarborStatusScheduleResponse[];
-    /** Type of Polytomic pipeline. */
+    /** Type of Polytomic pipeline */
     type: HarborPipelineStatusResponse.Type;
 }
 
 export namespace HarborPipelineStatusResponse {
-    /** Type of Polytomic pipeline. */
+    /** Type of Polytomic pipeline */
     export const Type = {
         Bulk: "bulk",
         Model: "model",

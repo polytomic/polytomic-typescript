@@ -201,7 +201,7 @@ export class UsersClient {
     /**
      * Returns a single user from the caller's current organization.
      *
-     * @param {string} id - Unique identifier of the user.
+     * @param {string} id - Unique identifier of the user
      * @param {UsersClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -288,7 +288,7 @@ export class UsersClient {
      * Only the user's role assignments are modified. Profile information such as name
      * and email address is not affected by this endpoint.
      *
-     * @param {string} id - Unique identifier of the user to update.
+     * @param {string} id - Unique identifier of the user to update
      * @param {Polytomic.CurrentOrgUpdateUserRequestSchema} request
      * @param {UsersClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -383,7 +383,7 @@ export class UsersClient {
      * > organization and loses access to all resources within it. This cannot be
      * > undone.
      *
-     * @param {string} id - Unique identifier of the user.
+     * @param {string} id - Unique identifier of the user
      * @param {UsersClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -479,7 +479,7 @@ export class UsersClient {
      *
      * Returns user records including each user's ID, email, and assigned roles.
      *
-     * @param {string} org_id - Unique identifier of the organization whose users should be listed.
+     * @param {string} org_id - Unique identifier of the organization whose users should be listed
      * @param {UsersClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -569,7 +569,7 @@ export class UsersClient {
      * The new user receives an invitation email prompting them to set up their
      * account. Role assignments take effect as soon as the invitation is accepted.
      *
-     * @param {string} org_id - Unique identifier of the organization the user belongs to.
+     * @param {string} org_id - Unique identifier of the organization the user belongs to
      * @param {Polytomic.CreateUserRequestSchema} request
      * @param {UsersClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -671,8 +671,8 @@ export class UsersClient {
      * >
      * > User endpoints are only accessible using [partner keys](../../../../../guides/obtaining-api-keys#partner-keys).
      *
-     * @param {string} org_id - Unique identifier of the organization the user belongs to.
-     * @param {string} id - Unique identifier of the user.
+     * @param {string} org_id - Unique identifier of the organization the user belongs to
+     * @param {string} id - Unique identifier of the user
      * @param {UsersClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -770,8 +770,8 @@ export class UsersClient {
      * Only the user's role assignments are modified. Profile information such as name
      * and email address is not affected by this endpoint.
      *
-     * @param {string} org_id - Unique identifier of the organization the user belongs to.
-     * @param {string} id - Unique identifier of the user to update.
+     * @param {string} org_id - Unique identifier of the organization the user belongs to
+     * @param {string} id - Unique identifier of the user to update
      * @param {Polytomic.UpdateUserRequestSchema} request
      * @param {UsersClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -879,8 +879,8 @@ export class UsersClient {
      * > organization and loses access to all resources within it. This cannot be
      * > undone.
      *
-     * @param {string} org_id - Unique identifier of the organization the user belongs to.
-     * @param {string} id - Unique identifier of the user.
+     * @param {string} org_id - Unique identifier of the organization the user belongs to
+     * @param {string} id - Unique identifier of the user
      * @param {UsersClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -975,8 +975,8 @@ export class UsersClient {
      * > 🚧 The API key value is only included in the response at creation time and
      * > cannot be retrieved again. Store it securely immediately after creation.
      *
-     * @param {string} org_id - Unique identifier of the organization the user belongs to.
-     * @param {string} id - Unique identifier of the user the key will be issued for.
+     * @param {string} org_id - Unique identifier of the organization the user belongs to
+     * @param {string} id - Unique identifier of the user the key will be issued for
      * @param {Polytomic.UsersCreateApiKeyRequest} request
      * @param {UsersClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *

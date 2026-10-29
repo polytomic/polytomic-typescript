@@ -17,7 +17,7 @@ describe("RecordViewLinksClient", () => {
         const rawResponseBody = {
             data: {
                 connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                default_field_policy: "default_field_policy",
+                default_field_policy: "all_readable_top_level",
                 default_ttl_seconds: 1,
                 lookup_key_field: "lookup_key_field",
                 max_ttl_seconds: 1,

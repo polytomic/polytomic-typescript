@@ -297,7 +297,7 @@ export class BulkSyncClient {
      * - To inspect which schemas are selected and how they are configured, use
      *   [`GET /api/bulk/syncs/{id}/schemas`](../../../../api-reference/bulk-sync/schemas/list).
      *
-     * @param {string} id
+     * @param {string} id - Bulk sync ID
      * @param {Polytomic.BulkSyncGetRequest} request
      * @param {BulkSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -384,7 +384,8 @@ export class BulkSyncClient {
      *
      * Updating a bulk sync is a **full replacement** of the sync's top-level
      * configuration. Every field in the request body is written to the sync; any
-     * field you omit is cleared or reset to its default value.
+     * field you omit is cleared or reset to its default value. An empty or omitted
+     * `policies` list leaves the sync's current policies unchanged.
      *
      * To make a partial change — for example, toggling `active` or swapping a
      * schedule — fetch the current sync with
@@ -418,7 +419,7 @@ export class BulkSyncClient {
      * > [Update Bulk Sync Schema](../../../../api-reference/bulk-sync/schemas/update)
      * > to replace a single schema's configuration.
      *
-     * @param {string} id - Unique identifier of the bulk sync to update.
+     * @param {string} id - Unique identifier of the bulk sync to update
      * @param {Polytomic.UpdateBulkSyncRequest} request
      * @param {BulkSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -537,7 +538,7 @@ export class BulkSyncClient {
      * > 🚧 All associated schedules, schema configurations, and execution history are
      * > deleted along with the sync.
      *
-     * @param {string} id
+     * @param {string} id - Bulk sync ID
      * @param {Polytomic.BulkSyncDeleteRequest} request
      * @param {BulkSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -644,8 +645,8 @@ export class BulkSyncClient {
      * > or
      * > [`POST /api/bulk/syncs/{id}/cancel`](../../../../../api-reference/bulk-sync/cancel).
      *
-     * @param {string} id
-     * @param {Polytomic.ActivateSyncInput} request
+     * @param {string} id - Bulk sync ID
+     * @param {Polytomic.ActivateBulkSyncInput} request
      * @param {BulkSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -662,7 +663,7 @@ export class BulkSyncClient {
      */
     public activate(
         id: string,
-        request: Polytomic.ActivateSyncInput,
+        request: Polytomic.ActivateBulkSyncInput,
         requestOptions?: BulkSyncClient.IdempotentRequestOptions,
     ): core.HttpResponsePromise<Polytomic.ActivateSyncEnvelope> {
         return core.HttpResponsePromise.fromPromise(this.__activate(id, request, requestOptions));
@@ -670,7 +671,7 @@ export class BulkSyncClient {
 
     private async __activate(
         id: string,
-        request: Polytomic.ActivateSyncInput,
+        request: Polytomic.ActivateBulkSyncInput,
         requestOptions?: BulkSyncClient.IdempotentRequestOptions,
     ): Promise<core.WithRawResponse<Polytomic.ActivateSyncEnvelope>> {
         const _authRequest: core.AuthRequest = await this._options.authProvider.getAuthRequest();
@@ -857,7 +858,7 @@ export class BulkSyncClient {
      *
      * If another execution is already running, the endpoint returns `409 Conflict`.
      *
-     * @param {string} id - Unique identifier of the bulk sync.
+     * @param {string} id - Unique identifier of the bulk sync
      * @param {Polytomic.StartBulkSyncRequest} request
      * @param {BulkSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -957,7 +958,7 @@ export class BulkSyncClient {
      * For the full details of a specific run, including per-schema breakdowns, use
      * [`GET /api/bulk/syncs/{id}/executions/{exec_id}`](../../../../../api-reference/bulk-sync/executions/get).
      *
-     * @param {string} id - Unique identifier of the bulk sync.
+     * @param {string} id - Unique identifier of the bulk sync
      * @param {BulkSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -1048,7 +1049,7 @@ export class BulkSyncClient {
      * Omit it when you only need the schema list, as field enumeration can be slow for
      * large sources.
      *
-     * @param {string} id - Unique identifier of the connection.
+     * @param {string} id - Unique identifier of the connection
      * @param {Polytomic.BulkSyncGetSourceRequest} request
      * @param {BulkSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1160,7 +1161,7 @@ export class BulkSyncClient {
      * > The configuration schema is the same for all syncs sharing the same
      * > destination connection.
      *
-     * @param {string} id
+     * @param {string} id - Connection ID
      * @param {BulkSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}

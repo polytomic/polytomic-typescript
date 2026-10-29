@@ -3,10 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface TargetObject {
-    /** The identifier of the target object. */
+    /** The identifier of the target object */
     id?: string | undefined;
-    /** The supported sync modes and their properties for the target object. */
+    /** The supported sync modes and their properties for the target object */
     modes?: Polytomic.SupportedMode[] | undefined;
-    /** The name of the target object. */
+    /** The name of the target object */
     name?: string | undefined;
 }

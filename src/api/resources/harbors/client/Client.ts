@@ -119,7 +119,7 @@ export class HarborsClient {
     /**
      * Lists one bounded page of schema resources authorized by the current Harbor profile.
      *
-     * @param {string} connection_id
+     * @param {string} connection_id - Connection ID
      * @param {Polytomic.HarborsListAuthorizedSchemasRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -211,8 +211,8 @@ export class HarborsClient {
     /**
      * Returns one schema resource authorized by the current Harbor profile.
      *
-     * @param {string} connection_id
-     * @param {string} schema_id
+     * @param {string} connection_id - Connection ID
+     * @param {string} schema_id - Schema ID
      * @param {Polytomic.HarborsGetAuthorizedSchemaRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -394,7 +394,7 @@ export class HarborsClient {
     /**
      * Closes a service-attested Harbor MCP transport session.
      *
-     * @param {string} session_id
+     * @param {string} session_id - Harbor session ID
      * @param {Polytomic.HarborsCloseSessionRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -701,7 +701,7 @@ export class HarborsClient {
      *
      * The response exposes the backing Connection ID but not the internal profile used to authorize Harbor credentials.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -791,7 +791,7 @@ export class HarborsClient {
      *
      * This operation does not change `backing_mode` or `backing_connection_id`.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.UpdateHarborRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -904,7 +904,7 @@ export class HarborsClient {
      * storage in the background and retries failed cleanup automatically. You can also
      * delete a Harbor while it is provisioning.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -1007,7 +1007,7 @@ export class HarborsClient {
      * removing its grants. Configuration responses contain metadata only, not provider
      * credentials or record values.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -1129,7 +1129,7 @@ export class HarborsClient {
      * The response contains the empty configuration. This request does not delete
      * Connections, syncs, or provider records.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -1252,7 +1252,7 @@ export class HarborsClient {
      *
      * Discover schemas and operations before choosing the grants to configure.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -1384,8 +1384,8 @@ export class HarborsClient {
      *
      * This request changes permissions only. It does not execute provider actions.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} connection_id - Source Connection whose action grants you want to manage.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} connection_id - Source Connection whose action grants you want to manage
      * @param {Polytomic.SetHarborActionConfigurationRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1517,8 +1517,8 @@ export class HarborsClient {
      * the Connection is deleted. The response contains the remaining configured action
      * Connections. This request does not delete the Connection or provider records.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} connection_id - Source Connection whose action grants you want to manage.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} connection_id - Source Connection whose action grants you want to manage
      * @param {Polytomic.HarborsRemoveActionConfigurationRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1658,8 +1658,8 @@ export class HarborsClient {
      * Operation IDs in the catalog are hints. Operation discovery returns the current
      * configurable fields for a schema.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} connection_id - Source Connection whose action grants you want to manage.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} connection_id - Source Connection whose action grants you want to manage
      * @param {Polytomic.HarborsListActionConfigurationSchemasRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1803,9 +1803,9 @@ export class HarborsClient {
      * choose output field IDs and at least one lookup field ID. Required input fields
      * must be included in the grant.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} connection_id - Source Connection whose action grants you want to manage.
-     * @param {string} schema_id - Exact action schema ID returned by schema discovery.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} connection_id - Source Connection whose action grants you want to manage
+     * @param {string} schema_id - Exact action schema ID returned by schema discovery
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -1927,7 +1927,7 @@ export class HarborsClient {
      * A Harbor profile credential can read context only when `harbor_id` identifies
      * its own Harbor.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.HarborsListContextsRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2046,7 +2046,7 @@ export class HarborsClient {
      *
      * The new document belongs only to this Harbor. Context documents cannot be attached to multiple Harbors.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.CreateHarborContextRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2159,7 +2159,7 @@ export class HarborsClient {
      * detail endpoint to read the complete candidate. Normal context list and detail
      * operations continue to return published content only.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.HarborsListContextDraftsRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2281,7 +2281,7 @@ export class HarborsClient {
      * Use the regular context creation endpoint instead when the initial payload should
      * be published immediately.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.CreateHarborContextDraftRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2392,8 +2392,8 @@ export class HarborsClient {
      * A Harbor profile credential can read context only when `harbor_id` identifies
      * its own Harbor.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.HarborsGetContextRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2498,8 +2498,8 @@ export class HarborsClient {
      *
      * A direct publication leaves an existing draft unchanged.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.SaveHarborContextRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2617,8 +2617,8 @@ export class HarborsClient {
      *
      * Deleting a context document does not affect the Harbor or its other context documents.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.HarborsDeleteContextRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2729,8 +2729,8 @@ export class HarborsClient {
      * context reads and Harbor MCP tools continue to return the current published
      * version. Creator and updater IDs are null when their actor type is `system`.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.HarborsGetContextDraftRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2842,8 +2842,8 @@ export class HarborsClient {
      * updater provenance comes from the request actor; system actors have a null actor
      * ID.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.SaveHarborContextDraftRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -2963,8 +2963,8 @@ export class HarborsClient {
      * history. If the draft belongs to a context that has never been published,
      * discarding it also removes the otherwise empty context identity.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.HarborsDeleteContextDraftRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -3078,8 +3078,8 @@ export class HarborsClient {
      * the draft's `base_revision_id`. The stale draft remains available so an author
      * can compare it with the current version before discarding and recreating it.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.HarborsPromoteContextDraftRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -3204,8 +3204,8 @@ export class HarborsClient {
      * A Harbor profile credential can read versions only when `harbor_id` identifies
      * its own Harbor.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
      * @param {Polytomic.HarborsListContextVersionsRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -3335,9 +3335,9 @@ export class HarborsClient {
      * Published versions cannot be changed or deleted. System publications have
      * `published_by_type: "system"` and a null `published_by`.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} context_id - Unique identifier of the context document.
-     * @param {string} version_id - Unique identifier of the published context version.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} context_id - Unique identifier of the context document
+     * @param {string} version_id - Unique identifier of the published context version
      * @param {Polytomic.HarborsGetContextVersionRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -3446,7 +3446,7 @@ export class HarborsClient {
      *
      * Each item contains a masked `key_hint`. Polytomic never returns a credential plaintext after creation.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.HarborsListKeysRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -3553,7 +3553,7 @@ export class HarborsClient {
      *
      * Store the returned `value` securely. Polytomic returns it only in this response.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -3645,8 +3645,8 @@ export class HarborsClient {
      *
      * Revocation affects only the selected credential. Other active Harbor credentials remain valid.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} key_id - Unique identifier of the Harbor credential.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} key_id - Unique identifier of the Harbor credential
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -3750,7 +3750,7 @@ export class HarborsClient {
      * pagination links for additional rows. Results are temporary; check `expires`
      * on the completed query.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor whose backing connection runs the query.
+     * @param {string} harbor_id - Unique identifier of the Harbor whose backing connection runs the query
      * @param {Polytomic.RunHarborQueryRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -3897,7 +3897,7 @@ export class HarborsClient {
      * values, and expected column names. If Polytomic cannot record the event, the
      * request returns `503 Service Unavailable` without saved-query data.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.HarborsListSavedQueriesRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -4062,7 +4062,7 @@ export class HarborsClient {
      * {"name": "days", "type": "number", "required": true, "default_value": 7}
      * ```
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.CreateHarborSavedQueryDraftRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -4180,7 +4180,7 @@ export class HarborsClient {
      * parameter declarations, and author-supplied validation values. Harbor profile
      * credentials cannot access this endpoint.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.HarborsListSavedQueryDraftsRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -4316,8 +4316,8 @@ export class HarborsClient {
      * and result rows. If Polytomic cannot record the event, the request returns
      * `503 Service Unavailable` without saved-query data.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} saved_query_id - Unique stable identifier of the saved query.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} saved_query_id - Unique stable identifier of the saved query
      * @param {Polytomic.HarborsGetSavedQueryRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -4452,8 +4452,8 @@ export class HarborsClient {
      * Unpublish is available only through the GraphQL `unpublishHarborSavedQuery`
      * mutation. There is no REST unpublish endpoint.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} saved_query_id - Unique stable identifier of the saved query.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} saved_query_id - Unique stable identifier of the saved query
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -4573,8 +4573,8 @@ export class HarborsClient {
      * {"name": "days", "type": "number", "required": true, "default_value": 7}
      * ```
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} saved_query_id - Unique stable identifier of the saved query.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} saved_query_id - Unique stable identifier of the saved query
      * @param {Polytomic.SaveHarborSavedQueryDraftRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -4696,8 +4696,8 @@ export class HarborsClient {
      * saved-query identity. Discarding a later draft preserves every immutable
      * published version.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} saved_query_id - Unique stable identifier of the saved query.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} saved_query_id - Unique stable identifier of the saved query
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -4818,8 +4818,8 @@ export class HarborsClient {
      * deletes the mutable draft. The response includes the immutable `revision_id`
      * that future executions use for exact provenance.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} saved_query_id - Unique stable identifier of the saved query.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} saved_query_id - Unique stable identifier of the saved query
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -4934,8 +4934,8 @@ export class HarborsClient {
      * never falls back to the Harbor writer credential. Preview rows and serialized
      * response size are bounded. The preview and validation attempt are not persisted.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} saved_query_id - Unique stable identifier of the saved query.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} saved_query_id - Unique stable identifier of the saved query
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -5104,8 +5104,8 @@ export class HarborsClient {
      * `query.started` records provider invocation. `query.succeeded` means results are
      * available for authorized retrieval, not that you have consumed them.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} saved_query_id - Unique stable identifier of the saved query.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} saved_query_id - Unique stable identifier of the saved query
      * @param {Polytomic.ExecuteHarborSavedQueryRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -5239,7 +5239,7 @@ export class HarborsClient {
     /**
      * Resolves documented source table and field identities to the names a Harbor's backing Connection accepts.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.ResolveHarborSourceMappingsRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -5376,7 +5376,7 @@ export class HarborsClient {
      * staleness for your task. The endpoint does not classify datasets or the Harbor
      * as healthy, stale, or unhealthy.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -5467,7 +5467,7 @@ export class HarborsClient {
      *
      * The response contains only Harbor-only users currently assigned to this Harbor.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.HarborsListUsersRequest} request
      * @param {HarborsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -5579,7 +5579,7 @@ export class HarborsClient {
      *
      * The invited account is restricted to assigned Harbors and does not receive regular Polytomic application access.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.InviteHarborUserRequest} request
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -5691,8 +5691,8 @@ export class HarborsClient {
      *
      * The assignment is idempotent. Regular Polytomic users cannot be assigned because they already have application access to Harbors.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} user_id - Unique identifier of the Harbor-only user.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} user_id - Unique identifier of the Harbor-only user
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -5792,8 +5792,8 @@ export class HarborsClient {
      *
      * This removes only the Harbor assignment. The organization user remains available and may retain assignments to other Harbors.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} user_id - Unique identifier of the Harbor-only user.
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} user_id - Unique identifier of the Harbor-only user
      * @param {HarborsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}

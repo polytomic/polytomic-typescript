@@ -1,3 +1,4 @@
+export type { ActivateSyncInput } from "./ActivateSyncInput";
 export type { CreateModelSyncV5Request } from "./CreateModelSyncV5Request";
 export type { ModelSyncGetSourceFieldsRequest } from "./ModelSyncGetSourceFieldsRequest";
 export type { ModelSyncGetSourceRequest } from "./ModelSyncGetSourceRequest";

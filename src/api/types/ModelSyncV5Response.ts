@@ -3,37 +3,58 @@
 import type * as Polytomic from "../index";
 
 export interface ModelSyncV5Response {
+    /** Whether the sync is enabled and scheduled */
     active?: boolean | undefined;
+    /** When the sync was created */
     created_at?: string | undefined;
+    /** Actor that created the sync */
     created_by?: Polytomic.OutputActor | undefined;
+    /** Passphrase for encrypting the sync data, masked */
     encryption_passphrase?: string | undefined;
+    /** Fields synced from source to destination */
     fields?: Polytomic.SyncField[] | undefined;
     /** Deprecated. Use 'model_filters.logic'. */
     filter_logic?: string | undefined;
     /** Deprecated. Use 'model_filters.conditions' and 'target_filters.conditions'. Reports the same filters, with the two kinds interleaved and told apart by 'field_type'. */
     filters?: Polytomic.Filter[] | undefined;
+    /** Model sync ID */
     id?: string | undefined;
-    /** Identity mappings for the sync and the strategy combining them. */
+    /** Identity mappings for the sync and the strategy combining them */
     identities?: Polytomic.ModelSyncIdentities | undefined;
     /** Deprecated. Use 'identities'. Reports the first identity mapping only. */
     identity?: Polytomic.Identity | undefined;
+    /** How source records are written to the target */
     mode?: Polytomic.ModelsyncSyncTargetMode | undefined;
+    /** Filters narrowing the records read from the source */
     model_filters?: Polytomic.ModelFilters | undefined;
-    /** Model IDs used in the sync. */
+    /** Model IDs used in the sync */
     model_ids?: string[] | undefined;
+    /** Name of the model sync */
     name?: string | undefined;
+    /** Whether only changes to the base models cause a record to sync, rather than changes to enrichment models */
     only_enrich_updates?: boolean | undefined;
+    /** ID of the organization the sync belongs to */
     organization_id?: string | undefined;
+    /** Target fields which are set to a fixed value for every record */
     override_fields?: Polytomic.OverrideField[] | undefined;
+    /** Conditional value replacement for fields */
     overrides?: Polytomic.Override[] | undefined;
+    /** Permissions policy IDs applied to the sync */
     policies?: string[] | undefined;
     /** Parts of this configuration which could not be resolved when it was read. The configuration is reported unchanged, references included, so it can be corrected and written back; this property is ignored on input. */
     problems?: Polytomic.ModelSyncProblem[] | undefined;
+    /** Sync schedule. Schedule times are interpreted in UTC. */
     schedule?: Polytomic.Schedule | undefined;
+    /** Whether the initial backfill of records is skipped, so only records seen after the sync is enabled are synced */
     skip_initial_backfill?: boolean | undefined;
+    /** Whether to sync all records from the source, regardless of whether they have changed since the previous execution */
     sync_all_records?: boolean | undefined;
+    /** Sync destination configuration */
     target?: Polytomic.ModelSyncV5Target | undefined;
+    /** Filters narrowing the records written to the destination */
     target_filters?: Polytomic.TargetFilters | undefined;
+    /** When the sync was last updated */
     updated_at?: string | undefined;
+    /** Actor that most recently updated the sync */
     updated_by?: Polytomic.OutputActor | undefined;
 }

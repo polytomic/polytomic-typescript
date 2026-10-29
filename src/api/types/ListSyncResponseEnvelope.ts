@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ListSyncResponseEnvelope {
+    /** Model syncs on this page */
     data?: Polytomic.ListSyncItem[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
 }

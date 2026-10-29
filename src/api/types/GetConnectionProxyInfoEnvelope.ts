@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface GetConnectionProxyInfoEnvelope {
+    /** The connection proxy contract */
     data?: Polytomic.ConnectionProxyInfoResponse | undefined;
 }

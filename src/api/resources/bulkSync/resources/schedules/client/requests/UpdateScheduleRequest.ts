@@ -11,5 +11,6 @@ import type * as Polytomic from "../../../../../../index";
  *     }
  */
 export interface UpdateScheduleRequest {
+    /** Bulk sync schedule. Schedule times are interpreted in UTC. */
     schedule: Polytomic.BulkSyncScheduleApi;
 }

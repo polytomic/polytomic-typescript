@@ -7,6 +7,6 @@
  *     }
  */
 export interface UpdateConnectionProxySettingsRequest {
-    /** Whether the connection can be used through the Connection Proxy API. */
+    /** Whether the connection can be used through the Connection Proxy API */
     enabled: boolean;
 }

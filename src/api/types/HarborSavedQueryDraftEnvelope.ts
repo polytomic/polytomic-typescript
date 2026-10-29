@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborSavedQueryDraftEnvelope {
+    /** The saved query draft */
     data?: Polytomic.HarborSavedQueryDraftResponse | undefined;
 }

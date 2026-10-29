@@ -3,32 +3,32 @@
 import type * as Polytomic from "../index";
 
 export interface HarborSavedQueryResponse {
-    /** Note supplied when this version was published. */
+    /** Note supplied when this version was published */
     change_note?: string | undefined;
-    /** Business definition and usage notes. */
+    /** Business definition and usage notes */
     description?: string | undefined;
-    /** Expected ordered result-column names. */
+    /** Expected ordered result-column names */
     expected_columns?: string[] | undefined;
-    /** Stable saved-query identifier. */
+    /** Stable saved-query identifier */
     id?: string | undefined;
-    /** Human-readable saved-query name. */
+    /** Human-readable saved-query name */
     name?: string | undefined;
-    /** Human-readable owner label. */
+    /** Human-readable owner label */
     owner?: string | undefined;
-    /** Published typed scalar parameter declarations. */
+    /** Published typed scalar parameter declarations */
     parameters?: Polytomic.HarborSavedQueryParameter[] | undefined;
-    /** When this version was published. */
+    /** When this version was published */
     published_at?: string | undefined;
     /** Actor that published this version. Null for the system actor. */
     published_by?: string | undefined;
-    /** Type of actor that published this version. */
+    /** Type of actor that published this version */
     published_by_type?: string | undefined;
-    /** Immutable identifier of this exact published definition. */
+    /** Immutable identifier of this exact published definition */
     revision_id?: string | undefined;
-    /** Published SQL template. */
+    /** Published SQL template */
     sql_template?: string | undefined;
-    /** When this version's draft was last updated before publication. */
+    /** When this version's draft was last updated before publication */
     updated_at?: string | undefined;
-    /** Current published version number. */
+    /** Current published version number */
     version?: number | undefined;
 }

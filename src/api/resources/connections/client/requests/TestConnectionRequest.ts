@@ -14,10 +14,10 @@
  *     }
  */
 export interface TestConnectionRequest {
-    /** Connection configuration to test. */
+    /** Connection configuration to test */
     configuration: Record<string, unknown>;
     /** Optional existing connection ID to use as a base for testing. The provided configuration will be merged over the stored configuration for this connection before testing. */
     connection_id?: string;
-    /** The type of connection to test. */
+    /** The type of connection to test */
     type: string;
 }

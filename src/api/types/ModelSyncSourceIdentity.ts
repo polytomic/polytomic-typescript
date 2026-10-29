@@ -3,7 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ModelSyncSourceIdentity {
+    /** Model field holding the value, named the same way as an identity mapping's source */
     source: Polytomic.Source;
-    /** Value the field must hold. */
+    /** Value the field must hold */
     value: string;
 }

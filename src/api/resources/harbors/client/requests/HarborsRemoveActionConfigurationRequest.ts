@@ -7,6 +7,6 @@
  *     }
  */
 export interface HarborsRemoveActionConfigurationRequest {
-    /** Current revision of the Connection's action grants. */
+    /** Current revision of the Connection's action grants */
     expected_revision: string;
 }

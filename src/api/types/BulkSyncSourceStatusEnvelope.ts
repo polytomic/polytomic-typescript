@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncSourceStatusEnvelope {
+    /** Schema cache status of the connection */
     data?: Polytomic.BulkSyncSourceStatus | undefined;
 }

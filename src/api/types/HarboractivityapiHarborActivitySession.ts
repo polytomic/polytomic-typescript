@@ -3,25 +3,40 @@
 import type * as Polytomic from "../index";
 
 export interface HarboractivityapiHarborActivitySession {
+    /** MCP-observed client name */
     client_name?: string | undefined;
+    /** MCP-observed client version */
     client_version?: string | undefined;
+    /** Harbor credential that registered the session */
     credential?: Polytomic.HarboractivityapiHarborActivityIdentitySnapshot | undefined;
+    /** When the session closed or expired */
     ended_at?: string | undefined;
+    /** Session events on this page */
     events?: Polytomic.HarboractivityapiHarborActivityEvent[] | undefined;
+    /** When the session expires */
     expires_at?: string | undefined;
+    /** Client-supplied run correlation value */
     external_run_id?: string | undefined;
+    /** Harbor ID of the session */
     harbor_id?: string | undefined;
-    /** Whether retention removed events from the beginning of the session. */
+    /** Whether retention removed events from the beginning of the session */
     history_truncated?: boolean | undefined;
+    /** Harbor session ID */
     id?: string | undefined;
+    /** Harbor profile of the session's credential */
     profile?: Polytomic.HarboractivityapiHarborActivityIdentitySnapshot | undefined;
+    /** When the session started */
     started_at?: string | undefined;
+    /** ID of the session.started event */
     started_event_id?: string | undefined;
+    /** Session status */
     status?: HarboractivityapiHarborActivitySession.Status | undefined;
+    /** ID of the event that closed or expired the session */
     terminal_event_id?: string | undefined;
 }
 
 export namespace HarboractivityapiHarborActivitySession {
+    /** Session status */
     export const Status = {
         Active: "active",
         Closed: "closed",

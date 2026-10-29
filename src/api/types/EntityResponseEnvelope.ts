@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface EntityResponseEnvelope {
+    /** The resolved entity */
     data?: Polytomic.EntityResponse | undefined;
 }

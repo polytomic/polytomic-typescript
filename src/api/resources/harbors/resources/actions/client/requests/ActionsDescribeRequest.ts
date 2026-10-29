@@ -9,9 +9,14 @@
  *     }
  */
 export interface ActionsDescribeRequest {
+    /** Connection ID of the action */
     connection_id: string;
+    /** Schema ID of the action */
     schema_id: string;
+    /** Operation ID of the action */
     operation_id: string;
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
 }

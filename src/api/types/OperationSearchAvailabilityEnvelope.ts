@@ -3,13 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface OperationSearchAvailabilityEnvelope {
+    /** Operation search availability */
     data?: OperationSearchAvailabilityEnvelope.Data | undefined;
 }
 
 export namespace OperationSearchAvailabilityEnvelope {
+    /**
+     * Operation search availability
+     */
     export interface Data {
-        /** Whether operation search is configured on this API deployment. */
+        /** Whether operation search is configured on this API deployment */
         enabled: boolean;
+        /** Present when a one-question request exceeds a question budget for this organization */
         rate_limited?: Polytomic.OperationSearchRateLimit | undefined;
     }
 }

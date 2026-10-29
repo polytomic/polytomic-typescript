@@ -3,10 +3,11 @@
 import type * as Polytomic from "../index";
 
 export interface SupportedFilterFunction {
+    /** Identifier of the comparison; use this value as a target filter condition's function. */
     id?: Polytomic.FilterFunction | undefined;
-    /** Human-readable label for the comparison. */
+    /** Human-readable label for the comparison */
     label?: string | undefined;
-    /** True if this comparison takes a list of values rather than a single one. */
+    /** True if this comparison takes a list of values rather than a single one */
     multi_value?: boolean | undefined;
     /** True if a condition using this comparison must carry a value; comparisons such as 'IsNotNull' take none. */
     requires_value?: boolean | undefined;

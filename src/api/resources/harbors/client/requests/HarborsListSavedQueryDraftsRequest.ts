@@ -8,8 +8,8 @@
  *     }
  */
 export interface HarborsListSavedQueryDraftsRequest {
-    /** Maximum number of saved-query drafts to return. */
+    /** Maximum number of saved-query drafts to return */
     limit?: number;
-    /** Opaque pagination cursor returned by the previous request. */
+    /** Opaque pagination cursor returned by the previous request */
     page_token?: string;
 }

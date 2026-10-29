@@ -8,7 +8,7 @@
  *     }
  */
 export interface EntitiesSearchRequest {
-    /** Search term matched, by word prefix, against models, model fields, model syncs, bulk syncs, and connections in the caller's organization. */
+    /** Search term matched, by word prefix, against models, model fields, model syncs, bulk syncs, and connections in the caller's organization */
     search: string;
     /** Maximum number of results to return across all result types. Defaults to 50 and cannot exceed 100. */
     limit?: number;

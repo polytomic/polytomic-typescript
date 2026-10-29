@@ -3,7 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface HarborSchemaListEnvelope {
+    /** Schemas on this page */
     data?: Polytomic.HarborSchemaResponse[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
+    /** Whether the connection organizes schemas into namespaces */
     supports_namespaces?: boolean | undefined;
 }

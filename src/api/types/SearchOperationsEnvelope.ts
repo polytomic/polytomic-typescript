@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface SearchOperationsEnvelope {
+    /** Operation search results */
     data?: Polytomic.SearchOperationsResponse | undefined;
 }

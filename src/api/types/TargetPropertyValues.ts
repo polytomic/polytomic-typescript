@@ -3,12 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface TargetPropertyValues {
-    /** True if the property is an enum. */
+    /** True if the property is an enum */
     enum?: boolean | undefined;
-    /** The identifier of the target property. */
+    /** The identifier of the target property */
     id?: string | undefined;
-    /** A human readable title for the target property. */
+    /** A human readable title for the target property */
     title?: string | undefined;
-    /** Valid values for the target property. */
+    /** Valid values for the target property */
     values?: Polytomic.UtilEnumValue[] | undefined;
 }

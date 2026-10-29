@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ModelRelation {
+    /** Source field name on this model */
     from?: string | undefined;
+    /** Field on the related model */
     to?: Polytomic.ModelRelationTo | undefined;
 }

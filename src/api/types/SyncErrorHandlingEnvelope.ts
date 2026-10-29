@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface SyncErrorHandlingEnvelope {
+    /** Error handling settings for the model sync */
     data?: Polytomic.SyncErrorHandling | undefined;
 }

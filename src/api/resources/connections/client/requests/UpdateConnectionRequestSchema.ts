@@ -15,12 +15,15 @@
  */
 export interface UpdateConnectionRequestSchema {
     configuration: Record<string, unknown>;
-    /** Override interval for connection health checking. */
+    /** Override interval for connection health checking */
     healthcheck_interval?: string;
     name: string;
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
+    /** Permissions policy IDs applied to the connection. A non-empty list replaces the connection's policies and an empty or omitted list leaves them unchanged. */
     policies?: string[];
     reconnect?: boolean;
+    /** Ignored. A connection's type is fixed at creation. */
     type?: string;
     /** Validate connection configuration. */
     validate?: boolean;

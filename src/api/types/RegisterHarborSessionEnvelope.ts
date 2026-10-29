@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface RegisterHarborSessionEnvelope {
+    /** The registered session */
     data?: Polytomic.RegisterHarborSessionResponse | undefined;
 }

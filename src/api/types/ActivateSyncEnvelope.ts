@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ActivateSyncEnvelope {
+    /** The sync's updated active state */
     data?: Polytomic.ActivateSyncOutput | undefined;
 }

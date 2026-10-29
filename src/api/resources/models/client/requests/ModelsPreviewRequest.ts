@@ -16,6 +16,7 @@ import type * as Polytomic from "../../../../index";
  *     }
  */
 export interface ModelsPreviewRequest {
+    /** Run in the background and return a job instead of the result. */
     async?: boolean;
     body: Polytomic.CreateModelRequest;
 }

@@ -3,10 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncDest {
+    /** Destination configuration options this connection accepts, keyed by option name */
     configuration?: Record<string, unknown> | undefined;
+    /** Bulk sync modes this destination supports */
     modes?: Polytomic.SupportedBulkMode[] | undefined;
-    /** Resync modes supported by this destination (refetch, resync, rebuild). */
+    /** Resync modes supported by this destination (refetch, resync, rebuild) */
     supported_resync_modes?: Polytomic.BulkResyncMode[] | undefined;
-    /** True if this destination can maintain a companion history table per schema (history_enabled) in replicate mode. */
+    /** True if this destination can maintain a companion history table per schema (history_enabled) in replicate mode */
     supports_history_mode?: boolean | undefined;
 }

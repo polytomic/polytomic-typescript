@@ -37,7 +37,7 @@ export class ExecutionsClient {
      * summaries — use
      * [`GET /api/syncs/{sync_id}/executions/{id}`](../../../../api-reference/model-sync/executions/get).
      *
-     * @param {string} sync_id
+     * @param {string} sync_id - Model sync ID
      * @param {Polytomic.modelSync.ExecutionsListRequest} request
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -138,8 +138,8 @@ export class ExecutionsClient {
      * [`GET /api/syncs/{sync_id}/executions/{id}/{type}`](../../../../../api-reference/model-sync/executions/get-log-urls) to retrieve
      * signed URLs grouped by log category.
      *
-     * @param {string} sync_id
-     * @param {string} id
+     * @param {string} sync_id - Model sync ID
+     * @param {string} id - Execution ID
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -227,8 +227,8 @@ export class ExecutionsClient {
     /**
      * Requests cancellation of a model sync execution.
      *
-     * @param {string} sync_id
-     * @param {string} id - The ID of the execution to cancel.
+     * @param {string} sync_id - Model sync ID
+     * @param {string} id - The ID of the execution to cancel
      * @param {ExecutionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -329,8 +329,8 @@ export class ExecutionsClient {
     /**
      * Fetch the latest console log entries for a sync execution. Returns the most recent 50 entries.
      *
-     * @param {string} sync_id
-     * @param {string} id
+     * @param {string} sync_id - Model sync ID
+     * @param {string} id - Execution ID
      * @param {Polytomic.modelSync.ExecutionsGetConsoleLogsRequest} request
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -445,8 +445,8 @@ export class ExecutionsClient {
     /**
      * Returns an index of the record-log types produced by this model sync execution, with the per-type endpoint to retrieve signed URLs for each type's segment files.
      *
-     * @param {string} sync_id - Unique identifier of the model sync.
-     * @param {string} id - Unique identifier of the execution whose logs are being indexed.
+     * @param {string} sync_id - Unique identifier of the model sync
+     * @param {string} id - Unique identifier of the execution whose logs are being indexed
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -538,9 +538,9 @@ export class ExecutionsClient {
      * > it from this endpoint. To fetch a single file's URL directly, use
      * > [`GET /api/syncs/{sync_id}/executions/{id}/{type}/{filename}`](../../../../../../api-reference/model-sync/executions/get-logs).
      *
-     * @param {string} sync_id
-     * @param {string} id
-     * @param {Polytomic.ExecutionLogType} type
+     * @param {string} sync_id - Model sync ID
+     * @param {string} id - Execution ID
+     * @param {Polytomic.ExecutionLogType} type - Log category
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -641,10 +641,10 @@ export class ExecutionsClient {
      * after a short period, so call this endpoint again to obtain a fresh URL if it
      * expires before you download the file.
      *
-     * @param {string} sync_id
-     * @param {string} id
-     * @param {Polytomic.ExecutionLogType} type
-     * @param {string} filename
+     * @param {string} sync_id - Model sync ID
+     * @param {string} id - Execution ID
+     * @param {Polytomic.ExecutionLogType} type - Log category
+     * @param {string} filename - Log file name
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}

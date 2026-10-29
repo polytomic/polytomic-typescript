@@ -10,6 +10,7 @@ import type * as Polytomic from "../../../../../../index";
  */
 export interface CreatePolicyRequest {
     name: string;
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
     policy_actions?: Polytomic.PolicyAction[];
 }

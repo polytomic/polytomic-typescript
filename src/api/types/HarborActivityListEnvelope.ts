@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActivityListEnvelope {
+    /** Activity events on this page */
     data?: Polytomic.HarboractivityapiHarborActivityEvent[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
 }

@@ -3,22 +3,23 @@
 import type * as Polytomic from "../index";
 
 export interface GetIdentityResponseSchema {
+    /** Metadata about the credential that authenticated the request */
     credential?: Polytomic.IdentityCredentialSchema | undefined;
-    /** The email of the caller. */
+    /** The email of the caller */
     email?: string | undefined;
     /** The ID of the caller; this will be omitted for non-user callers. */
     id?: string | undefined;
-    /** Whether the caller is using an organization key. */
+    /** Whether the caller is using an organization key */
     is_organization?: boolean | undefined;
-    /** Whether the caller is using a partner key. */
+    /** Whether the caller is using a partner key */
     is_partner?: boolean | undefined;
-    /** Whether the caller is a system actor. */
+    /** Whether the caller is a system actor */
     is_system?: boolean | undefined;
-    /** Whether the caller is a user. */
+    /** Whether the caller is a user */
     is_user?: boolean | undefined;
-    /** The ID of the organization the caller belongs to. */
+    /** The ID of the organization the caller belongs to */
     organization_id?: string | undefined;
-    /** The name of the organization the caller belongs to. */
+    /** The name of the organization the caller belongs to */
     organization_name?: string | undefined;
     /** Deprecated legacy role name. Populated only for user callers. */
     role?: string | undefined;

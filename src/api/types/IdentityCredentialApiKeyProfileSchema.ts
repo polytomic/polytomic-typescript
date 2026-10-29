@@ -3,13 +3,14 @@
 import type * as Polytomic from "../index";
 
 export interface IdentityCredentialApiKeyProfileSchema {
+    /** Profile-scoped resource capabilities. These capabilities narrow, but do not expand, the caller's authority. */
     capabilities?: Polytomic.IdentityCredentialCapabilitiesSchema | undefined;
-    /** Organization-provided summary of the data and questions this scoped profile supports. */
+    /** Organization-provided summary of the data and questions this scoped profile supports */
     description?: string | undefined;
-    /** Stable API key profile ID. */
+    /** Stable API key profile ID */
     id?: string | undefined;
-    /** API key profile kind. */
+    /** API key profile kind */
     kind?: string | undefined;
-    /** Stable API key profile name. */
+    /** Stable API key profile name */
     name?: string | undefined;
 }

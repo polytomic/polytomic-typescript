@@ -3,10 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface OperationSearchResult {
-    /** Operations ranked by probability of being the single best choice for this task; empty when no match wins. */
+    /** Operations ranked by probability of being the single best choice for this task; empty when no match wins */
     matches?: Polytomic.OperationMatch[] | undefined;
-    /** Relative probability that none of the documented operations is the best choice. */
+    /** Relative probability that none of the documented operations is the best choice */
     noMatchProbability?: number | undefined;
-    /** The trimmed input task. */
+    /** The trimmed input task */
     query?: string | undefined;
 }

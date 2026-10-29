@@ -3,10 +3,16 @@
 import type * as Polytomic from "../index";
 
 export interface EventingSyncCanceledEvent {
+    /** Execution ID */
     execution_id?: string | undefined;
+    /** Organization ID */
     organization_id?: string | undefined;
+    /** Status of the execution */
     status?: Polytomic.UtilExecutionStatus | undefined;
+    /** Model sync ID */
     sync_id?: string | undefined;
+    /** Name of the model sync */
     sync_name?: string | undefined;
+    /** Destination connection ID */
     target_connection_id?: string | undefined;
 }

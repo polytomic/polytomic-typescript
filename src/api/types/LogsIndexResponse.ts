@@ -3,10 +3,16 @@
 import type * as Polytomic from "../index";
 
 export interface LogsIndexResponse {
+    /** Count and retrieval URL for the log of records deleted at the destination; omitted when no records were deleted */
     deletes?: Polytomic.LogsIndexEntry | undefined;
+    /** Count and retrieval URL for the log of records that failed to write; omitted when no errors were produced */
     errors?: Polytomic.LogsIndexEntry | undefined;
+    /** Count and retrieval URL for the log of records inserted at the destination; omitted when no records were inserted */
     inserts?: Polytomic.LogsIndexEntry | undefined;
+    /** Count and retrieval URL for the log of every record processed by the execution; omitted when no records were processed */
     records?: Polytomic.LogsIndexEntry | undefined;
+    /** Count and retrieval URL for the log of records updated at the destination; omitted when no records were updated */
     updates?: Polytomic.LogsIndexEntry | undefined;
+    /** Count and retrieval URL for the log of records that produced warnings during the write; omitted when no warnings were produced */
     warnings?: Polytomic.LogsIndexEntry | undefined;
 }

@@ -3,27 +3,28 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionConfigurationOperationResponse {
-    /** Operation description. */
+    /** Operation description */
     description?: string | undefined;
-    /** Whether the operation changes records or only reads them. */
+    /** Whether the operation changes records or only reads them */
     effect?: HarborActionConfigurationOperationResponse.Effect | undefined;
+    /** Provider idempotency guarantees, when supported */
     idempotency?: Polytomic.HarborActionConfigurationIdempotencyResponse | undefined;
-    /** Fields you can grant for a mutating operation. */
+    /** Fields you can grant for a mutating operation */
     input_fields?: Polytomic.HarborActionConfigurationFieldResponse[] | undefined;
-    /** Lookup fields supported by this operation. */
+    /** Lookup fields supported by this operation */
     lookup_fields?: Polytomic.HarborActionConfigurationFieldResponse[] | undefined;
-    /** Operation name. */
+    /** Operation name */
     name?: string | undefined;
-    /** Stable operation ID. */
+    /** Stable operation ID */
     operation_id?: string | undefined;
-    /** Fields you can grant for a read-only operation. */
+    /** Fields you can grant for a read-only operation */
     output_fields?: Polytomic.HarborActionConfigurationFieldResponse[] | undefined;
-    /** Action schema ID. */
+    /** Action schema ID */
     schema_id?: string | undefined;
 }
 
 export namespace HarborActionConfigurationOperationResponse {
-    /** Whether the operation changes records or only reads them. */
+    /** Whether the operation changes records or only reads them */
     export const Effect = {
         Mutating: "mutating",
         ReadOnly: "read_only",

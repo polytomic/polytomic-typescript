@@ -3,7 +3,7 @@
 import type * as Polytomic from "../index";
 
 export interface HarborStatusResponse {
-    /** UTC time at which Polytomic assembled this status snapshot. */
+    /** UTC time at which Polytomic assembled this status snapshot */
     as_of: string;
     /** Polytomic pipelines that populate datasets in the Harbor backing Connection. Unmanaged tables are excluded. */
     pipelines?: Polytomic.HarborPipelineStatusResponse[] | undefined;

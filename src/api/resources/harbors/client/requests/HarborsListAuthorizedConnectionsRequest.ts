@@ -8,8 +8,12 @@
  *     }
  */
 export interface HarborsListAuthorizedConnectionsRequest {
+    /** Maximum number of results to return */
     limit?: number;
+    /** Token from the previous page */
     page_token?: string;
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
 }

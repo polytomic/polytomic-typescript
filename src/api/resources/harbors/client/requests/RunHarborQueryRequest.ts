@@ -7,8 +7,10 @@
  *     }
  */
 export interface RunHarborQueryRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
-    /** SQL query to execute against the Harbor backing connection. */
+    /** SQL query to execute against the Harbor backing connection */
     query: string;
 }

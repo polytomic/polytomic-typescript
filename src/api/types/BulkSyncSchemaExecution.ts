@@ -3,17 +3,28 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncSchemaExecution {
+    /** When the schema execution finished */
     completed_at?: string | undefined;
+    /** When the schema execution was created */
     created_at?: string | undefined;
+    /** Number of errors for this schema */
     error_count?: number | undefined;
+    /** Name of the destination object the schema was written to, set only once the schema execution completes */
     output_name?: string | undefined;
+    /** Number of records processed for this schema */
     record_count?: number | undefined;
+    /** Source schema ID */
     schema?: string | undefined;
+    /** When the schema execution started */
     started_at?: string | undefined;
+    /** Status of the schema execution */
     status?: Polytomic.BulkSchemaExecutionStatus | undefined;
+    /** Detail about the schema execution's status, such as an error message */
     status_message?: string | undefined;
+    /** When the schema execution was last updated */
     updated_at?: string | undefined;
-    /** Polytomic version which last ran this schema execution. */
+    /** Polytomic version which last ran this schema execution */
     version?: string | undefined;
+    /** Number of warnings for this schema */
     warning_count?: number | undefined;
 }

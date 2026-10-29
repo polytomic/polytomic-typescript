@@ -3,11 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface SupportedMode {
+    /** Sync mode identifier */
     id?: Polytomic.ModelsyncSyncTargetMode | undefined;
-    /** True if the sync mode requires an identity field mapping. */
+    /** True if the sync mode requires an identity field mapping */
     requires_identity?: boolean | undefined;
-    /** True if the target supports per-field sync modes. */
+    /** True if the target supports per-field sync modes */
     supports_per_field_mode?: boolean | undefined;
-    /** True if the sync mode supports target filters. */
+    /** True if the sync mode supports target filters */
     supports_target_filters?: boolean | undefined;
 }

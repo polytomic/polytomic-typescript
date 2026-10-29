@@ -3,34 +3,34 @@
 import type * as Polytomic from "../index";
 
 export interface HarborSavedQueryDraftResponse {
-    /** Optional draft change note. */
+    /** Optional draft change note */
     change_note?: string | undefined;
-    /** When the draft was created. */
+    /** When the draft was created */
     created_at?: string | undefined;
     /** Actor that created the draft. Null for the system actor. */
     created_by?: string | undefined;
-    /** Type of actor that created the draft. */
+    /** Type of actor that created the draft */
     created_by_type?: string | undefined;
-    /** Draft business definition. */
+    /** Draft business definition */
     description?: string | undefined;
-    /** Unique identifier of this mutable draft candidate. */
+    /** Unique identifier of this mutable draft candidate */
     id?: string | undefined;
-    /** Draft name. */
+    /** Draft name */
     name?: string | undefined;
-    /** Draft owner label. */
+    /** Draft owner label */
     owner?: string | undefined;
-    /** Draft typed parameter declarations. */
+    /** Draft typed parameter declarations */
     parameters?: Polytomic.HarborSavedQueryParameter[] | undefined;
-    /** Stable saved-query identifier. */
+    /** Stable saved-query identifier */
     saved_query_id?: string | undefined;
-    /** Draft SQL template. */
+    /** Draft SQL template */
     sql_template?: string | undefined;
-    /** When the draft was last replaced. */
+    /** When the draft was last replaced */
     updated_at?: string | undefined;
     /** Actor that last replaced the draft. Null for the system actor. */
     updated_by?: string | undefined;
-    /** Type of actor that last replaced the draft. */
+    /** Type of actor that last replaced the draft */
     updated_by_type?: string | undefined;
-    /** Author-supplied validation inputs. */
+    /** Author-supplied validation inputs */
     validation_values?: Record<string, unknown> | undefined;
 }

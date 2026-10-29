@@ -3,12 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionListEnvelope {
+    /** Configured actions on this page */
     data?: Polytomic.HarborActionSummary[] | undefined;
+    /** Pagination details for the next page */
     pagination?: HarborActionListEnvelope.Pagination | undefined;
 }
 
 export namespace HarborActionListEnvelope {
+    /**
+     * Pagination details for the next page
+     */
     export interface Pagination {
+        /** Token for the next page */
         next_page_token?: string | undefined;
     }
 }

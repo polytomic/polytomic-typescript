@@ -8,7 +8,7 @@ export interface WebhookDelivery {
     event_id?: string | undefined;
     event_type?: string | undefined;
     id?: string | undefined;
-    /** Response content returned by the webhook endpoint. */
+    /** Response content returned by the webhook endpoint */
     response_body?: string | undefined;
     status_code?: number | undefined;
     success?: boolean | undefined;

@@ -13,11 +13,12 @@
 export interface WebhooksListDeliveriesRequest {
     /** Filter by delivery result. */
     success?: boolean;
+    /** Return only attempts to deliver this event. */
     event_id?: string;
     /** Include attempts at or after this time. */
     start?: string;
     /** Include attempts before this time. */
     end?: string;
-    /** Token from the previous page. */
+    /** Token from the previous page */
     page_token?: string;
 }

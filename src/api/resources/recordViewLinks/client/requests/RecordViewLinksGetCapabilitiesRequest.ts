@@ -8,10 +8,12 @@
  *     }
  */
 export interface RecordViewLinksGetCapabilitiesRequest {
-    /** Connection to check for record-view link support. */
+    /** Connection to check for record-view link support */
     connection_id: string;
-    /** Schema to check for record-view link support. */
+    /** Schema to check for record-view link support */
     schema_id: string;
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
 }

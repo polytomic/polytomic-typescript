@@ -3,21 +3,38 @@
 import type * as Polytomic from "../index";
 
 export interface BulkBulkSyncSchedule {
+    /** Timestamp the schedule was created */
     createdAt?: string | undefined;
+    /** ID of the actor that created the schedule */
     createdBy?: string | undefined;
+    /** Day of the month for custom and builder schedules */
     dayOfMonth?: string | undefined;
+    /** Day of the week for weekly, custom, and builder schedules */
     dayOfWeek?: string | undefined;
+    /** Timestamp the schedule was deleted */
     deletedAt?: string | undefined;
+    /** ID of the actor that deleted the schedule */
     deletedBy?: string | undefined;
+    /** How often the sync runs on this schedule */
     frequency: Polytomic.ScheduleFrequency;
+    /** Hour of the day, in UTC, for daily, weekly, custom, and builder schedules */
     hour?: string | undefined;
+    /** Whether this is the bulk sync's default schedule */
     isDefault?: boolean | undefined;
+    /** Minute of the hour for hourly, daily, weekly, custom, and builder schedules */
     minute?: string | undefined;
+    /** Month of the year for custom and builder schedules */
     month?: string | undefined;
+    /** Schema IDs this schedule applies to; empty means all schemas */
     schemas?: string[] | undefined;
+    /** Whether this schedule runs a full fetch, only incremental fields, or only non-incremental fields */
     selectiveMode?: Polytomic.BulkSelectiveMode | undefined;
+    /** Bulk sync ID */
     syncId?: string | undefined;
+    /** Controls how the destination is handled when this schedule executes */
     syncMode?: Polytomic.BulkScheduleSyncMode | undefined;
+    /** Timestamp the schedule was last updated */
     updatedAt?: string | undefined;
+    /** ID of the actor that most recently updated the schedule */
     updatedBy?: string | undefined;
 }

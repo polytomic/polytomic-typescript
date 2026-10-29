@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface TargetObjectsResponseEnvelope {
+    /** Target objects available on the connection */
     data?: Polytomic.TargetObject[] | undefined;
+    /** The target creation properties */
     target_creation?: Polytomic.TargetCreator | undefined;
 }

@@ -7,8 +7,10 @@
  *     }
  */
 export interface QueryRunnerGetQueryRequest {
-    /** Opaque pagination token returned in the links.next or links.previous URL of the previous response. */
+    /** Opaque pagination token returned in the links.next or links.previous URL of the previous response */
     page?: string;
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
 }

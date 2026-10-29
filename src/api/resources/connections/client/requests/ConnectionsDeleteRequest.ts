@@ -7,5 +7,6 @@
  *     }
  */
 export interface ConnectionsDeleteRequest {
+    /** Delete the connection with the models and syncs that depend on it. */
     force?: boolean;
 }

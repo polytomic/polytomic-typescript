@@ -3,14 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface ResolveHarborSourceMappingsEnvelope {
+    /** The resolved source mappings */
     data?: ResolveHarborSourceMappingsEnvelope.Data | undefined;
 }
 
 export namespace ResolveHarborSourceMappingsEnvelope {
+    /**
+     * The resolved source mappings
+     */
     export interface Data {
-        /** Connection the resolved names belong to. */
+        /** Connection the resolved names belong to */
         backing_connection_id?: string | undefined;
-        /** One result per requested source table, in request order. */
+        /** One result per requested source table, in request order */
         sources?: Polytomic.HarborSourceMappingResponse[] | undefined;
     }
 }

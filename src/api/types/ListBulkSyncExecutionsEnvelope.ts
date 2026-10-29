@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ListBulkSyncExecutionsEnvelope {
+    /** Executions on this page */
     data?: Polytomic.BulkSyncExecution[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
 }

@@ -8,9 +8,11 @@
  *     }
  */
 export interface SaveHarborContextDraftRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
-    /** Optional note stored with the draft and copied to the published version on promotion. */
+    /** Optional note stored with the draft and copied to the published version on promotion */
     change_note?: string;
     /** Complete plain-text draft content. Maximum 20,000 characters. */
     content: string;

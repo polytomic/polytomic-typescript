@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ModelSampleResponseEnvelope {
+    /** The sampled records */
     data?: Polytomic.ModelSample | undefined;
+    /** Background job running the request when async is true */
     job?: Polytomic.JobResponse | undefined;
 }

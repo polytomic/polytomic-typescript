@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ModelSyncV5ResponseEnvelope {
+    /** The model sync */
     data?: Polytomic.ModelSyncV5Response | undefined;
 }

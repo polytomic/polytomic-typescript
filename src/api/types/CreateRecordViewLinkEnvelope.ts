@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface CreateRecordViewLinkEnvelope {
+    /** The created record-view link */
     data?: Polytomic.CreateRecordViewLinkResponse | undefined;
 }

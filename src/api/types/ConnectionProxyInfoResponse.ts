@@ -5,12 +5,16 @@ import type * as Polytomic from "../index";
 export interface ConnectionProxyInfoResponse {
     /** Upstream APIs this connection exposes through the proxy, when there is more than one. Select one by passing its name as request.api; requests without request.api use the default. */
     apis?: Polytomic.ConnectionProxyApi[] | undefined;
-    /** Connection backend identifier (e.g. hubspot, salesforce). */
+    /** Connection backend identifier (e.g. hubspot, salesforce) */
     backendType?: string | undefined;
-    /** Unique identifier of the connection the proxy contract applies to. */
+    /** Unique identifier of the connection the proxy contract applies to */
     connectionId?: string | undefined;
+    /** Base URL, query parameters, and headers that the proxy automatically applies to every outbound request. For connections that expose more than one API, this describes the default API. */
     inheritedBase?: Polytomic.ConnectionProxyInheritedBase | undefined;
+    /** Rules describing how inherited query parameters and headers are merged with caller-supplied values */
     mergeRules?: Polytomic.ConnectionProxyMergeRules | undefined;
+    /** Allowed request shapes, limits, and rate limits enforced by the proxy */
     requestContract?: Polytomic.ConnectionProxyContract | undefined;
+    /** Usage statistics for the connection over the last 24 hours */
     stats?: Polytomic.ConnectionProxyStats | undefined;
 }

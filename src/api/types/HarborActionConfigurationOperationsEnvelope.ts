@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionConfigurationOperationsEnvelope {
+    /** Operations available for the action schema */
     data?: Polytomic.HarborActionConfigurationOperationResponse[] | undefined;
 }

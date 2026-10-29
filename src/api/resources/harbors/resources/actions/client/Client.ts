@@ -47,8 +47,8 @@ export class ActionsClient {
      * may omit `X-Polytomic-Harbor-Session`; a supplied session must be active and bound
      * to the same credential and Harbor.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
-     * @param {string} execution_id
+     * @param {string} harbor_id - Unique identifier of the Harbor
+     * @param {string} execution_id - Action execution ID
      * @param {Polytomic.harbors.ActionsGetExecutionRequest} request
      * @param {ActionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -164,7 +164,7 @@ export class ActionsClient {
      * be active and bound to the credential and Harbor. Discovery is recorded as
      * `action.listed`; no response is returned if that event cannot be recorded.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.harbors.ActionsListRequest} request
      * @param {ActionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -290,7 +290,7 @@ export class ActionsClient {
      * `X-Polytomic-Harbor-Session` must be active and bound to this credential and
      * Harbor. Successful description is recorded as `action.listed`.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.harbors.ActionsDescribeRequest} request
      * @param {ActionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -438,7 +438,7 @@ export class ActionsClient {
      * original attribution, and safe outcome categories. They exclude lookup values,
      * input values, output payloads, and raw provider errors.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.harbors.ExecuteHarborActionRequest} request
      * @param {ActionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -558,7 +558,7 @@ export class ActionsClient {
      * `X-Polytomic-Harbor-Session` is optional for direct REST requests. A supplied
      * session must be active and bound to your credential and Harbor.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.harbors.LookupHarborActionRequest} request
      * @param {ActionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -693,7 +693,7 @@ export class ActionsClient {
      * preparations are recorded as `action.preparation_expired`. Execution records its
      * own actor and attempt separately.
      *
-     * @param {string} harbor_id - Unique identifier of the Harbor.
+     * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.harbors.PrepareHarborActionRequest} request
      * @param {ActionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *

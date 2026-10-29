@@ -16,6 +16,6 @@ export interface CreateHarborRequest {
     description?: string;
     /** Whether to generate a profile credential. Defaults to true. */
     generate_api_key?: boolean;
-    /** Human-readable Harbor name. */
+    /** Human-readable Harbor name */
     name: string;
 }

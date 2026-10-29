@@ -5,7 +5,7 @@ import type * as Polytomic from "../index";
 export interface RunQueryResult {
     /** The number of rows returned by the query. This will not be returned until the query completes. */
     count?: number | undefined;
-    /** Error message if the query failed. */
+    /** Error message if the query failed */
     error?: string | undefined;
     /** The time at which the query will expire and be deleted. This will not be returned until the query completes. */
     expires?: string | undefined;
@@ -13,7 +13,8 @@ export interface RunQueryResult {
     fields?: string[] | undefined;
     /** The ID of the query task. Poll GET /api/queries/{id} until the task reaches the terminal status done, failed, or unknown. */
     id?: string | undefined;
-    /** The query results, returned as an array of objects. */
+    /** The query results, returned as an array of objects */
     results?: Record<string, unknown>[] | undefined;
+    /** Current query status. The terminal statuses are done, failed, and unknown. Unknown means execution started but its durable terminal result was lost or expired. */
     status?: Polytomic.QueryStatus | undefined;
 }

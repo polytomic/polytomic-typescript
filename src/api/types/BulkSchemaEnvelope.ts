@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSchemaEnvelope {
+    /** The bulk sync schema */
     data?: Polytomic.BulkSchema | undefined;
 }

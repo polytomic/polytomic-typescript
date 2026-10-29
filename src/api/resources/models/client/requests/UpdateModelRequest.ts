@@ -14,19 +14,32 @@ import type * as Polytomic from "../../../../index";
  *     }
  */
 export interface UpdateModelRequest {
+    /** Run in the background and return a job instead of the result. */
     async?: boolean;
+    /** User-defined fields to add to the model alongside its source fields */
     additional_fields?: Polytomic.ModelModelFieldRequest[];
+    /** Model configuration for the source connection type */
     configuration: Record<string, unknown>;
+    /** Connection ID of the model's source, which cannot be changed after the model is created */
     connection_id: string;
+    /** Enrichment to apply to the model */
     enricher?: Polytomic.Enrichment;
     /** Technical/source field names to publish in the model. Use source names, not model-field UUIDs or display labels. For example, use dealname rather than Deal Name. Omit or pass an empty array to publish all standard source fields. */
     fields?: string[];
+    /** Source field name of the model's unique identifier */
     identifier?: string;
+    /** Deprecated; ignored */
     labels?: string[];
+    /** Model name */
     name: string;
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
+    /** Permissions policy IDs applied to the model. On update, a non-empty list replaces the model's policies and an empty or omitted list leaves them unchanged. */
     policies?: string[];
+    /** Whether to refresh the enricher's fields and example values */
     refresh?: boolean;
+    /** Joins from this model's fields to fields on other models */
     relations?: Polytomic.ModelRelation[];
+    /** Source field names used to detect changed records */
     tracking_columns?: string[];
 }

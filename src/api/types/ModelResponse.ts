@@ -3,22 +3,40 @@
 import type * as Polytomic from "../index";
 
 export interface ModelResponse {
+    /** Model configuration for the source connection type */
     configuration?: Record<string, unknown> | undefined;
+    /** Connection ID of the model's source */
     connection_id?: string | undefined;
+    /** When the model was created */
     created_at?: string | undefined;
+    /** Actor that created the model */
     created_by?: Polytomic.OutputActor | undefined;
+    /** Enrichment applied to the model */
     enricher?: Polytomic.Enrichment | undefined;
+    /** Fields published by the model */
     fields?: Polytomic.ModelField[] | undefined;
+    /** Model ID */
     id?: string | undefined;
+    /** Source field name of the model's unique identifier */
     identifier?: string | undefined;
+    /** Deprecated; never returned */
     labels?: Polytomic.LabelLabel[] | undefined;
+    /** Model name */
     name?: string | undefined;
+    /** Organization ID of the model */
     organization_id?: string | undefined;
+    /** Permissions policy IDs applied to the model */
     policies?: string[] | undefined;
+    /** Joins from this model's fields to fields on other models */
     relations?: Polytomic.Relation[] | undefined;
+    /** Source field names used to detect changed records */
     tracking_columns?: string[] | undefined;
+    /** Connection type of the model's source */
     type?: string | undefined;
+    /** When the model was last updated */
     updated_at?: string | undefined;
+    /** Actor that most recently updated the model */
     updated_by?: Polytomic.OutputActor | undefined;
+    /** Model version; increments when the configuration or field structure changes */
     version?: number | undefined;
 }

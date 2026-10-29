@@ -3,15 +3,26 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionField {
+    /** Detailed type definition of the field */
     definition?: Polytomic.TypesDefinition | undefined;
+    /** Description of the field */
     description?: string | undefined;
+    /** Field ID */
     id?: string | undefined;
+    /** Maximum length of a string value in bytes */
     max_bytes?: number | undefined;
+    /** Display name of the field */
     name?: string | undefined;
+    /** Whether a string value must contain a non-whitespace character */
     non_blank?: boolean | undefined;
+    /** Whether the field accepts null */
     nullable?: boolean | undefined;
+    /** Regular expression a string value must match */
     pattern?: string | undefined;
+    /** Whether input must include the field */
     required?: boolean | undefined;
+    /** Type of the field */
     type?: Polytomic.UtilFieldType | undefined;
+    /** Known values for the field; not enforced on input */
     values?: Polytomic.CompletionValue[] | undefined;
 }

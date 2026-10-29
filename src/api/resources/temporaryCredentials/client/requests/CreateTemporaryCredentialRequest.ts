@@ -15,5 +15,6 @@ export interface CreateTemporaryCredentialRequest {
     duration_seconds?: number;
     /** Optional audit correlation label, limited to 128 characters. Do not include secrets or personal data. */
     session_name?: string;
+    /** User or Harbor authority the temporary credential will assume */
     subject: Polytomic.TemporaryCredentialSubject;
 }

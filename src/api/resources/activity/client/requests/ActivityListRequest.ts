@@ -11,8 +11,8 @@ import type * as Polytomic from "../../../../index";
  *         page_token: "page_token",
  *         order: "asc",
  *         harbor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
- *         event_type: ["event_type"],
- *         outcome: ["outcome"],
+ *         event_type: ["action.looked_up"],
+ *         outcome: ["succeeded"],
  *         operation_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
  *         session_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
  *         actor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
@@ -21,7 +21,7 @@ import type * as Polytomic from "../../../../index";
  *     }
  */
 export interface ActivityListRequest {
-    /** Inclusive start of the event recorded-time range. */
+    /** Inclusive start of the event recorded-time range */
     start_time: string;
     /** Exclusive end of the event recorded-time range. The range can span at most 90 days. */
     end_time: string;
@@ -34,9 +34,9 @@ export interface ActivityListRequest {
     /** Return events for these Harbors. Repeat the parameter to filter by multiple IDs. */
     harbor_id?: string | string[];
     /** Return events with these event types. Repeat the parameter to filter by multiple types. */
-    event_type?: string | string[];
+    event_type?: Polytomic.HarboractivityEventType | Polytomic.HarboractivityEventType[];
     /** Return events with these outcomes. Repeat the parameter to filter by multiple outcomes. */
-    outcome?: string | string[];
+    outcome?: Polytomic.HarboractivityOutcome | Polytomic.HarboractivityOutcome[];
     /** Return events for these operation IDs. */
     operation_id?: string | string[];
     /** Return events for these session IDs. */

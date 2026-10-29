@@ -10,9 +10,11 @@
  *     }
  */
 export interface CreateRecordViewLinkRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
-    /** Connection containing the record. */
+    /** Connection containing the record */
     connection_id: string;
     /** Optional expiry timestamp. Defaults to 72 hours and cannot exceed 7 days. */
     expires_at?: string;
@@ -20,10 +22,10 @@ export interface CreateRecordViewLinkRequest {
     fields?: string[];
     /** The schema lookup-key field used to identify the record. V1 only accepts the schema's single effective primary key. */
     lookup_key_field: string;
-    /** The lookup-key value for the record. */
+    /** The lookup-key value for the record */
     lookup_key_value: string;
-    /** Schema containing the record. */
+    /** Schema containing the record */
     schema_id: string;
-    /** Optional creator/source label. */
+    /** Optional creator/source label */
     source?: string;
 }

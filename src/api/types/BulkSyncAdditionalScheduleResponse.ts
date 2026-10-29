@@ -3,27 +3,32 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncAdditionalScheduleResponse {
-    /** Timestamp the schedule was created. */
+    /** Timestamp the schedule was created */
     created_at?: string | undefined;
+    /** Actor that created the schedule */
     created_by?: Polytomic.OutputActor | undefined;
-    /** Day of the month (1-31) for monthly schedules. */
+    /** Day of the month for custom and builder schedules */
     day_of_month?: string | undefined;
-    /** Day of the week for weekly schedules. */
+    /** Day of the week, 0 (Sunday) to 6 (Saturday), for weekly schedules; a cron day-of-week field for custom and builder schedules */
     day_of_week?: string | undefined;
+    /** How often the sync runs on this schedule: manual, continuous, hourly, daily, weekly, custom, or builder */
     frequency: Polytomic.ScheduleFrequency;
-    /** Hour of the day (0-23, in UTC) the schedule fires. */
+    /** Hour of the day (0-23, in UTC) for daily, weekly, custom, and builder schedules */
     hour?: string | undefined;
-    /** Unique identifier of the schedule. */
+    /** Unique identifier of the schedule */
     id?: string | undefined;
-    /** Minute of the hour (0-59) the schedule fires. */
+    /** Minute of the hour (0-59) for hourly, daily, weekly, custom, and builder schedules */
     minute?: string | undefined;
-    /** Month of the year (1-12) for yearly schedules. */
+    /** Month of the year for custom and builder schedules */
     month?: string | undefined;
+    /** Controls how the destination is handled when this schedule executes */
     resync_mode?: Polytomic.BulkScheduleSyncMode | undefined;
     /** Schema IDs this schedule applies to. Empty means all schemas. */
     schemas?: string[] | undefined;
+    /** Whether this schedule runs a full fetch, only incremental fields, or only non-incremental fields */
     selective_mode?: Polytomic.BulkSelectiveMode | undefined;
-    /** Timestamp the schedule was last updated. */
+    /** Timestamp the schedule was last updated */
     updated_at?: string | undefined;
+    /** Actor that most recently updated the schedule */
     updated_by?: Polytomic.OutputActor | undefined;
 }

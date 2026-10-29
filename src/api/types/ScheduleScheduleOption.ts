@@ -3,8 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface ScheduleScheduleOption {
+    /** Settings form for schedules of this type */
     configuration?: Polytomic.JsonschemaForm | undefined;
+    /** Description of the schedule option */
     description?: string | undefined;
+    /** Schedule frequency */
     frequency?: Polytomic.ScheduleFrequency | undefined;
+    /** Display name of the schedule option */
     label?: string | undefined;
 }

@@ -8,7 +8,7 @@
  *     }
  */
 export interface CreateHarborContextDraftRequest {
-    /** Optional note stored with the draft and copied to published version 1 on promotion. */
+    /** Optional note stored with the draft and copied to published version 1 on promotion */
     change_note?: string;
     /** Complete plain-text draft content. Maximum 20,000 characters. */
     content: string;

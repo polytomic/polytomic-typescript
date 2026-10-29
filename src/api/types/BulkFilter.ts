@@ -3,8 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface BulkFilter {
-    /** Schema field ID to filter on. */
+    /** Schema field ID to filter on */
     field_id?: string | undefined;
+    /** Comparison function applied to the field */
     function: Polytomic.FilterFunction;
+    /** Value the function compares the field against */
     value?: unknown | undefined;
 }

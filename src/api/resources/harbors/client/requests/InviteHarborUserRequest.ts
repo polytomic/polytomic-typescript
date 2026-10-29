@@ -7,6 +7,6 @@
  *     }
  */
 export interface InviteHarborUserRequest {
-    /** Email address used to invite the Harbor-only user. */
+    /** Email address used to invite the Harbor-only user */
     email: string;
 }

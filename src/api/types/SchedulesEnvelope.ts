@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface SchedulesEnvelope {
+    /** Schedules configured on the bulk sync */
     data?: Polytomic.BulkBulkSyncSchedule[] | undefined;
 }

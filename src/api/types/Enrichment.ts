@@ -3,11 +3,14 @@
 import type * as Polytomic from "../index";
 
 export interface Enrichment {
+    /** Enricher configuration */
     configuration?: Polytomic.EnricherConfiguration | undefined;
+    /** Connection ID of the enrichment source */
     connection_id?: string | undefined;
     /** Must be provided to update an existing enrichment */
     enricher_id?: string | undefined;
     /** If not provided, all fields will be enabled. */
     fields?: Polytomic.ModelField[] | undefined;
+    /** Mappings from model fields to enricher input fields */
     mappings?: Polytomic.EnricherMapping | undefined;
 }

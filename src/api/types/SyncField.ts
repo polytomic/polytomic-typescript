@@ -3,15 +3,16 @@
 import type * as Polytomic from "../index";
 
 export interface SyncField {
-    /** Whether the field should be encrypted. */
+    /** Whether the field should be encrypted */
     encryption_enabled?: boolean | undefined;
     /** New is set to true if the target field should be created by Polytomic. This is not supported by all backends. */
     "new"?: boolean | undefined;
     /** Value to set in the target field; a mapping with an override value and no source is stored as an override field. */
     override_value?: string | undefined;
+    /** Source field to sync from. Required if 'override_value' is not provided. */
     source?: Polytomic.Source | undefined;
     /** Sync mode for the field; defaults to 'updateOrCreate'. If set to 'create', the field will not be synced if it already has a value. This is not supported by all backends. */
     sync_mode?: string | undefined;
-    /** Target field ID the source field value will be written to. */
+    /** Target field ID the source field value will be written to */
     target: string;
 }

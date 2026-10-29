@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface CreateHarborEnvelope {
+    /** The created Harbor */
     data?: Polytomic.CreateHarborResponse | undefined;
 }

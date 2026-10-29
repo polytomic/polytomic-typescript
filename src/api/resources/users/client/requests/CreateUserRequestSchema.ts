@@ -7,7 +7,7 @@
  *     }
  */
 export interface CreateUserRequestSchema {
-    /** Email address used to sign the user in and receive notifications. */
+    /** Email address used to sign the user in and receive notifications */
     email: string;
     /** Deprecated legacy role name. Use role_ids instead; setting both role and role_ids in the same request is rejected. */
     role?: string;

@@ -3,11 +3,11 @@
 import type * as Polytomic from "../index";
 
 export interface EntityResponse {
-    /** Canonical REST path for the resolved resource, suitable for fetching it directly. */
+    /** Canonical REST path for the resolved resource, suitable for fetching it directly */
     canonical_path?: string | undefined;
-    /** Lightweight additional context about the resolved entity, such as bulk sync schema_ids. */
+    /** Lightweight additional context about the resolved entity, such as bulk sync schema_ids */
     context?: Record<string, unknown> | undefined;
-    /** UUID that was resolved. */
+    /** UUID that was resolved */
     id?: string | undefined;
     /** Organization that owns the resolved resource. Omitted from responses on the user-scoped endpoint. */
     organization_id?: string | undefined;

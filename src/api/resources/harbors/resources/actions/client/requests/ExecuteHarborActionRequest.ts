@@ -7,7 +7,9 @@
  *     }
  */
 export interface ExecuteHarborActionRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
     /** Server-issued identifier returned by prepare. Preserve it for status recovery; never prepare a replacement to retry uncertainty. */
     execution_id: string;

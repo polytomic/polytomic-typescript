@@ -209,7 +209,7 @@ export class WebhooksClient {
      * > [Events documentation](../../../guides/events) for the
      * > list of event types and payload shapes.
      *
-     * @param {string} id
+     * @param {string} id - Webhook ID
      * @param {WebhooksClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -288,7 +288,7 @@ export class WebhooksClient {
      * > [Events documentation](../../../guides/events) for the
      * > list of event types and payload shapes.
      *
-     * @param {string} id
+     * @param {string} id - Webhook ID
      * @param {Polytomic.UpdateWebhooksSchema} request
      * @param {WebhooksClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -393,7 +393,7 @@ export class WebhooksClient {
      * configuration, use
      * [`POST /api/webhooks/{id}/disable`](../../../api-reference/webhooks/disable) instead.
      *
-     * @param {string} id
+     * @param {string} id - Webhook ID
      * @param {WebhooksClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -478,7 +478,7 @@ export class WebhooksClient {
      * there are no more results. Response bodies contain content returned by your
      * webhook endpoint. Attempts are listed only while their event is retained.
      *
-     * @param {string} id
+     * @param {string} id - Webhook ID
      * @param {Polytomic.WebhooksListDeliveriesRequest} request
      * @param {WebhooksClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -607,7 +607,7 @@ export class WebhooksClient {
      * delivery, re-enable the webhook using
      * [`POST /api/webhooks/{id}/enable`](../../../../api-reference/webhooks/enable).
      *
-     * @param {string} id
+     * @param {string} id - Webhook ID
      * @param {WebhooksClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -702,7 +702,7 @@ export class WebhooksClient {
      * Delivery resumes from the next event generated after this call. Events that
      * occurred while the webhook was disabled are not replayed.
      *
-     * @param {string} id
+     * @param {string} id - Webhook ID
      * @param {WebhooksClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}

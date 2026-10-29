@@ -208,7 +208,7 @@ export class RolesClient {
      *
      * Returns the role's name, action set, and whether it is a built-in system role.
      *
-     * @param {string} id
+     * @param {string} id - Role ID
      * @param {RolesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -285,7 +285,7 @@ export class RolesClient {
      * > 🚧 Built-in system roles (such as Admin and Member) cannot be updated.
      * > Attempting to modify a system role returns an error.
      *
-     * @param {string} id
+     * @param {string} id - Role ID
      * @param {Polytomic.permissions.UpdateRoleRequest} request
      * @param {RolesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -392,7 +392,7 @@ export class RolesClient {
      * [`PUT /api/permissions/policies/{id}`](../../../../api-reference/permissions/policies/update) to avoid
      * leaving stale role references.
      *
-     * @param {string} id
+     * @param {string} id - Role ID
      * @param {RolesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}

@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface GetConnectionUsageEnvelope {
+    /** API usage for the connection */
     data?: Polytomic.ConnectionUsageResponse | undefined;
 }

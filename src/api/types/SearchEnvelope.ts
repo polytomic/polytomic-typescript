@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface SearchEnvelope {
+    /** Matching resources, ordered by type and name */
     data?: Polytomic.SearchResultItem[] | undefined;
+    /** Truncation and completeness details for the results */
     metadata?: Polytomic.SearchResultMetadata | undefined;
 }

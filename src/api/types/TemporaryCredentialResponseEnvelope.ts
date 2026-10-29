@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface TemporaryCredentialResponseEnvelope {
+    /** The issued temporary credential */
     data?: Polytomic.TemporaryCredentialResponse | undefined;
 }

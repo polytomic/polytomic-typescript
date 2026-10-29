@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface StartSyncResponseEnvelope {
+    /** The started execution */
     data?: Polytomic.StartSyncResponseSchema | undefined;
 }

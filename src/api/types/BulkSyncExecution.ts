@@ -3,23 +3,40 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncExecution {
+    /** When the execution finished */
     completed_at?: string | undefined;
+    /** When the execution was created */
     created_at?: string | undefined;
+    /** Total errors across all schemas */
     error_count?: number | undefined;
+    /** Selective fetch mode the execution runs with */
     fetch_mode?: Polytomic.BulkFetchMode | undefined;
+    /** Bulk sync execution ID */
     id?: string | undefined;
+    /** Whether the execution syncs only a selected subset of schemas */
     is_partial?: boolean | undefined;
+    /** Whether the execution is a resync */
     is_resync?: boolean | undefined;
+    /** Whether the execution is a test execution */
     is_test?: boolean | undefined;
+    /** How the destination was handled during this execution (retain, truncate, rebuild) */
     output_disposition?: Polytomic.BulkOutputDisposition | undefined;
+    /** Total records processed across all schemas */
     record_count?: number | undefined;
+    /** Per-schema executions within this execution */
     schemas?: Polytomic.BulkSyncSchemaExecution[] | undefined;
+    /** When the execution started */
     started_at?: string | undefined;
+    /** Status of the execution */
     status?: Polytomic.BulkExecutionStatus | undefined;
+    /** Detail about the execution's status, such as an error message */
     status_message?: string | undefined;
+    /** What triggered the execution */
     type?: string | undefined;
+    /** When the execution was last updated */
     updated_at?: string | undefined;
-    /** Polytomic version which last ran this execution. */
+    /** Polytomic version which last ran this execution */
     version?: string | undefined;
+    /** Total warnings across all schemas */
     warning_count?: number | undefined;
 }

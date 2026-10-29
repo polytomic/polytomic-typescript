@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ExportSyncLogsEnvelope {
+    /** The exported log archive, with an empty url while the export job runs */
     data?: Polytomic.ExportSyncLogsResponse | undefined;
+    /** Export job to poll, present while the log archive is being prepared */
     job?: Polytomic.JobResponse | undefined;
 }

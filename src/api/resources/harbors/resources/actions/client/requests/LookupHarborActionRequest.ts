@@ -12,15 +12,18 @@ import type * as Polytomic from "../../../../../../index";
  *     }
  */
 export interface LookupHarborActionRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
-    /** Connection ID from Harbor action discovery. */
+    /** Connection ID from Harbor action discovery */
     connection_id: string;
     /** Unique, nonempty subset of granted output field IDs. Omit to return all currently available granted outputs. Null and empty arrays are invalid. */
     fields?: string[];
+    /** One granted lookup field and exact scalar value */
     lookup: Polytomic.ActionLookup;
-    /** Exact read-only operation ID from action discovery. */
+    /** Exact read-only operation ID from action discovery */
     operation_id: string;
-    /** Exact schema ID from action discovery. */
+    /** Exact schema ID from action discovery */
     schema_id: string;
 }

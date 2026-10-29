@@ -1,3 +1,4 @@
+export type { ActivateBulkSyncInput } from "./ActivateBulkSyncInput";
 export type { BulkSyncDeleteRequest } from "./BulkSyncDeleteRequest";
 export type { BulkSyncGetRequest } from "./BulkSyncGetRequest";
 export type { BulkSyncGetSourceRequest } from "./BulkSyncGetSourceRequest";

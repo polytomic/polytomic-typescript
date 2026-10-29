@@ -3,11 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncExecutionStatus {
-    /** Next scheduled execution time, if the sync has a schedule configured. */
+    /** Next scheduled execution time, if the sync has a schedule configured */
     nextExecutionTime?: string | undefined;
-    /** Most recent execution status for each enabled schema in the sync. */
+    /** Most recent execution status for each enabled schema in the sync */
     schemas?: Polytomic.BulkSyncSchemaExecutionStatus[] | undefined;
+    /** Sync execution status across all schemas */
     status?: Polytomic.BulkExecutionStatus | undefined;
-    /** Unique identifier of the bulk sync. */
+    /** Unique identifier of the bulk sync */
     sync_id?: string | undefined;
 }

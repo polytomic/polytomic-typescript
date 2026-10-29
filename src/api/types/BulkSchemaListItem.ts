@@ -7,13 +7,13 @@ export interface BulkSchemaListItem {
     destination_history_output_name?: string | undefined;
     /** When true, the sync ignores any configured data_cutoff_timestamp and syncs the full history of this schema. */
     disable_data_cutoff?: boolean | undefined;
-    /** Whether this schema is included in sync runs. */
+    /** Whether this schema is included in sync runs */
     enabled?: boolean | undefined;
-    /** Whether a companion history table is maintained beside this schema's output, recording every version observed on successive runs. */
+    /** Whether a companion history table is maintained beside this schema's output, recording every version observed on successive runs */
     history_enabled?: boolean | undefined;
-    /** Source-side schema identifier (e.g. object name for SaaS sources, schema.table for databases). */
+    /** Source-side schema identifier (e.g. object name for SaaS sources, schema.table for databases) */
     id?: string | undefined;
-    /** Effective name of the object written to the destination after any configured naming rules are applied. */
+    /** Effective name of the object written to the destination after any configured naming rules are applied */
     output_name?: string | undefined;
     /** Source field used to partition rows when writing to the destination. Empty if the destination does not require one. */
     partition_key?: string | undefined;

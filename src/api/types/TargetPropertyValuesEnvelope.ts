@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface TargetPropertyValuesEnvelope {
+    /** The target-creation property and its valid values */
     data?: Polytomic.TargetPropertyValues | undefined;
 }

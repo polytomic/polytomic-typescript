@@ -3,12 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface ModelSearchHit {
+    /** API paths of the model and its connection */
     links: Polytomic.SearchResultLinks;
-    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata. */
+    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata */
     matches?: Polytomic.SearchMatch[] | undefined;
+    /** Connection ID of the model */
     model_connection_id: string;
+    /** Name of the model's connection */
     model_connection_name: string;
+    /** Connection type of the model's connection */
     model_connection_type: string;
+    /** Model ID */
     model_id: string;
+    /** Model name */
     model_name: string;
 }

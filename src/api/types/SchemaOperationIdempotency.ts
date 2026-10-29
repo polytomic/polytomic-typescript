@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface SchemaOperationIdempotency {
+    /** Deduplication window in nanoseconds */
     retention_ns?: Polytomic.TimeDuration | undefined;
+    /** Where idempotency keys must be unique */
     scope?: string | undefined;
 }

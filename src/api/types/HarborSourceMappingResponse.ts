@@ -3,8 +3,8 @@
 export interface HarborSourceMappingResponse {
     /** Qualified table name in the Harbor's backing Connection. Empty unless status is resolved. */
     destination_schema_id?: string | undefined;
-    /** Requested source field identifiers mapped to their destination names. A requested field that was not materialized is absent. */
+    /** Requested source field identifiers mapped to their destination names. A requested field that is not in the Harbor is absent. */
     fields?: Record<string, string | undefined> | undefined;
-    /** resolved when exactly one completed materialization was found, unresolved when none was, ambiguous when more than one was. */
+    /** resolved when exactly one sync writes the table into the Harbor and the table is there: a bulk sync's completed run, or a model sync's configured table in the Harbor's cached schema. unresolved when none does, ambiguous when more than one does. */
     status?: string | undefined;
 }

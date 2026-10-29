@@ -210,7 +210,7 @@ export class PoliciesClient {
      * Returns the full set of action/role bindings defined by the policy, including
      * the resources it applies to.
      *
-     * @param {string} id
+     * @param {string} id - Policy ID
      * @param {PoliciesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -299,7 +299,7 @@ export class PoliciesClient {
      * [`GET /api/permissions/policies/{id}`](../../../../api-reference/permissions/policies/get), modify the relevant bindings,
      * and send the complete object back.
      *
-     * @param {string} id
+     * @param {string} id - Policy ID
      * @param {Polytomic.permissions.UpdatePolicyRequest} request
      * @param {PoliciesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -406,7 +406,7 @@ export class PoliciesClient {
      * Deletion is permanent. Any access that was granted solely through this policy
      * is revoked immediately for all users who depended on it.
      *
-     * @param {string} id
+     * @param {string} id - Policy ID
      * @param {PoliciesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}

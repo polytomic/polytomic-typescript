@@ -52,7 +52,7 @@ export class ModelSyncClient {
      * sync mapping with
      * [`GET /api/connections/{id}/modelsync/source/fields`](../../../../../api-reference/model-sync/get-source-fields).
      *
-     * @param {string} id - Unique identifier of the connection.
+     * @param {string} id - Unique identifier of the connection
      * @param {Polytomic.ModelSyncGetSourceRequest} request
      * @param {ModelSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -193,7 +193,7 @@ export class ModelSyncClient {
      * > array suffix, such as `params[stream_id][]=deals`, is rejected with
      * > `400 Bad Request`. Use `params[stream_id]=deals` instead.
      *
-     * @param {string} id - Unique identifier of the connection.
+     * @param {string} id - Unique identifier of the connection
      * @param {Polytomic.ModelSyncGetSourceFieldsRequest} request
      * @param {ModelSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -664,7 +664,7 @@ export class ModelSyncClient {
      * [`GET /api/syncs/{id}/status`](../../../api-reference/model-sync/get-status). For the full history of
      * executions, use [`GET /api/syncs/{id}/executions`](../../../api-reference/model-sync/executions/list).
      *
-     * @param {string} id
+     * @param {string} id - Model sync ID
      * @param {ModelSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -747,7 +747,8 @@ export class ModelSyncClient {
      *
      * Updating a model sync is a **full replacement** of the sync's configuration.
      * Every field in the request body is written to the sync; any field you omit is
-     * cleared or reset to its default value.
+     * cleared or reset to its default value. An empty or omitted `policies` list
+     * leaves the sync's current policies unchanged.
      *
      * To make a partial change — for example, toggling `active` or adjusting a
      * single field mapping — fetch the current sync with
@@ -759,7 +760,7 @@ export class ModelSyncClient {
      * Changes to source fields, target configuration, filters, or field mappings
      * take effect on the sync's next execution.
      *
-     * @param {string} id
+     * @param {string} id - Model sync ID
      * @param {Polytomic.UpdateModelSyncV5Request} request
      * @param {ModelSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -885,7 +886,7 @@ export class ModelSyncClient {
      * record is removed. Deleted syncs cannot be recovered; recreate them using
      * [`POST /api/syncs`](../../../api-reference/model-sync/create) if needed.
      *
-     * @param {string} id
+     * @param {string} id - Model sync ID
      * @param {ModelSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -989,7 +990,7 @@ export class ModelSyncClient {
      * > progress. Use [`POST /api/syncs/{id}/cancel`](../../../../api-reference/model-sync/cancel) to stop a
      * > running execution.
      *
-     * @param {string} id
+     * @param {string} id - Model sync ID
      * @param {Polytomic.ActivateSyncInput} request
      * @param {ModelSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1183,7 +1184,7 @@ export class ModelSyncClient {
      * >
      * > Use caution when setting the `resync` parameter to `true`. This will force a full resync of the data from the source system. This can be a time-consuming operation and may impact the performance of the source system. It is recommended to only use this option when necessary.
      *
-     * @param {string} id
+     * @param {string} id - Model sync ID
      * @param {Polytomic.StartModelSyncRequest} request
      * @param {ModelSyncClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1290,7 +1291,7 @@ export class ModelSyncClient {
      * start time, completion time, and record counts. For the complete execution
      * history, use [`GET /api/syncs/{id}/executions`](../../../../api-reference/model-sync/executions/list).
      *
-     * @param {string} id
+     * @param {string} id - Model sync ID
      * @param {ModelSyncClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}

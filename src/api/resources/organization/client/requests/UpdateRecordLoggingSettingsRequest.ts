@@ -11,6 +11,6 @@ export interface UpdateRecordLoggingSettingsRequest {
     deliveryConnectionId?: string;
     /** Path record logs are delivered under, ahead of the organization ID. Omit or send null for none; this field is replaced, not merged. */
     deliveryPrefix?: string;
-    /** Whether record logging is enabled for the organization. */
+    /** Whether record logging is enabled for the organization */
     enabled: boolean;
 }

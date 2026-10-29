@@ -57,7 +57,7 @@ export class SharedConnectionsClient {
      * If any required lookup is unavailable, `rate_limit` is `null`. This does not change
      * `status` or `status_error`, and the Connection response is still returned.
      *
-     * @param {string} id - Unique identifier of the parent connection whose shared copies should be listed.
+     * @param {string} id - Unique identifier of the parent connection whose shared copies should be listed
      * @param {SharedConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -179,8 +179,8 @@ export class SharedConnectionsClient {
      * If any required lookup is unavailable, `rate_limit` is `null`. This does not change
      * `status` or `status_error`, and the Connection response is still returned.
      *
-     * @param {string} org_id - Unique identifier of the organization that owns the parent connection.
-     * @param {string} connection_id - Unique identifier of the parent connection whose shared copies should be listed.
+     * @param {string} org_id - Unique identifier of the organization that owns the parent connection
+     * @param {string} connection_id - Unique identifier of the parent connection whose shared copies should be listed
      * @param {SharedConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -282,8 +282,8 @@ export class SharedConnectionsClient {
     /**
      * Shares a connection with another organization in the caller's partner account.
      *
-     * @param {string} org_id - Unique identifier of the organization that owns the parent connection.
-     * @param {string} connection_id - Unique identifier of the parent connection to share.
+     * @param {string} org_id - Unique identifier of the organization that owns the parent connection
+     * @param {string} connection_id - Unique identifier of the parent connection to share
      * @param {Polytomic.connections.PartnerCreateSharedConnectionRequestSchema} request
      * @param {SharedConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *

@@ -3,6 +3,6 @@
 export interface IdentityFunction {
     /** Identifier of the identity function; use this value when configuring the sync identity. */
     id?: string | undefined;
-    /** Human-readable label for the identity function. */
+    /** Human-readable label for the identity function */
     label?: string | undefined;
 }

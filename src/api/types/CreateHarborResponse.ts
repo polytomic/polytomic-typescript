@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface CreateHarborResponse {
+    /** New plaintext credential. Omitted when credential generation is disabled. */
     api_key?: Polytomic.HarborApiKeyCreatedResponse | undefined;
+    /** Created Harbor */
     harbor?: Polytomic.HarborResponse | undefined;
 }

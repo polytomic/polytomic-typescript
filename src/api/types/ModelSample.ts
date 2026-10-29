@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface ModelSample {
+    /** Up to ten records sampled from the model */
     records?: Polytomic.SampleRecord[] | undefined;
+    /** Warnings raised while enriching the sampled records */
     warnings?: string[] | undefined;
 }

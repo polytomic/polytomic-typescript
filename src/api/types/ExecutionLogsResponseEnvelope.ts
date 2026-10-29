@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ExecutionLogsResponseEnvelope {
+    /** Signed URLs for the execution log files */
     data?: Polytomic.ExecutionLogResponse | undefined;
 }

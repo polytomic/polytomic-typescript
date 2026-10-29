@@ -20,7 +20,7 @@ describe("PoliciesClient", () => {
                     id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     name: "Policy",
                     organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                    policy_actions: [{ action: "read", role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"] }],
+                    policy_actions: [{ action: "edit", role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"] }],
                     system: false,
                 },
             ],
@@ -76,7 +76,7 @@ describe("PoliciesClient", () => {
                 id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                 name: "Policy",
                 organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                policy_actions: [{ action: "read", role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"] }],
+                policy_actions: [{ action: "edit", role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"] }],
                 system: false,
             },
         };

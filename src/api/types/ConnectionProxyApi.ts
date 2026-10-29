@@ -3,11 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectionProxyApi {
-    /** True for the API used when request.api is omitted. */
+    /** True for the API used when request.api is omitted */
     default?: boolean | undefined;
-    /** What this API is for. */
+    /** What this API is for */
     description?: string | undefined;
+    /** Base URL, query parameters, and headers that the proxy automatically applies to requests sent to this API */
     inheritedBase?: Polytomic.ConnectionProxyInheritedBase | undefined;
-    /** Identifier to pass as request.api to call this API. */
+    /** Identifier to pass as request.api to call this API */
     name?: string | undefined;
 }

@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface LogsIndexResponseEnvelope {
+    /** Record-log index for the execution */
     data?: Polytomic.LogsIndexResponse | undefined;
 }

@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionLookupEnvelope {
+    /** Exactly one record projected to the selected currently granted outputs */
     data?: Polytomic.SchemaRecord | undefined;
 }

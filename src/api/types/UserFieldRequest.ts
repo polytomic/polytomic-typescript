@@ -3,15 +3,16 @@
 import type * as Polytomic from "../index";
 
 export interface UserFieldRequest {
+    /** Detailed type of the field, such as "bigint" or ["decimal", {"precision": 10, "scale": 2}]; it must be consistent with type. */
     definition?: Polytomic.TypesDefinition | undefined;
-    /** Example value shown in the UI and used as a hint for downstream consumers. */
+    /** Example value shown in the UI and used as a hint for downstream consumers */
     example?: unknown | undefined;
     /** Stable identifier for the user-defined field. Reuse an existing field_id to update a field in place. */
     field_id: string;
-    /** Human-readable label shown to users selecting this field in the app. */
+    /** Human-readable label shown to users selecting this field in the app */
     label: string;
     /** JSON path expression that extracts the field's value from the source record. Required for nested or computed fields; omit for top-level fields. */
     path?: string | undefined;
-    /** One of: string, number, boolean, datetime, array, object, binary. */
+    /** One of: string, number, boolean, datetime, array, object, binary */
     type: string;
 }

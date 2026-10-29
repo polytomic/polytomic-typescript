@@ -142,7 +142,7 @@ export class ExecutionsClient {
      * For the full details of a single run — including per-schema execution status —
      * use [`GET /api/bulk/syncs/{id}/executions/{exec_id}`](../../../../../api-reference/bulk-sync/executions/get).
      *
-     * @param {string} id - Unique identifier of the bulk sync.
+     * @param {string} id - Unique identifier of the bulk sync
      * @param {Polytomic.bulkSync.ExecutionsListRequest} request
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -246,8 +246,8 @@ export class ExecutionsClient {
      * error details. This makes it suitable for diagnosing partial failures where
      * some schemas succeeded while others did not.
      *
-     * @param {string} id - Unique identifier of the bulk sync.
-     * @param {string} exec_id - Unique identifier of the execution.
+     * @param {string} id - Unique identifier of the bulk sync
+     * @param {string} exec_id - Unique identifier of the execution
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -332,8 +332,8 @@ export class ExecutionsClient {
      * execution reaches a terminal state (`completed`, `canceled`, or `failed`) to
      * confirm cancellation has taken effect.
      *
-     * @param {string} id - The bulk sync ID.
-     * @param {string} exec_id - The execution ID to cancel.
+     * @param {string} id - The bulk sync ID
+     * @param {string} exec_id - The execution ID to cancel
      * @param {ExecutionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -428,8 +428,8 @@ export class ExecutionsClient {
     /**
      * Fetch the latest console log entries for a bulk sync execution. Returns the most recent 50 entries.
      *
-     * @param {string} sync_id
-     * @param {string} execution_id
+     * @param {string} sync_id - Bulk sync ID
+     * @param {string} execution_id - Bulk sync execution ID
      * @param {Polytomic.bulkSync.ExecutionsGetConsoleLogsRequest} request
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -555,8 +555,8 @@ export class ExecutionsClient {
      * > [`POST /api/bulk/syncs/{sync_id}/executions/{execution_id}/logs/export`](../../../../../../../api-reference/bulk-sync/executions/export-logs)
      * > instead.
      *
-     * @param {string} sync_id - Unique identifier of the bulk sync.
-     * @param {string} execution_id - Unique identifier of the execution whose log files should be listed.
+     * @param {string} sync_id - Unique identifier of the bulk sync
+     * @param {string} execution_id - Unique identifier of the execution whose log files should be listed
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -650,8 +650,8 @@ export class ExecutionsClient {
      * > Set `notify=true` to also email the requesting user when the archive is
      * > ready.
      *
-     * @param {string} sync_id - Unique identifier of the bulk sync.
-     * @param {string} execution_id - Unique identifier of the execution whose logs should be exported.
+     * @param {string} sync_id - Unique identifier of the bulk sync
+     * @param {string} execution_id - Unique identifier of the execution whose logs should be exported
      * @param {Polytomic.bulkSync.ExecutionsExportLogsRequest} request
      * @param {ExecutionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -756,9 +756,9 @@ export class ExecutionsClient {
     /**
      * Fetch the latest console log entries for a schema within a bulk sync execution. Returnst the most recent 50 entries.
      *
-     * @param {string} sync_id
-     * @param {string} execution_id
-     * @param {string} schema_id - Schema identifier for schema-scoped console logs.
+     * @param {string} sync_id - Bulk sync ID
+     * @param {string} execution_id - Bulk sync execution ID
+     * @param {string} schema_id - Schema identifier for schema-scoped console logs
      * @param {Polytomic.bulkSync.ExecutionsGetSchemaConsoleLogsRequest} request
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -877,7 +877,7 @@ export class ExecutionsClient {
     /**
      * Fetch the latest console log entries for ingestion scoped by connection and optional bulk sync. Returns the most recent 50 entries.
      *
-     * @param {string} connection_id
+     * @param {string} connection_id - Connection ID
      * @param {Polytomic.bulkSync.ExecutionsGetIngestConsoleLogsRequest} request
      * @param {ExecutionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *

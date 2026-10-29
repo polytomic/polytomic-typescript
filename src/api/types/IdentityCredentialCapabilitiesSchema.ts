@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface IdentityCredentialCapabilitiesSchema {
+    /** Connections this credential may query through the query runner */
     query?: Polytomic.IdentityCredentialConnectionCapabilitySchema | undefined;
+    /** Connections this credential may inspect schemas for */
     schemas?: Polytomic.IdentityCredentialConnectionCapabilitySchema | undefined;
 }

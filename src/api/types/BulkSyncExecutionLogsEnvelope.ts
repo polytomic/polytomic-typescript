@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncExecutionLogsEnvelope {
+    /** Signed URLs for the execution's log files */
     data?: Polytomic.BulkSyncExecutionLogs | undefined;
 }

@@ -10,6 +10,6 @@
 export interface HarborsListUsersRequest {
     /** Maximum number of assigned users to return. Defaults to 50 and cannot exceed 50. */
     limit?: number;
-    /** Opaque pagination cursor returned by the previous request. */
+    /** Opaque pagination cursor returned by the previous request */
     page_token?: string;
 }

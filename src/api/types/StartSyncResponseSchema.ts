@@ -3,8 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface StartSyncResponseSchema {
+    /** When the execution was created */
     created_at?: string | undefined;
     /** Execution ID */
     id?: string | undefined;
+    /** Status of the new execution */
     status?: Polytomic.UtilExecutionStatus | undefined;
 }

@@ -16,12 +16,14 @@
  */
 export interface CreateConnectionRequestSchema {
     configuration: Record<string, unknown>;
-    /** Override interval for connection health checking. */
+    /** Override interval for connection health checking */
     healthcheck_interval?: string;
     name: string;
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
+    /** Permissions policy IDs applied to the connection */
     policies?: string[];
-    /** URL to redirect to after completing OAuth flow. */
+    /** URL to redirect to after completing OAuth flow */
     redirect_url?: string;
     type: string;
     /** Validate connection configuration. */

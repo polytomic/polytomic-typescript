@@ -7,5 +7,6 @@
  *     }
  */
 export interface BulkSyncGetRequest {
+    /** Deprecated; has no effect */
     refresh_schemas?: boolean;
 }

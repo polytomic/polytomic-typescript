@@ -3,26 +3,47 @@
 import type * as Polytomic from "../index";
 
 export interface HarboractivityapiHarborActivityEvent {
+    /** Actor that performed the operation */
     actor?: Polytomic.HarboractivityapiHarborActivityActorSnapshot | undefined;
+    /** Query attempt ID */
     attempt_id?: string | undefined;
+    /** MCP-observed client name of the event's session */
     client_name?: string | undefined;
+    /** MCP-observed client version of the event's session */
     client_version?: string | undefined;
+    /** Connection ID involved in the event */
     connection_id?: string | undefined;
+    /** Context document ID involved in the event */
     context_id?: string | undefined;
+    /** Context revision ID involved in the event */
     context_revision_id?: string | undefined;
+    /** Harbor credential associated with the event */
     credential?: Polytomic.HarboractivityapiHarborActivityIdentitySnapshot | undefined;
-    event_type?: string | undefined;
+    /** Type of operation the event records */
+    event_type?: Polytomic.HarboractivityEventType | undefined;
+    /** Harbor ID of the event */
     harbor_id?: string | undefined;
+    /** Activity event ID */
     id?: string | undefined;
     lifecycle_events?: Polytomic.HarboractivityapiHarborActivityEvent[] | undefined;
+    /** Event-specific details */
     metadata?: Polytomic.HarboractivityapiHarborActivityMetadata | undefined;
+    /** When the operation occurred */
     occurred_at?: string | undefined;
+    /** Operation ID shared by the events of one query or action */
     operation_id?: string | undefined;
-    outcome?: string | undefined;
+    /** Outcome of the operation: succeeded, failed, denied, or unknown */
+    outcome?: Polytomic.HarboractivityOutcome | undefined;
+    /** Harbor profile associated with the event */
     profile?: Polytomic.HarboractivityapiHarborActivityIdentitySnapshot | undefined;
-    provenance?: string | undefined;
+    /** How the event was attested: server_observed, service_attested, or client_asserted */
+    provenance?: Polytomic.HarboractivityProvenance | undefined;
+    /** Source of the query, for query events */
     query_source?: Polytomic.HarboractivityapiHarborActivityQuerySource | undefined;
+    /** When Polytomic recorded the event */
     recorded_at?: string | undefined;
+    /** Harbor session ID of the event */
     session_id?: string | undefined;
+    /** Resources involved in the event */
     targets?: Polytomic.HarboractivityapiHarborActivityTarget[] | undefined;
 }

@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectCardResponseEnvelope {
+    /** The Connect session */
     data?: Polytomic.ConnectCardResponse | undefined;
 }

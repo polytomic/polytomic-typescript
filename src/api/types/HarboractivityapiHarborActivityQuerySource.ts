@@ -3,8 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface HarboractivityapiHarborActivityQuerySource {
+    /** Query source: saved_query, ad_hoc, or unknown when the submission is no longer retained */
     kind?: string | undefined;
+    /** Saved query that was submitted, when kind is saved_query */
     saved_query?: Polytomic.HarboractivityapiHarborActivitySavedQuerySource | undefined;
+    /** ID of the query.submitted event */
     submission_event_id?: string | undefined;
+    /** When the query was submitted */
     submitted_at?: string | undefined;
 }

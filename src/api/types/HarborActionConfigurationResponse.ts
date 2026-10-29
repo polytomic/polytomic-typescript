@@ -3,14 +3,14 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionConfigurationResponse {
-    /** Configured source Connection ID, including sources no longer attached to the Harbor. */
+    /** Configured source Connection ID, including sources no longer attached to the Harbor */
     connection_id?: string | undefined;
-    /** When these grants were first created. */
+    /** When these grants were first created */
     created_at?: string | undefined;
-    /** Configured action permissions. */
+    /** Configured action permissions */
     grants?: Polytomic.HarborActionGrantSchema[] | undefined;
-    /** Revision to supply when replacing or removing these grants. */
+    /** Revision to supply when replacing or removing these grants */
     revision?: string | undefined;
-    /** When these grants were last replaced. */
+    /** When these grants were last replaced */
     updated_at?: string | undefined;
 }

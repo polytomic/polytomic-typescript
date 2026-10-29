@@ -3,14 +3,22 @@
 import type * as Polytomic from "../index";
 
 export interface GetExecutionResponseSchema {
+    /** When the execution completed */
     completed_at?: string | undefined;
+    /** Record counts for the execution */
     counts?: Polytomic.ExecutionCounts | undefined;
+    /** When the execution was created */
     created_at?: string | undefined;
+    /** Execution errors not tied to a specific record */
     errors?: string[] | undefined;
+    /** Execution ID */
     id?: string | undefined;
+    /** When the execution started */
     started_at?: string | undefined;
+    /** Status of the execution */
     status?: Polytomic.UtilExecutionStatus | undefined;
+    /** What triggered the execution */
     type?: string | undefined;
-    /** Polytomic version which last ran this execution. */
+    /** Polytomic version which last ran this execution */
     version?: string | undefined;
 }

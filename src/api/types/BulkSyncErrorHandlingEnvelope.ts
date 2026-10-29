@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncErrorHandlingEnvelope {
+    /** Error handling settings for the bulk sync */
     data?: Polytomic.BulkSyncErrorHandling | undefined;
 }

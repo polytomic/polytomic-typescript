@@ -3,12 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface CreateConnectionResponseSchema {
-    /** Code to enter in order to complete connection authentication. */
+    /** Code to enter in order to complete connection authentication */
     auth_code?: string | undefined;
-    /** URL to visit to complete connection authentication. */
+    /** URL to visit to complete connection authentication */
     auth_url?: string | undefined;
     configuration?: Record<string, unknown> | undefined;
-    /** Interval for connection health checking. */
+    /** Interval for connection health checking */
     healthcheck_interval?: string | undefined;
     id?: string | undefined;
     name?: string | undefined;

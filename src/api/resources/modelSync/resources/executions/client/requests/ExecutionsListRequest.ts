@@ -9,7 +9,10 @@
  *     }
  */
 export interface ExecutionsListRequest {
+    /** Token from the previous page */
     page_token?: string;
+    /** Return only completed executions. */
     only_completed?: boolean;
+    /** Return executions oldest first. */
     ascending?: boolean;
 }

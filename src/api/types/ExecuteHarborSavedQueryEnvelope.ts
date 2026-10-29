@@ -3,14 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface ExecuteHarborSavedQueryEnvelope {
+    /** The submitted query */
     data?: ExecuteHarborSavedQueryEnvelope.Data | undefined;
 }
 
 export namespace ExecuteHarborSavedQueryEnvelope {
+    /**
+     * The submitted query
+     */
     export interface Data {
         /** The number of rows returned by the query. This will not be returned until the query completes. */
         count?: number | undefined;
-        /** Error message if the query failed. */
+        /** Error message if the query failed */
         error?: string | undefined;
         /** The time at which the query will expire and be deleted. This will not be returned until the query completes. */
         expires?: string | undefined;
@@ -18,14 +22,15 @@ export namespace ExecuteHarborSavedQueryEnvelope {
         fields?: string[] | undefined;
         /** The ID of the query task. Poll GET /api/queries/{id} until the task reaches the terminal status done, failed, or unknown. */
         id?: string | undefined;
-        /** The query results, returned as an array of objects. */
+        /** The query results, returned as an array of objects */
         results?: Record<string, unknown>[] | undefined;
-        /** Immutable published revision selected while processing this request, before execution acceptance. */
+        /** Immutable published revision selected while processing this request, before execution acceptance */
         revision_id?: string | undefined;
-        /** Stable identifier of the executed saved query. */
+        /** Stable identifier of the executed saved query */
         saved_query_id?: string | undefined;
+        /** Current query status. The terminal statuses are done, failed, and unknown. Unknown means execution started but its durable terminal result was lost or expired. */
         status?: Polytomic.QueryStatus | undefined;
-        /** Published version of the selected immutable revision. */
+        /** Published version of the selected immutable revision */
         version?: number | undefined;
     }
 }

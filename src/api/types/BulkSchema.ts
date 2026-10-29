@@ -3,10 +3,13 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSchema {
+    /** Records older than this timestamp are excluded from sync runs. */
     data_cutoff_timestamp?: string | undefined;
-    /** Name of the companion history table. Present only when history is enabled on a destination that supports it. */
+    /** Name of the companion history table. Present only when history is enabled on a destination that supports it. This value is computed and ignored on input. */
     destination_history_output_name?: string | undefined;
+    /** When true, the sync ignores any configured data_cutoff_timestamp for this schema. */
     disable_data_cutoff?: boolean | undefined;
+    /** Whether this schema is included in sync runs */
     enabled?: boolean | undefined;
     /** fields is not populated on the list endpoint and will be removed in a future version; retrieve individual schemas for fields. */
     fields?: Polytomic.BulkField[] | undefined;
@@ -14,9 +17,14 @@ export interface BulkSchema {
     filters?: Polytomic.BulkFilter[] | undefined;
     /** Whether a companion history table is maintained beside this schema's output, recording every version observed on successive runs. Requires a replicate-mode sync to a destination reporting supports_history_mode. Always present in responses; when patching, omit it to keep the current value. */
     history_enabled?: boolean | undefined;
+    /** Source-side schema identifier */
     id?: string | undefined;
+    /** Name of the object written to the destination. This value is computed and ignored on input; set user_output_name to rename the object. */
     output_name?: string | undefined;
+    /** Source field used to partition rows when writing to the destination */
     partition_key?: string | undefined;
+    /** Source field used to detect changes between incremental sync runs */
     tracking_field?: string | undefined;
+    /** User-specified override for the destination object name */
     user_output_name?: string | undefined;
 }

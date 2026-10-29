@@ -3,12 +3,13 @@
 import type * as Polytomic from "../index";
 
 export interface JobResponse {
-    /** Error message if the job failed. */
+    /** Error message if the job failed */
     error?: string | undefined;
-    /** Identifier of the job. */
+    /** Identifier of the job */
     job_id?: string | undefined;
     /** Job result. Shape depends on the job type; only populated once status is done. */
     result?: unknown | undefined;
+    /** Current execution status of the job (e.g. running, done, failed) */
     status?: Polytomic.WorkTaskStatus | undefined;
     /** Job type. Matches the type used to fetch the job. */
     type?: string | undefined;

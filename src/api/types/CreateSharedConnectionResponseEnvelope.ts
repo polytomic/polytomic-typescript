@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface CreateSharedConnectionResponseEnvelope {
+    /** The shared connection */
     data?: Polytomic.CreateSharedConnectionResponseSchema | undefined;
 }

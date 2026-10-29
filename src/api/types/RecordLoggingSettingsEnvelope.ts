@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface RecordLoggingSettingsEnvelope {
+    /** The organization record logging settings */
     data?: Polytomic.RecordLoggingSettingsResponse | undefined;
 }

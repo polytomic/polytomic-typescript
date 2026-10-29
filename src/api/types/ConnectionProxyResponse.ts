@@ -5,21 +5,22 @@ import type * as Polytomic from "../index";
 export interface ConnectionProxyResponse {
     /** Upstream response body. If the upstream returned JSON, the body is returned as-is; otherwise it is returned as a string. */
     body?: string | undefined;
-    /** Content-Type of the upstream response. */
+    /** Content-Type of the upstream response */
     contentType?: string | undefined;
     /** Response headers returned by the upstream service. Headers listed in blockedResponseHeaders are removed. */
     headers?: Record<string, string | undefined> | undefined;
-    /** Identifier for the async proxy job when async is true. */
+    /** Identifier for the async proxy job when async is true */
     jobId?: string | undefined;
+    /** Current async proxy job status when async is true */
     jobStatus?: Polytomic.WorkTaskStatus | undefined;
-    /** Polling URL for the async proxy job when async is true. */
+    /** Polling URL for the async proxy job when async is true */
     jobUrl?: string | undefined;
-    /** End-to-end latency of the proxied request in milliseconds. */
+    /** End-to-end latency of the proxied request in milliseconds */
     latencyMs?: number | undefined;
-    /** Identifier for this proxy call, suitable for correlating with audit logs. */
+    /** Identifier for this proxy call, suitable for correlating with audit logs */
     proxyCallId?: string | undefined;
-    /** HTTP status code returned by the upstream service for synchronous calls, or 202 when an async proxy job is accepted. */
+    /** HTTP status code returned by the upstream service for synchronous calls, or 202 when an async proxy job is accepted */
     status?: number | undefined;
-    /** True if the response body was truncated because it exceeded maxResponseBodyBytes. */
+    /** True if the response body was truncated because it exceeded maxResponseBodyBytes */
     truncated?: boolean | undefined;
 }

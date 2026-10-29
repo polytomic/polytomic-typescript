@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ScheduleOptionResponseEnvelope {
+    /** Available schedule options */
     data?: Polytomic.ScheduleOptionResponse | undefined;
 }

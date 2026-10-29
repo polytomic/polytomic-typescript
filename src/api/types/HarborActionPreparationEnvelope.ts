@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionPreparationEnvelope {
+    /** The prepared action */
     data?: Polytomic.HarborActionPreparation | undefined;
 }

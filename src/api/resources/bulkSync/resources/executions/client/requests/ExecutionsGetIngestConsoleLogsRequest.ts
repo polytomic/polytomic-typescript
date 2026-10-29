@@ -9,7 +9,7 @@
  *     }
  */
 export interface ExecutionsGetIngestConsoleLogsRequest {
-    /** Optional bulk sync ID for sync-scoped ingestion logs. */
+    /** Optional bulk sync ID for sync-scoped ingestion logs */
     sync_id?: string;
     /** Maximum number of entries to return. Values above the logger retention limit are capped to 50. */
     limit?: number;

@@ -3,9 +3,14 @@
 import type * as Polytomic from "../index";
 
 export interface Identity {
+    /** Function used to match source and destination values */
     function: Polytomic.SchemaIdentityFunction;
+    /** Whether Polytomic creates the identity field in the destination */
     new_field?: boolean | undefined;
+    /** Destination field type to use when Polytomic creates the identity field */
     remote_field_type_id?: string | undefined;
+    /** Model field matched against the destination */
     source: Polytomic.Source;
+    /** Destination field ID matched against the source field */
     target: string;
 }

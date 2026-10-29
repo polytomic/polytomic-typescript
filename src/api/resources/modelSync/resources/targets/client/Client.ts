@@ -67,7 +67,7 @@ export class TargetsClient {
      * When `properties` is supplied, the `refresh` parameter is ignored — a
      * not-yet-created target has no cached schema to refresh.
      *
-     * @param {string} id - Unique identifier of the connection.
+     * @param {string} id - Unique identifier of the connection
      * @param {Polytomic.modelSync.TargetsGetTargetFieldsRequest} request
      * @param {TargetsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -196,7 +196,7 @@ export class TargetsClient {
      * model sync. The `modes` array for a target object defines the `id` along with
      * what operations the mode supports.
      *
-     * @param {string} id
+     * @param {string} id - Connection ID
      * @param {Polytomic.modelSync.TargetsListRequest} request
      * @param {TargetsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -338,8 +338,8 @@ export class TargetsClient {
      * The `value` for the selected option should be passed when [creating a
      * sync](../../../../../../../api-reference/model-sync/create).
      *
-     * @param {string} id
-     * @param {string} property
+     * @param {string} id - Connection ID
+     * @param {string} property - Target-creation property ID
      * @param {TargetsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}

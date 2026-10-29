@@ -10,5 +10,6 @@ export interface GetConnectionTypeParameterValuesRequestSchema {
     connection_id?: string;
     field: string;
     parameters?: Record<string, unknown>;
+    /** Has no effect on the values returned. */
     query?: string;
 }

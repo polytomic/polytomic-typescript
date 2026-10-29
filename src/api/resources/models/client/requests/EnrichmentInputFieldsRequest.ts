@@ -7,5 +7,6 @@ import type * as Polytomic from "../../../../index";
  *     {}
  */
 export interface EnrichmentInputFieldsRequest {
+    /** Enricher configuration to list valid input fields for */
     configuration?: Polytomic.EnricherConfiguration;
 }

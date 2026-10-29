@@ -3,11 +3,11 @@
 import type * as Polytomic from "../index";
 
 export interface ModelFilterCondition {
-    /** Comparison this condition applies to the field's value. */
+    /** Comparison this condition applies to the field's value */
     function: Polytomic.FilterFunction;
     /** Handle naming this condition in 'logic'. A label starts with a letter or underscore and continues with letters, digits and underscores. Labels are scoped to this object, so a model condition and a target condition may share one. Optional: label every condition in the object or none of them, and an unlabelled object is labelled by position -- A, B, C -- which is how labels are always reported back. */
     label?: string | undefined;
-    /** Model field this condition tests, named the same way as a field mapping's source. */
+    /** Model field this condition tests, named the same way as a field mapping's source */
     source: Polytomic.Source;
     /** Value the field is compared against. Omitted for functions which take no value, such as 'IsNotNull'. */
     value?: unknown | undefined;

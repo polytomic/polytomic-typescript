@@ -3,8 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface SearchOperationsResponse {
-    /** Ranked results in the same order as the input queries. */
+    /** Ranked results in the same order as the input queries */
     results?: Polytomic.OperationSearchResult[] | undefined;
-    /** SHA-256 digest of the OpenAPI-derived operation catalog source. */
+    /** SHA-256 digest of the OpenAPI-derived operation catalog source */
     sourceSha256?: string | undefined;
 }

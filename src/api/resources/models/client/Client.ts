@@ -41,7 +41,7 @@ export class ModelsClient {
      * configuration fields required to set it up. Pass those values in the
      * `enrichment` block when creating or updating a model sync.
      *
-     * @param {string} id - Unique identifier of the connection.
+     * @param {string} id - Unique identifier of the connection
      * @param {Polytomic.ModelsGetEnrichmentSourceRequest} request
      * @param {ModelsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -153,10 +153,11 @@ export class ModelsClient {
      * valid input field sets that map your model's fields to the enrichment service's
      * expected inputs.
      *
-     * @param {string} connection_id
+     * @param {string} connection_id - Enrichment connection ID
      * @param {Polytomic.EnrichmentInputFieldsRequest} request
      * @param {ModelsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
+     * @throws {@link Polytomic.BadRequestError}
      * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
@@ -217,6 +218,11 @@ export class ModelsClient {
 
         if (_response.error.reason === "status-code") {
             switch (_response.error.statusCode) {
+                case 400:
+                    throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 403:
                     throw new Polytomic.ForbiddenError(
                         _response.error.body as Polytomic.ApiError,
@@ -250,12 +256,15 @@ export class ModelsClient {
     }
 
     /**
-     * Submits a job that previews the fields a model would expose without persisting it.
+     * Previews the fields a model exposes without saving the model.
      *
-     * The response contains a job ID that resolves to the list of fields the model
-     * would expose. Poll the job until it completes to retrieve the field list. The
-     * model is not persisted — this endpoint is useful for validating a query or
-     * configuration before calling [`POST /api/models`](../../api-reference/models/create) to save it.
+     * The response contains the previewed model, including the fields it exposes.
+     * With `async=true`, the response contains a job instead; poll the job until it
+     * completes to retrieve the field list.
+     *
+     * The model is not saved, and `policies` and `labels` are ignored. Use this
+     * endpoint to validate a query or configuration before calling
+     * [`POST /api/models`](../../api-reference/models/create) to save it.
      *
      * @param {Polytomic.ModelsPreviewRequest} request
      * @param {ModelsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
@@ -557,7 +566,7 @@ export class ModelsClient {
      * configured filters. To preview the data a model would return without saving
      * changes, use [`GET /api/models/{id}/sample`](../../../api-reference/models/sample).
      *
-     * @param {string} id
+     * @param {string} id - Model ID
      * @param {Polytomic.ModelsGetRequest} request
      * @param {ModelsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -650,7 +659,8 @@ export class ModelsClient {
      *
      * Updating a model is a **full replacement** of its configuration. Every field in
      * the request body is written to the model; any field you omit is cleared or reset
-     * to its default value.
+     * to its default value. An empty or omitted `policies` list leaves the model's
+     * current policies unchanged.
      *
      * To make a partial change, fetch the current model with
      * [`GET /api/models/{id}`](../../../api-reference/models/get), modify the fields you want to change, and send
@@ -659,7 +669,7 @@ export class ModelsClient {
      * Changes to source fields, filters, or the identity column take effect on the
      * next sync execution that uses this model.
      *
-     * @param {string} id
+     * @param {string} id - Model ID
      * @param {Polytomic.UpdateModelRequest} request
      * @param {ModelsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -768,7 +778,7 @@ export class ModelsClient {
      * > 🚧 Deleting a model used by one or more syncs will break those syncs. Remove
      * > or reconfigure any syncs that reference this model before deleting it.
      *
-     * @param {string} id
+     * @param {string} id - Model ID
      * @param {Polytomic.ModelsDeleteRequest} request
      * @param {ModelsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -870,7 +880,7 @@ export class ModelsClient {
      * enrichment step can exceed that budget, use the asynchronous option so the
      * work runs as a background job.
      *
-     * @param {string} id
+     * @param {string} id - Model ID
      * @param {Polytomic.ModelsSampleRequest} request
      * @param {ModelsClient.RequestOptions} requestOptions - Request-specific configuration.
      *

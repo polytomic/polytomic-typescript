@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ExecutionConsoleLogsResponseEnvelope {
+    /** Console log entries and the cursor for newer entries */
     data?: Polytomic.ExecutionConsoleLogsResponse | undefined;
 }

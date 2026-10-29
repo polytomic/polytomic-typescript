@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ScheduleOptionResponse {
+    /** Schedule types available for model syncs */
     schedule_options?: Polytomic.ScheduleScheduleOption[] | undefined;
 }

@@ -66,7 +66,7 @@ export class ProxyClient {
      * The response includes `proxyCallId`, which you can use to correlate the call
      * with audit logs.
      *
-     * @param {string} id - Unique identifier of the connection to proxy the request through.
+     * @param {string} id - Unique identifier of the connection to proxy the request through
      * @param {Polytomic.connections.ExecuteConnectionProxyRequest} request
      * @param {ProxyClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -215,7 +215,7 @@ export class ProxyClient {
      * contract is still useful for discovering which keys are fixed by the
      * connection, even though their raw values are not exposed.
      *
-     * @param {string} id - Unique identifier of the connection whose proxy contract should be returned.
+     * @param {string} id - Unique identifier of the connection whose proxy contract should be returned
      * @param {ProxyClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
@@ -324,7 +324,7 @@ export class ProxyClient {
      * `parentConnectionId` that controls proxy access. For non-shared connections,
      * `parentConnectionId` is omitted.
      *
-     * @param {string} id - Unique identifier of the connection whose proxy settings should be returned.
+     * @param {string} id - Unique identifier of the connection whose proxy settings should be returned
      * @param {ProxyClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -426,7 +426,7 @@ export class ProxyClient {
      *
      * Setting `enabled` to `false` prevents proxy calls for the connection.
      *
-     * @param {string} id - Unique identifier of the connection whose proxy settings should be updated.
+     * @param {string} id - Unique identifier of the connection whose proxy settings should be updated
      * @param {Polytomic.connections.UpdateConnectionProxySettingsRequest} request
      * @param {ProxyClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *

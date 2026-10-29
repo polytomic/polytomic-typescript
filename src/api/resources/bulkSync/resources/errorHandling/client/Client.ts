@@ -28,7 +28,7 @@ export class ErrorHandlingClient {
     /**
      * Returns the error handling settings for a bulk sync.
      *
-     * @param {string} id - Unique identifier of the bulk sync.
+     * @param {string} id - Unique identifier of the bulk sync
      * @param {ErrorHandlingClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -120,7 +120,7 @@ export class ErrorHandlingClient {
     /**
      * Updates the error handling settings for a bulk sync.
      *
-     * @param {string} id - Unique identifier of the bulk sync.
+     * @param {string} id - Unique identifier of the bulk sync
      * @param {Polytomic.bulkSync.UpdateBulkSyncErrorHandlingRequest} request
      * @param {ErrorHandlingClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *

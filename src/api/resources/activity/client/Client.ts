@@ -67,8 +67,8 @@ export class ActivityClient {
      *         page_token: "page_token",
      *         order: "asc",
      *         harbor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-     *         event_type: ["event_type"],
-     *         outcome: ["outcome"],
+     *         event_type: ["action.looked_up"],
+     *         outcome: ["succeeded"],
      *         operation_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
      *         session_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
      *         actor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
@@ -109,8 +109,12 @@ export class ActivityClient {
             page_token: pageToken,
             order: order != null ? order : undefined,
             harbor_id: harborId,
-            event_type: eventType,
-            outcome,
+            event_type: Array.isArray(eventType)
+                ? eventType.map((item) => item)
+                : eventType != null
+                  ? eventType
+                  : undefined,
+            outcome: Array.isArray(outcome) ? outcome.map((item) => item) : outcome != null ? outcome : undefined,
             operation_id: operationId,
             session_id: sessionId,
             actor_id: actorId,
@@ -215,7 +219,7 @@ export class ActivityClient {
      * > Polytomic retains Activity events for at least 90 days. Pagination tokens
      * > expire 24 hours after the first page.
      *
-     * @param {string} session_id - Harbor Activity session ID.
+     * @param {string} session_id - Harbor Activity session ID
      * @param {Polytomic.ActivityGetSessionRequest} request
      * @param {ActivityClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -351,7 +355,7 @@ export class ActivityClient {
      * >
      * > Polytomic retains Activity events for at least 90 days.
      *
-     * @param {string} event_id - Activity event ID.
+     * @param {string} event_id - Activity event ID
      * @param {ActivityClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}

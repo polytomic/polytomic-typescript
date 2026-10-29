@@ -118,6 +118,7 @@ export class NotificationsClient {
      * @param {NotificationsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
      * @throws {@link errors.PolytomicTimeoutError}
@@ -176,6 +177,11 @@ export class NotificationsClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );

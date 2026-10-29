@@ -10,7 +10,7 @@ import type * as Polytomic from "../../../../index";
  *     }
  */
 export interface CreateHarborSavedQueryDraftRequest {
-    /** Optional note copied to the immutable published version. */
+    /** Optional note copied to the immutable published version */
     change_note?: string;
     /** Business definition and usage notes. Maximum 2,000 characters. */
     description?: string;
@@ -18,10 +18,10 @@ export interface CreateHarborSavedQueryDraftRequest {
     name: string;
     /** Human-readable owner label. Maximum 200 characters. */
     owner?: string;
-    /** Typed scalar parameter declarations. */
+    /** Typed scalar parameter declarations */
     parameters?: Polytomic.HarborSavedQueryParameter[];
-    /** DuckDB SQL template using {{name}} references for bound parameters. */
+    /** DuckDB SQL template using {{name}} references for bound parameters */
     sql_template: string;
-    /** Author-supplied JSON scalar values used only to validate this draft. */
+    /** Author-supplied JSON scalar values used only to validate this draft */
     validation_values?: Record<string, unknown>;
 }

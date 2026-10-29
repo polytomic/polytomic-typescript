@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborConnectionSchemaEnvelope {
+    /** The schema */
     data?: Polytomic.Schema | undefined;
 }

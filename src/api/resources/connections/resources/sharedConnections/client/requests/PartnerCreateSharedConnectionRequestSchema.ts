@@ -7,7 +7,7 @@
  *     }
  */
 export interface PartnerCreateSharedConnectionRequestSchema {
-    /** Unique identifier of the child organization that should receive the shared connection. */
+    /** Unique identifier of the child organization that should receive the shared connection */
     child_organization_id: string;
     /** Optional name for the shared copy. Defaults to the parent connection name. */
     name?: string;

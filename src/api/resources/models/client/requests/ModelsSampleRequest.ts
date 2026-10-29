@@ -7,5 +7,6 @@
  *     }
  */
 export interface ModelsSampleRequest {
+    /** Run in the background and return a job instead of the result. */
     async?: boolean;
 }

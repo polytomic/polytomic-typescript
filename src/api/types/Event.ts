@@ -3,13 +3,14 @@
 import type * as Polytomic from "../index";
 
 export interface Event {
-    /** Timestamp the event was emitted. */
+    /** Timestamp the event was emitted */
     created_at?: string | undefined;
+    /** Event payload. Shape depends on the event type. */
     event?: Polytomic.EventPayload | undefined;
-    /** Unique identifier of the event. */
+    /** Unique identifier of the event */
     id?: string | undefined;
-    /** Organization the event belongs to. */
+    /** Organization the event belongs to */
     organization_id?: string | undefined;
-    /** Event type identifier. */
+    /** Event type identifier */
     type?: string | undefined;
 }

@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface GetRecordViewCapabilitiesEnvelope {
+    /** Record-view link capabilities for the schema */
     data?: Polytomic.RecordviewCapabilities | undefined;
 }

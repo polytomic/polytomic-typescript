@@ -3,7 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface SyncStatusResponse {
+    /** The execution in progress */
     current_execution?: Polytomic.GetExecutionResponseSchema | undefined;
+    /** The most recent finished execution */
     last_execution?: Polytomic.GetExecutionResponseSchema | undefined;
+    /** When the sync is next scheduled to run */
     next_execution_time?: string | undefined;
 }

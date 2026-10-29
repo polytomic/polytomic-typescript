@@ -3,8 +3,12 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncStatusResponse {
+    /** Execution in progress, if any */
     current_execution?: Polytomic.BulkSyncExecution | undefined;
+    /** Change ingestion status, present when the sync consumes ingested changes */
     ingestion_status?: Polytomic.BulkSyncIngestionStatus | undefined;
+    /** Most recent finished execution */
     last_execution?: Polytomic.BulkSyncExecution | undefined;
+    /** When the sync is next scheduled to run */
     next_execution_time?: string | undefined;
 }

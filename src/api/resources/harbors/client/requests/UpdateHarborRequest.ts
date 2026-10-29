@@ -9,6 +9,6 @@
 export interface UpdateHarborRequest {
     /** Short description of the Harbor. Maximum 1,000 characters. */
     description?: string;
-    /** Human-readable Harbor name. */
+    /** Human-readable Harbor name */
     name: string;
 }

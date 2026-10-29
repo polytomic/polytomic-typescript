@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface RunQueryEnvelope {
+    /** The submitted query */
     data?: Polytomic.RunQueryResult | undefined;
 }

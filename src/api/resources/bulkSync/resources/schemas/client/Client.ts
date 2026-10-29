@@ -40,7 +40,7 @@ export class SchemasClient {
      * or
      * [`PUT /api/bulk/syncs/{id}/schemas/{schema_id}`](../../../../../api-reference/bulk-sync/schemas/update).
      *
-     * @param {string} id - Unique identifier of the bulk sync.
+     * @param {string} id - Unique identifier of the bulk sync
      * @param {Polytomic.bulkSync.SchemasListRequest} request
      * @param {SchemasClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -130,14 +130,23 @@ export class SchemasClient {
      *
      * Within each provided schema, omitting `fields` enables all available fields on
      * that schema. To control which fields are enabled, include the `fields` array
-     * with explicit `enabled` values for each field.
+     * with explicit `enabled` values for each field. Primary-key fields stay enabled
+     * while their schema is enabled, even when the request sets `enabled: false` for
+     * them.
+     *
+     * `output_name` and `destination_history_output_name` on a schema, and
+     * `output_name` on a field, are computed by Polytomic and ignored on input. Set
+     * `user_output_name` to rename a destination object or field.
+     *
+     * The response contains every schema on the bulk sync after the update, not only
+     * the schemas included in the request.
      *
      * > 📘 To replace a single schema's configuration in full (clearing any fields you
      * > omit), use
      * > [`PUT /api/bulk/syncs/{id}/schemas/{schema_id}`](../../../../../api-reference/bulk-sync/schemas/update)
      * > instead.
      *
-     * @param {string} id - Unique identifier of the bulk sync.
+     * @param {string} id - Unique identifier of the bulk sync
      * @param {Polytomic.bulkSync.UpdateBulkSyncSchemasRequest} request
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -251,8 +260,8 @@ export class SchemasClient {
      * [`PUT /api/bulk/syncs/{id}/schemas/{schema_id}`](../../../../../../api-reference/bulk-sync/schemas/update)
      * to fully replace this schema's configuration.
      *
-     * @param {string} id - Unique identifier of the bulk sync.
-     * @param {string} schema_id - Source-side schema identifier.
+     * @param {string} id - Unique identifier of the bulk sync
+     * @param {string} schema_id - Source-side schema identifier
      * @param {SchemasClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -339,14 +348,16 @@ export class SchemasClient {
      *
      * Omitting `fields` enables all available fields on the schema. To control which
      * fields are enabled, include the `fields` array with explicit `enabled` values.
+     * Primary-key fields stay enabled while the schema is enabled, even when the
+     * request sets `enabled: false` for them.
      *
      * > 📘 To update multiple schemas in a single request without affecting others,
      * > use the partial-update endpoint
      * > [`PATCH /api/bulk/syncs/{id}/schemas`](../../../../../../api-reference/bulk-sync/schemas/patch)
      * > instead.
      *
-     * @param {string} id - Unique identifier of the bulk sync.
-     * @param {string} schema_id - Source-side schema identifier.
+     * @param {string} id - Unique identifier of the bulk sync
+     * @param {string} schema_id - Source-side schema identifier
      * @param {Polytomic.bulkSync.UpdateBulkSchema} request
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -457,8 +468,8 @@ export class SchemasClient {
      * `GET /api/bulk/syncs/{id}/status` to confirm the schema has reached a terminal
      * state.
      *
-     * @param {string} id - The bulk sync ID.
-     * @param {string} schema_id - The schema ID to cancel for the bulk sync.
+     * @param {string} id - The bulk sync ID
+     * @param {string} schema_id - The schema ID to cancel for the bulk sync
      * @param {SchemasClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}

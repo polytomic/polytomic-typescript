@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface QueryResultsEnvelope {
+    /** The query and its results for this page */
     data?: Polytomic.RunQueryResult | undefined;
+    /** Links to adjacent pages of results */
     links?: Polytomic.RunQueryPagination | undefined;
 }

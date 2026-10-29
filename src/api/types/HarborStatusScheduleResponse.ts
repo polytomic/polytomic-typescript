@@ -3,29 +3,32 @@
 import type * as Polytomic from "../index";
 
 export interface HarborStatusScheduleResponse {
-    /** External schedule Connection ID, when configured. */
+    /** External schedule Connection ID, when configured */
     connection_id?: string | undefined;
-    /** Raw day-of-month schedule expression for an advanced schedule, when configured. */
+    /** Raw day-of-month schedule expression for an advanced schedule, when configured */
     day_of_month?: string | undefined;
-    /** Raw day-of-week schedule expression, when configured. */
+    /** Raw day-of-week schedule expression, when configured */
     day_of_week?: string | undefined;
+    /** Raw Polytomic schedule frequency */
     frequency: Polytomic.ScheduleFrequency;
-    /** Raw hour schedule expression, when configured. */
+    /** Raw hour schedule expression, when configured */
     hour?: string | undefined;
-    /** Whether this is the bulk sync's default schedule. */
+    /** Whether this is the bulk sync's default schedule */
     is_default?: boolean | undefined;
-    /** External job ID for an event-driven model sync schedule, when configured. */
+    /** External job ID for an event-driven model sync schedule, when configured */
     job_id?: number | undefined;
-    /** Raw minute schedule expression, when configured. */
+    /** Raw minute schedule expression, when configured */
     minute?: string | undefined;
-    /** Raw month schedule expression for an advanced schedule, when configured. */
+    /** Raw month schedule expression for an advanced schedule, when configured */
     month?: string | undefined;
     /** Next scheduled run time in UTC. Continuous schedules use persisted scheduler state. Omitted for disabled, manual, event-driven, otherwise non-cron, or unavailable scheduler state. */
     next_run_at?: string | undefined;
-    /** Whether a run-after model schedule requires the upstream execution to succeed. */
+    /** Whether a run-after model schedule requires the upstream execution to succeed */
     run_after_success_only?: boolean | undefined;
-    /** Source schema IDs explicitly selected by this bulk schedule. */
+    /** Source schema IDs explicitly selected by this bulk schedule */
     schemas?: string[] | undefined;
+    /** Bulk schedule field-selection mode, when the schedule applies selectively */
     selective_mode?: Polytomic.BulkSelectiveMode | undefined;
+    /** Bulk refresh mode selected by this schedule */
     sync_mode?: Polytomic.BulkScheduleSyncMode | undefined;
 }

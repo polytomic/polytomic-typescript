@@ -3,14 +3,23 @@
 import type * as Polytomic from "../index";
 
 export interface Schedule {
+    /** Connection ID of the dbt Cloud connection; required for dbtcloud schedules */
     connection_id?: string | undefined;
+    /** Day of the month for custom and builder schedules */
     day_of_month?: string | undefined;
+    /** Day of the week, 0 (Sunday) to 6 (Saturday), for weekly schedules; a cron day-of-week field for custom and builder schedules */
     day_of_week?: string | undefined;
+    /** How often the sync runs */
     frequency?: Polytomic.ScheduleFrequency | undefined;
+    /** Hour of the day for daily, weekly, custom, and builder schedules */
     hour?: string | undefined;
+    /** dbt Cloud job ID; required for dbtcloud schedules */
     job_id?: number | undefined;
+    /** Minute of the hour for hourly, daily, weekly, custom, and builder schedules */
     minute?: string | undefined;
+    /** Month of the year for custom and builder schedules */
     month?: string | undefined;
+    /** Syncs this sync runs after; required for runafter schedules */
     run_after?: Polytomic.RunAfter | undefined;
     /** If true, the sync will only run if the dependent syncs completed successfully. */
     run_after_success_only?: boolean | undefined;

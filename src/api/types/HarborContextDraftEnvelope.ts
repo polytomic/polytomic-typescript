@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborContextDraftEnvelope {
+    /** The context draft */
     data?: Polytomic.HarborContextDraftResponse | undefined;
 }

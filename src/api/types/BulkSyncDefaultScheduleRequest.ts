@@ -3,16 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncDefaultScheduleRequest {
-    /** Day of the month (1-31) to run monthly schedules. */
+    /** Day of the month for custom and builder schedules */
     day_of_month?: string | undefined;
-    /** Day of the week to run weekly schedules. */
+    /** Day of the week, 0 (Sunday) to 6 (Saturday), for weekly schedules; a cron day-of-week field for custom and builder schedules */
     day_of_week?: string | undefined;
+    /** How often the sync runs on this schedule: manual, continuous, hourly, daily, weekly, custom, or builder */
     frequency: Polytomic.ScheduleFrequency;
-    /** Hour of the day (0-23, in UTC) to run hourly, daily, weekly, or monthly schedules. */
+    /** Hour of the day (0-23, in UTC) for daily, weekly, custom, and builder schedules */
     hour?: string | undefined;
+    /** ID of an existing schedule on this bulk sync; omit to create a new schedule. Creating a bulk sync rejects any schedule ID, and updating one rejects an ID that does not match an existing schedule of that bulk sync. */
     id?: string | undefined;
-    /** Minute of the hour (0-59) to run the schedule. */
+    /** Minute of the hour (0-59) for hourly, daily, weekly, custom, and builder schedules */
     minute?: string | undefined;
-    /** Month of the year (1-12) to run yearly schedules. */
+    /** Month of the year for custom and builder schedules */
     month?: string | undefined;
 }

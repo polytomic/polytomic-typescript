@@ -6,10 +6,14 @@ import type * as Polytomic from "../index";
  * Either `field` or `field_id` must be provided. If `field_id` is provided, `field` is ignored.
  */
 export interface Override {
+    /** Model field whose value is overridden */
     field?: Polytomic.Source | undefined;
-    /** Field ID of the model field to override. */
+    /** Field ID of the model field to override */
     field_id?: string | undefined;
+    /** Comparison that decides when the override applies */
     function?: Polytomic.FilterFunction | undefined;
+    /** Value written in place of the field value when the condition matches */
     override?: unknown | undefined;
+    /** Value the field is compared against */
     value?: unknown | undefined;
 }

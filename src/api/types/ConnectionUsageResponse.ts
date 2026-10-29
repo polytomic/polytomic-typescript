@@ -3,11 +3,11 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectionUsageResponse {
-    /** Per-sync breakdown of API calls spent against this connection in the last 24 hours, sorted by total calls descending. */
+    /** Per-sync breakdown of API calls spent against this connection in the last 24 hours, sorted by total calls descending */
     bySync?: Polytomic.ConnectionUsageSyncStats[] | undefined;
-    /** Total backend API calls made through this connection over the last 24 hours, or null if the backend does not report usage. */
+    /** Total backend API calls made through this connection over the last 24 hours, or null if the backend does not report usage */
     callsLast24h?: number | undefined;
-    /** Unique identifier of the connection the usage applies to. */
+    /** Unique identifier of the connection the usage applies to */
     connectionId?: string | undefined;
     /** True when the backend can break its API consumption down per sync; otherwise only the 24h total is reported. */
     reportsSyncStats?: boolean | undefined;

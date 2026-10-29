@@ -3,26 +3,48 @@
 import type * as Polytomic from "../index";
 
 export interface EventingSyncCompletedEvent {
+    /** Number of records deleted */
+    deleted_count?: number | undefined;
+    /** URLs of the record log files for deleted records */
     deleted_records?: string[] | undefined;
+    /** Number of record errors */
     error_count?: number | undefined;
+    /** URLs of the record log files for records with errors */
     errored_records?: string[] | undefined;
+    /** Execution ID */
     execution_id?: string | undefined;
+    /** Number of records inserted */
     inserted_count?: number | undefined;
+    /** URLs of the record log files for inserted records */
     inserted_records?: string[] | undefined;
-    /** Endpoint returning the index of record logs produced by this execution. */
+    /** Endpoint returning the index of record logs produced by this execution */
     logs_url?: string | undefined;
+    /** Organization ID */
     organization_id?: string | undefined;
+    /** Number of records processed by the execution */
     record_count?: number | undefined;
+    /** Schedule that started the execution */
     schedule?: Polytomic.EventingSyncSchedule | undefined;
+    /** Final status of the execution */
     status?: Polytomic.UtilExecutionStatus | undefined;
+    /** Model sync ID */
     sync_id?: string | undefined;
+    /** Name of the model sync */
     sync_name?: string | undefined;
+    /** Destination connection ID */
     target_connection_id?: string | undefined;
+    /** URLs of the record log files for all records */
     total_records?: string[] | undefined;
+    /** What started the execution */
     trigger?: string | undefined;
+    /** Number of records updated */
     updated_count?: number | undefined;
+    /** URLs of the record log files for updated records */
     updated_records?: string[] | undefined;
+    /** Number of records upserted */
     upserted_count?: number | undefined;
+    /** Number of record warnings */
     warning_count?: number | undefined;
+    /** URLs of the record log files for records with warnings */
     warnings?: string[] | undefined;
 }

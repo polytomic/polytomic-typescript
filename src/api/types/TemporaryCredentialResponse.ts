@@ -3,9 +3,9 @@
 export interface TemporaryCredentialResponse {
     /** Temporary credential secret. This value is returned only once; store it securely. */
     access_token?: string | undefined;
-    /** Timestamp after which the credential is rejected. */
+    /** Timestamp after which the credential is rejected */
     expires_at?: string | undefined;
-    /** Temporary credential identifier used for usage attribution. */
+    /** Temporary credential identifier used for usage attribution */
     id?: string | undefined;
     /** Authorization scheme for the access token. Always Bearer. */
     token_type?: string | undefined;

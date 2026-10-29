@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ModelListResponseEnvelope {
+    /** Models in the organization */
     data?: Polytomic.ModelResponse[] | undefined;
 }

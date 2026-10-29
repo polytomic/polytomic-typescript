@@ -3,16 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncScheduleApi {
-    /** Day of the month (1-31) for monthly schedules. */
+    /** Day of the month for custom and builder schedules */
     dayOfMonth?: string | undefined;
-    /** Day of the week for weekly schedules. */
+    /** Day of the week, 0 (Sunday) to 6 (Saturday), for weekly schedules; a cron day-of-week field for custom and builder schedules */
     dayOfWeek?: string | undefined;
+    /** How often the sync runs on this schedule: manual, continuous, hourly, daily, weekly, custom, or builder */
     frequency: Polytomic.ScheduleFrequency;
-    /** Hour of the day (0-23, in UTC) the schedule fires. */
+    /** Hour of the day (0-23, in UTC) for daily, weekly, custom, and builder schedules */
     hour?: string | undefined;
-    /** Minute of the hour (0-59) the schedule fires. */
+    /** Minute of the hour (0-59) for hourly, daily, weekly, custom, and builder schedules */
     minute?: string | undefined;
-    /** Month of the year (1-12) for yearly schedules. */
+    /** Month of the year for custom and builder schedules */
     month?: string | undefined;
+    /** Whether this schedule runs a full fetch, only incremental fields, or only non-incremental fields */
     selectiveMode?: Polytomic.BulkSelectiveMode | undefined;
 }

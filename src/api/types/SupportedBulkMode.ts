@@ -3,10 +3,16 @@
 import type * as Polytomic from "../index";
 
 export interface SupportedBulkMode {
+    /** Description of the mode */
     description?: string | undefined;
+    /** Bulk sync mode identifier */
     id?: Polytomic.BulkSyncTargetMode | undefined;
+    /** Human-readable label for the mode */
     label?: string | undefined;
+    /** Deprecated; always false for bulk sync modes */
     requires_identity?: boolean | undefined;
+    /** Deprecated; always false for bulk sync modes */
     supports_field_sync_mode?: boolean | undefined;
+    /** Deprecated; always false for bulk sync modes */
     supports_target_filters?: boolean | undefined;
 }

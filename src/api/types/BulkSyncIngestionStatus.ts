@@ -3,12 +3,20 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncIngestionStatus {
+    /** Whether change ingestion is enabled for the sync */
     enabled?: boolean | undefined;
+    /** Source change-stream position that ingestion is catching up to */
     highwater_mark?: string | undefined;
+    /** Whether ingestion is currently running */
     is_running?: boolean | undefined;
+    /** Source change-stream position that ingestion has reached */
     position?: string | undefined;
+    /** Source time of the change at position, or of the next pending change while a backlog waits */
     position_time?: string | undefined;
+    /** Health of ingestion */
     status?: Polytomic.IngestionStatusLevel | undefined;
+    /** Ingestion error or warning detail */
     status_message?: string | undefined;
+    /** When the ingestion status was last updated */
     updated_at?: string | undefined;
 }

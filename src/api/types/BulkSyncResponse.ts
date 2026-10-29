@@ -7,39 +7,46 @@ export interface BulkSyncResponse {
     active?: boolean | undefined;
     /** Additional bulk sync schedules. Schedule times are interpreted in UTC. */
     additional_schedules?: Polytomic.BulkSyncAdditionalScheduleResponse[] | undefined;
+    /** Whether Polytomic automatically enables newly discovered fields on existing objects */
     automatically_add_new_fields?: Polytomic.BulkDiscover | undefined;
+    /** Whether Polytomic automatically enables newly discovered source objects */
     automatically_add_new_objects?: Polytomic.BulkDiscover | undefined;
-    /** Per-sync concurrency limit override. */
+    /** Per-sync concurrency limit override */
     concurrency_limit?: number | undefined;
-    /** Timestamp the sync was created. */
+    /** Timestamp the sync was created */
     created_at?: string | undefined;
+    /** Actor that created the sync */
     created_by?: Polytomic.OutputActor | undefined;
     /** Global cutoff applied across schemas; source records older than this timestamp are excluded. */
     data_cutoff_timestamp?: string | undefined;
+    /** The default bulk sync schedule. Null when no explicit default schedule is configured. */
     default_schedule?: Polytomic.BulkSyncDefaultScheduleResponse | undefined;
     /** Destination-specific bulk sync configuration. e.g. output schema name, s3 file format, etc. */
     destination_configuration?: Record<string, unknown> | undefined;
-    /** Connection rows are written to. */
+    /** Connection rows are written to */
     destination_connection_id?: string | undefined;
     /** When true, Polytomic does not add its own timestamp columns to destination rows. */
     disable_record_timestamps?: boolean | undefined;
-    /** Unique identifier of the bulk sync. */
+    /** Unique identifier of the bulk sync */
     id?: string | undefined;
+    /** How source data is written to the destination */
     mode?: Polytomic.BulkSyncTargetMode | undefined;
-    /** Human-readable name of the bulk sync. */
+    /** Human-readable name of the bulk sync */
     name?: string | undefined;
+    /** Whether destination object and field names are normalized */
     normalize_names?: Polytomic.BulkNormalizeNames | undefined;
-    /** Organization the sync belongs to. */
+    /** Organization the sync belongs to */
     organization_id?: string | undefined;
-    /** List of permissions policies applied to the bulk sync. */
+    /** List of permissions policies applied to the bulk sync */
     policies?: string[] | undefined;
-    /** Per-sync resync concurrency limit override. */
+    /** Per-sync resync concurrency limit override */
     resync_concurrency_limit?: number | undefined;
     /** Source-specific bulk sync configuration. e.g. replication slot name, sync lookback, etc. */
     source_configuration?: Record<string, unknown> | undefined;
-    /** Connection rows are read from. */
+    /** Connection rows are read from */
     source_connection_id?: string | undefined;
-    /** Timestamp the sync was last updated. */
+    /** Timestamp the sync was last updated */
     updated_at?: string | undefined;
+    /** Actor that most recently updated the sync */
     updated_by?: Polytomic.OutputActor | undefined;
 }

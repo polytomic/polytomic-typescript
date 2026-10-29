@@ -3,12 +3,12 @@
 export interface IdentityCredentialHarborSchema {
     /** Whether the organization has the Harbor actions feature enabled. Controls action tool visibility in new MCP sessions; does not grant permission or indicate that an action is configured. */
     actions_enabled?: boolean | undefined;
-    /** Organization-provided summary of the Harbor. */
+    /** Organization-provided summary of the Harbor */
     description?: string | undefined;
-    /** Immutable Harbor ID. */
+    /** Immutable Harbor ID */
     id?: string | undefined;
     /** Readable MCP resource URL for authorizing this Harbor independently. The credential's Harbor ID remains authoritative. */
     mcp_server_url?: string | undefined;
-    /** Current Harbor display name. */
+    /** Current Harbor display name */
     name?: string | undefined;
 }

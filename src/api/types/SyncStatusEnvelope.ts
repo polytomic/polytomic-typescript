@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface SyncStatusEnvelope {
+    /** The model sync's status */
     data?: Polytomic.SyncStatusResponse | undefined;
 }

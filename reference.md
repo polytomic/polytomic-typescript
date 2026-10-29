@@ -242,7 +242,7 @@ await client.bulkSync.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Bulk sync ID
     
 </dd>
 </dl>
@@ -286,7 +286,8 @@ Updates an existing bulk sync's top-level configuration.
 
 Updating a bulk sync is a **full replacement** of the sync's top-level
 configuration. Every field in the request body is written to the sync; any
-field you omit is cleared or reset to its default value.
+field you omit is cleared or reset to its default value. An empty or omitted
+`policies` list leaves the sync's current policies unchanged.
 
 To make a partial change — for example, toggling `active` or swapping a
 schedule — fetch the current sync with
@@ -359,7 +360,7 @@ await client.bulkSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync to update.
+**id:** `string` — Unique identifier of the bulk sync to update
     
 </dd>
 </dl>
@@ -438,7 +439,7 @@ await client.bulkSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Bulk sync ID
     
 </dd>
 </dl>
@@ -520,7 +521,7 @@ await client.bulkSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Bulk sync ID
     
 </dd>
 </dl>
@@ -528,7 +529,7 @@ await client.bulkSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**request:** `Polytomic.ActivateSyncInput` 
+**request:** `Polytomic.ActivateBulkSyncInput` 
     
 </dd>
 </dl>
@@ -675,7 +676,7 @@ await client.bulkSync.start("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -756,7 +757,7 @@ await client.bulkSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -834,7 +835,7 @@ await client.bulkSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection.
+**id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -915,7 +916,7 @@ await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -1048,7 +1049,7 @@ await client.connections.getConnectionTypeSchema("postgresql");
 <dl>
 <dd>
 
-**id:** `string` — Connection type identifier (e.g. postgresql, salesforce, hubspot).
+**id:** `string` — Connection type identifier (e.g. postgresql, salesforce, hubspot)
     
 </dd>
 </dl>
@@ -1121,7 +1122,7 @@ await client.connections.getTypeParameterValues("type", {
 <dl>
 <dd>
 
-**type:** `string` 
+**type:** `string` — Connection type ID
     
 </dd>
 </dl>
@@ -1355,8 +1356,7 @@ See also:
 
 ```typescript
 await client.connections.connect({
-    name: "Salesforce Connection",
-    redirect_url: "redirect_url"
+    name: "Salesforce Connection"
 });
 
 ```
@@ -1604,7 +1604,7 @@ await client.connections.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -1693,7 +1693,7 @@ await client.connections.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -1777,7 +1777,7 @@ await client.connections.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -1857,7 +1857,7 @@ await client.connections.getParameterValues("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -1934,7 +1934,7 @@ await client.connections.getUsage("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection whose API consumption should be returned.
+**id:** `string` — Unique identifier of the connection whose API consumption should be returned
     
 </dd>
 </dl>
@@ -2010,7 +2010,7 @@ await client.queryRunner.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**connection_id:** `string` — Unique identifier of the connection to run the query against.
+**connection_id:** `string` — Unique identifier of the connection to run the query against
     
 </dd>
 </dl>
@@ -2099,7 +2099,7 @@ await client.queryRunner.getQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the query task, as returned by POST /api/connections/{connection_id}/query.
+**id:** `string` — Unique identifier of the query task, as returned by POST /api/connections/{connection_id}/query
     
 </dd>
 </dl>
@@ -2181,7 +2181,7 @@ await client.schemas.upsertField("248df4b7-aa70-47b8-a036-33ac447e668d", "public
 <dl>
 <dd>
 
-**connection_id:** `string` — Unique identifier of the connection.
+**connection_id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -2189,7 +2189,7 @@ await client.schemas.upsertField("248df4b7-aa70-47b8-a036-33ac447e668d", "public
 <dl>
 <dd>
 
-**schema_id:** `string` — Identifier of the schema the fields belong to.
+**schema_id:** `string` — Identifier of the schema the fields belong to
     
 </dd>
 </dl>
@@ -2269,7 +2269,7 @@ await client.schemas.deleteField("248df4b7-aa70-47b8-a036-33ac447e668d", "public
 <dl>
 <dd>
 
-**connection_id:** `string` — Unique identifier of the connection.
+**connection_id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -2277,7 +2277,7 @@ await client.schemas.deleteField("248df4b7-aa70-47b8-a036-33ac447e668d", "public
 <dl>
 <dd>
 
-**schema_id:** `string` — Identifier of the schema the field belongs to.
+**schema_id:** `string` — Identifier of the schema the field belongs to
     
 </dd>
 </dl>
@@ -2285,7 +2285,7 @@ await client.schemas.deleteField("248df4b7-aa70-47b8-a036-33ac447e668d", "public
 <dl>
 <dd>
 
-**field_id:** `string` — Identifier of the user-defined field to delete.
+**field_id:** `string` — Identifier of the user-defined field to delete
     
 </dd>
 </dl>
@@ -2348,7 +2348,7 @@ await client.schemas.patchField("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_
 <dl>
 <dd>
 
-**connection_id:** `string` — Connection holding the schema.
+**connection_id:** `string` — Connection holding the schema
     
 </dd>
 </dl>
@@ -2356,7 +2356,7 @@ await client.schemas.patchField("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_
 <dl>
 <dd>
 
-**schema_id:** `string` — Schema identifier.
+**schema_id:** `string` — Schema identifier
     
 </dd>
 </dl>
@@ -2364,7 +2364,7 @@ await client.schemas.patchField("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_
 <dl>
 <dd>
 
-**field_id:** `string` — Field identifier within the schema.
+**field_id:** `string` — Field identifier within the schema
     
 </dd>
 </dl>
@@ -2446,7 +2446,7 @@ await client.schemas.setPrimaryKeys("248df4b7-aa70-47b8-a036-33ac447e668d", "pub
 <dl>
 <dd>
 
-**connection_id:** `string` — Unique identifier of the connection.
+**connection_id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -2454,7 +2454,7 @@ await client.schemas.setPrimaryKeys("248df4b7-aa70-47b8-a036-33ac447e668d", "pub
 <dl>
 <dd>
 
-**schema_id:** `string` — Identifier of the schema whose primary keys are being overridden.
+**schema_id:** `string` — Identifier of the schema whose primary keys are being overridden
     
 </dd>
 </dl>
@@ -2529,7 +2529,7 @@ await client.schemas.resetPrimaryKeys("248df4b7-aa70-47b8-a036-33ac447e668d", "p
 <dl>
 <dd>
 
-**connection_id:** `string` — Unique identifier of the connection.
+**connection_id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -2537,7 +2537,7 @@ await client.schemas.resetPrimaryKeys("248df4b7-aa70-47b8-a036-33ac447e668d", "p
 <dl>
 <dd>
 
-**schema_id:** `string` — Identifier of the schema whose primary key override should be cleared.
+**schema_id:** `string` — Identifier of the schema whose primary key override should be cleared
     
 </dd>
 </dl>
@@ -2619,7 +2619,7 @@ await client.schemas.refresh("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection whose schema cache should be refreshed.
+**id:** `string` — Unique identifier of the connection whose schema cache should be refreshed
     
 </dd>
 </dl>
@@ -2698,7 +2698,7 @@ await client.schemas.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection whose schema cache status should be returned.
+**id:** `string` — Unique identifier of the connection whose schema cache status should be returned
     
 </dd>
 </dl>
@@ -2769,7 +2769,7 @@ await client.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "public.users")
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection.
+**id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -2851,7 +2851,7 @@ await client.schemas.getRecords("248df4b7-aa70-47b8-a036-33ac447e668d", "public.
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection.
+**id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -2859,7 +2859,7 @@ await client.schemas.getRecords("248df4b7-aa70-47b8-a036-33ac447e668d", "public.
 <dl>
 <dd>
 
-**schema_id:** `string` — Identifier of the schema within the connection.
+**schema_id:** `string` — Identifier of the schema within the connection
     
 </dd>
 </dl>
@@ -2935,7 +2935,7 @@ await client.models.getEnrichmentSource("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection.
+**id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -3012,7 +3012,7 @@ await client.models.post("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**connection_id:** `string` 
+**connection_id:** `string` — Enrichment connection ID
     
 </dd>
 </dl>
@@ -3052,12 +3052,15 @@ await client.models.post("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-Submits a job that previews the fields a model would expose without persisting it.
+Previews the fields a model exposes without saving the model.
 
-The response contains a job ID that resolves to the list of fields the model
-would expose. Poll the job until it completes to retrieve the field list. The
-model is not persisted — this endpoint is useful for validating a query or
-configuration before calling [`POST /api/models`](../../api-reference/models/create) to save it.
+The response contains the previewed model, including the fields it exposes.
+With `async=true`, the response contains a job instead; poll the job until it
+completes to retrieve the field list.
+
+The model is not saved, and `policies` and `labels` are ignored. Use this
+endpoint to validate a query or configuration before calling
+[`POST /api/models`](../../api-reference/models/create) to save it.
 </dd>
 </dl>
 </dd>
@@ -3310,7 +3313,7 @@ await client.models.get("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model ID
     
 </dd>
 </dl>
@@ -3354,7 +3357,8 @@ Updates a model's configuration.
 
 Updating a model is a **full replacement** of its configuration. Every field in
 the request body is written to the model; any field you omit is cleared or reset
-to its default value.
+to its default value. An empty or omitted `policies` list leaves the model's
+current policies unchanged.
 
 To make a partial change, fetch the current model with
 [`GET /api/models/{id}`](../../../api-reference/models/get), modify the fields you want to change, and send
@@ -3399,7 +3403,7 @@ await client.models.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model ID
     
 </dd>
 </dl>
@@ -3475,7 +3479,7 @@ await client.models.delete("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model ID
     
 </dd>
 </dl>
@@ -3552,7 +3556,7 @@ await client.models.sample("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model ID
     
 </dd>
 </dl>
@@ -3629,7 +3633,7 @@ await client.modelSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection.
+**id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -3735,7 +3739,7 @@ await client.modelSync.getSourceFields("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection.
+**id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -4081,7 +4085,7 @@ await client.modelSync.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -4117,7 +4121,8 @@ Updates a model sync's configuration.
 
 Updating a model sync is a **full replacement** of the sync's configuration.
 Every field in the request body is written to the sync; any field you omit is
-cleared or reset to its default value.
+cleared or reset to its default value. An empty or omitted `policies` list
+leaves the sync's current policies unchanged.
 
 To make a partial change — for example, toggling `active` or adjusting a
 single field mapping — fetch the current sync with
@@ -4168,7 +4173,7 @@ await client.modelSync.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -4243,7 +4248,7 @@ await client.modelSync.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -4315,7 +4320,7 @@ await client.modelSync.activate("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -4459,7 +4464,7 @@ await client.modelSync.start("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -4534,7 +4539,7 @@ await client.modelSync.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -4758,7 +4763,7 @@ await client.entities.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — UUID of the entity to resolve.
+**id:** `string` — UUID of the entity to resolve
     
 </dd>
 </dl>
@@ -4864,7 +4869,7 @@ await client.entities.getForPartner("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — UUID of the entity to resolve.
+**id:** `string` — UUID of the entity to resolve
     
 </dd>
 </dl>
@@ -5136,7 +5141,7 @@ await client.harbors.listAuthorizedSchemas("248df4b7-aa70-47b8-a036-33ac447e668d
 <dl>
 <dd>
 
-**connection_id:** `string` 
+**connection_id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -5207,7 +5212,7 @@ await client.harbors.getAuthorizedSchema("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**connection_id:** `string` 
+**connection_id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -5215,7 +5220,7 @@ await client.harbors.getAuthorizedSchema("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**schema_id:** `string` 
+**schema_id:** `string` — Schema ID
     
 </dd>
 </dl>
@@ -5349,7 +5354,7 @@ await client.harbors.closeSession("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**session_id:** `string` 
+**session_id:** `string` — Harbor session ID
     
 </dd>
 </dl>
@@ -5565,7 +5570,7 @@ await client.harbors.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -5636,7 +5641,7 @@ await client.harbors.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -5715,7 +5720,7 @@ await client.harbors.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -5790,7 +5795,7 @@ await client.harbors.getActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -5865,7 +5870,7 @@ await client.harbors.disableActionConfiguration("248df4b7-aa70-47b8-a036-33ac447
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -5940,7 +5945,7 @@ await client.harbors.listActionSourceConnections("248df4b7-aa70-47b8-a036-33ac44
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6025,7 +6030,7 @@ await client.harbors.setActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6033,7 +6038,7 @@ await client.harbors.setActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**connection_id:** `string` — Source Connection whose action grants you want to manage.
+**connection_id:** `string` — Source Connection whose action grants you want to manage
     
 </dd>
 </dl>
@@ -6117,7 +6122,7 @@ await client.harbors.removeActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6125,7 +6130,7 @@ await client.harbors.removeActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e
 <dl>
 <dd>
 
-**connection_id:** `string` — Source Connection whose action grants you want to manage.
+**connection_id:** `string` — Source Connection whose action grants you want to manage
     
 </dd>
 </dl>
@@ -6212,7 +6217,7 @@ await client.harbors.listActionConfigurationSchemas("248df4b7-aa70-47b8-a036-33a
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6220,7 +6225,7 @@ await client.harbors.listActionConfigurationSchemas("248df4b7-aa70-47b8-a036-33a
 <dl>
 <dd>
 
-**connection_id:** `string` — Source Connection whose action grants you want to manage.
+**connection_id:** `string` — Source Connection whose action grants you want to manage
     
 </dd>
 </dl>
@@ -6304,7 +6309,7 @@ await client.harbors.listActionConfigurationOperations("248df4b7-aa70-47b8-a036-
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6312,7 +6317,7 @@ await client.harbors.listActionConfigurationOperations("248df4b7-aa70-47b8-a036-
 <dl>
 <dd>
 
-**connection_id:** `string` — Source Connection whose action grants you want to manage.
+**connection_id:** `string` — Source Connection whose action grants you want to manage
     
 </dd>
 </dl>
@@ -6320,7 +6325,7 @@ await client.harbors.listActionConfigurationOperations("248df4b7-aa70-47b8-a036-
 <dl>
 <dd>
 
-**schema_id:** `string` — Exact action schema ID returned by schema discovery.
+**schema_id:** `string` — Exact action schema ID returned by schema discovery
     
 </dd>
 </dl>
@@ -6392,7 +6397,7 @@ await client.harbors.listContexts("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6468,7 +6473,7 @@ await client.harbors.createContext("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6550,7 +6555,7 @@ await client.harbors.listContextDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6633,7 +6638,7 @@ await client.harbors.createContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", 
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6710,7 +6715,7 @@ await client.harbors.getContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6718,7 +6723,7 @@ await client.harbors.getContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -6797,7 +6802,7 @@ await client.harbors.updateContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248d
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6805,7 +6810,7 @@ await client.harbors.updateContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248d
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -6878,7 +6883,7 @@ await client.harbors.deleteContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248d
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6886,7 +6891,7 @@ await client.harbors.deleteContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248d
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -6962,7 +6967,7 @@ await client.harbors.getContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "24
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -6970,7 +6975,7 @@ await client.harbors.getContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "24
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -7054,7 +7059,7 @@ await client.harbors.saveContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "2
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7062,7 +7067,7 @@ await client.harbors.saveContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "2
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -7137,7 +7142,7 @@ await client.harbors.deleteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", 
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7145,7 +7150,7 @@ await client.harbors.deleteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", 
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -7224,7 +7229,7 @@ await client.harbors.promoteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7232,7 +7237,7 @@ await client.harbors.promoteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -7319,7 +7324,7 @@ await client.harbors.listContextVersions("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7327,7 +7332,7 @@ await client.harbors.listContextVersions("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -7404,7 +7409,7 @@ await client.harbors.getContextVersion("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7412,7 +7417,7 @@ await client.harbors.getContextVersion("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**context_id:** `string` — Unique identifier of the context document.
+**context_id:** `string` — Unique identifier of the context document
     
 </dd>
 </dl>
@@ -7420,7 +7425,7 @@ await client.harbors.getContextVersion("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**version_id:** `string` — Unique identifier of the published context version.
+**version_id:** `string` — Unique identifier of the published context version
     
 </dd>
 </dl>
@@ -7496,7 +7501,7 @@ await client.harbors.listKeys("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7569,7 +7574,7 @@ await client.harbors.createKey("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7634,7 +7639,7 @@ await client.harbors.deleteKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7642,7 +7647,7 @@ await client.harbors.deleteKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7
 <dl>
 <dd>
 
-**key_id:** `string` — Unique identifier of the Harbor credential.
+**key_id:** `string` — Unique identifier of the Harbor credential
     
 </dd>
 </dl>
@@ -7719,7 +7724,7 @@ await client.harbors.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor whose backing connection runs the query.
+**harbor_id:** `string` — Unique identifier of the Harbor whose backing connection runs the query
     
 </dd>
 </dl>
@@ -7817,7 +7822,7 @@ await client.harbors.listSavedQueries("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7918,7 +7923,7 @@ await client.harbors.createSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -7996,7 +8001,7 @@ await client.harbors.listSavedQueryDrafts("248df4b7-aa70-47b8-a036-33ac447e668d"
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8090,7 +8095,7 @@ await client.harbors.getSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "248d
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8098,7 +8103,7 @@ await client.harbors.getSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "248d
 <dl>
 <dd>
 
-**saved_query_id:** `string` — Unique stable identifier of the saved query.
+**saved_query_id:** `string` — Unique stable identifier of the saved query
     
 </dd>
 </dl>
@@ -8178,7 +8183,7 @@ await client.harbors.deleteSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "2
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8186,7 +8191,7 @@ await client.harbors.deleteSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "2
 <dl>
 <dd>
 
-**saved_query_id:** `string` — Unique stable identifier of the saved query.
+**saved_query_id:** `string` — Unique stable identifier of the saved query
     
 </dd>
 </dl>
@@ -8271,7 +8276,7 @@ await client.harbors.saveSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8279,7 +8284,7 @@ await client.harbors.saveSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**saved_query_id:** `string` — Unique stable identifier of the saved query.
+**saved_query_id:** `string` — Unique stable identifier of the saved query
     
 </dd>
 </dl>
@@ -8354,7 +8359,7 @@ await client.harbors.deleteSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8362,7 +8367,7 @@ await client.harbors.deleteSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d
 <dl>
 <dd>
 
-**saved_query_id:** `string` — Unique stable identifier of the saved query.
+**saved_query_id:** `string` — Unique stable identifier of the saved query
     
 </dd>
 </dl>
@@ -8437,7 +8442,7 @@ await client.harbors.publishSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8445,7 +8450,7 @@ await client.harbors.publishSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**saved_query_id:** `string` — Unique stable identifier of the saved query.
+**saved_query_id:** `string` — Unique stable identifier of the saved query
     
 </dd>
 </dl>
@@ -8517,7 +8522,7 @@ await client.harbors.validateSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e66
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8525,7 +8530,7 @@ await client.harbors.validateSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e66
 <dl>
 <dd>
 
-**saved_query_id:** `string` — Unique stable identifier of the saved query.
+**saved_query_id:** `string` — Unique stable identifier of the saved query
     
 </dd>
 </dl>
@@ -8654,7 +8659,7 @@ await client.harbors.executeSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8662,7 +8667,7 @@ await client.harbors.executeSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**saved_query_id:** `string` — Unique stable identifier of the saved query.
+**saved_query_id:** `string` — Unique stable identifier of the saved query
     
 </dd>
 </dl>
@@ -8733,7 +8738,7 @@ await client.harbors.resolveSourceMappings("248df4b7-aa70-47b8-a036-33ac447e668d
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8836,7 +8841,7 @@ await client.harbors.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8904,7 +8909,7 @@ await client.harbors.listUsers("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -8979,7 +8984,7 @@ await client.harbors.inviteUser("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -9052,7 +9057,7 @@ await client.harbors.assignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -9060,7 +9065,7 @@ await client.harbors.assignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b
 <dl>
 <dd>
 
-**user_id:** `string` — Unique identifier of the Harbor-only user.
+**user_id:** `string` — Unique identifier of the Harbor-only user
     
 </dd>
 </dl>
@@ -9125,7 +9130,7 @@ await client.harbors.unassignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -9133,7 +9138,7 @@ await client.harbors.unassignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df
 <dl>
 <dd>
 
-**user_id:** `string` — Unique identifier of the Harbor-only user.
+**user_id:** `string` — Unique identifier of the Harbor-only user
     
 </dd>
 </dl>
@@ -9215,7 +9220,7 @@ await client.jobs.get("createmodel", "248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the job (usually returned by whichever endpoint started the job).
+**id:** `string` — Unique identifier of the job (usually returned by whichever endpoint started the job)
     
 </dd>
 </dl>
@@ -9974,7 +9979,7 @@ await client.organization.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the organization.
+**id:** `string` — Unique identifier of the organization
     
 </dd>
 </dl>
@@ -10046,7 +10051,7 @@ await client.organization.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the organization to update.
+**id:** `string` — Unique identifier of the organization to update
     
 </dd>
 </dl>
@@ -10119,7 +10124,7 @@ await client.organization.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the organization.
+**id:** `string` — Unique identifier of the organization
     
 </dd>
 </dl>
@@ -10197,8 +10202,8 @@ await client.activity.list({
     page_token: "page_token",
     order: "asc",
     harbor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-    event_type: ["event_type"],
-    outcome: ["outcome"],
+    event_type: ["action.looked_up"],
+    outcome: ["succeeded"],
     operation_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
     session_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
     actor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
@@ -10308,7 +10313,7 @@ await client.activity.getSession("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**session_id:** `string` — Harbor Activity session ID.
+**session_id:** `string` — Harbor Activity session ID
     
 </dd>
 </dl>
@@ -10391,7 +10396,7 @@ await client.activity.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**event_id:** `string` — Activity event ID.
+**event_id:** `string` — Activity event ID
     
 </dd>
 </dl>
@@ -10580,7 +10585,7 @@ await client.users.getCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the user.
+**id:** `string` — Unique identifier of the user
     
 </dd>
 </dl>
@@ -10646,7 +10651,7 @@ await client.users.updateCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the user to update.
+**id:** `string` — Unique identifier of the user to update
     
 </dd>
 </dl>
@@ -10721,7 +10726,7 @@ await client.users.deleteCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the user.
+**id:** `string` — Unique identifier of the user
     
 </dd>
 </dl>
@@ -10790,7 +10795,7 @@ await client.users.list("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization whose users should be listed.
+**org_id:** `string` — Unique identifier of the organization whose users should be listed
     
 </dd>
 </dl>
@@ -10862,7 +10867,7 @@ await client.users.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization the user belongs to.
+**org_id:** `string` — Unique identifier of the organization the user belongs to
     
 </dd>
 </dl>
@@ -10937,7 +10942,7 @@ await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization the user belongs to.
+**org_id:** `string` — Unique identifier of the organization the user belongs to
     
 </dd>
 </dl>
@@ -10945,7 +10950,7 @@ await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the user.
+**id:** `string` — Unique identifier of the user
     
 </dd>
 </dl>
@@ -11017,7 +11022,7 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization the user belongs to.
+**org_id:** `string` — Unique identifier of the organization the user belongs to
     
 </dd>
 </dl>
@@ -11025,7 +11030,7 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the user to update.
+**id:** `string` — Unique identifier of the user to update
     
 </dd>
 </dl>
@@ -11104,7 +11109,7 @@ await client.users.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization the user belongs to.
+**org_id:** `string` — Unique identifier of the organization the user belongs to
     
 </dd>
 </dl>
@@ -11112,7 +11117,7 @@ await client.users.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the user.
+**id:** `string` — Unique identifier of the user
     
 </dd>
 </dl>
@@ -11180,7 +11185,7 @@ await client.users.createApiKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization the user belongs to.
+**org_id:** `string` — Unique identifier of the organization the user belongs to
     
 </dd>
 </dl>
@@ -11188,7 +11193,7 @@ await client.users.createApiKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the user the key will be issued for.
+**id:** `string` — Unique identifier of the user the key will be issued for
     
 </dd>
 </dl>
@@ -11645,7 +11650,7 @@ await client.webhooks.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Webhook ID
     
 </dd>
 </dl>
@@ -11718,7 +11723,7 @@ await client.webhooks.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Webhook ID
     
 </dd>
 </dl>
@@ -11800,7 +11805,7 @@ await client.webhooks.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Webhook ID
     
 </dd>
 </dl>
@@ -11875,7 +11880,7 @@ await client.webhooks.listDeliveries("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Webhook ID
     
 </dd>
 </dl>
@@ -11958,7 +11963,7 @@ await client.webhooks.disable("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Webhook ID
     
 </dd>
 </dl>
@@ -12031,7 +12036,7 @@ await client.webhooks.enable("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Webhook ID
     
 </dd>
 </dl>
@@ -12193,7 +12198,7 @@ await client.bulkSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -12269,7 +12274,7 @@ await client.bulkSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "24
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -12277,7 +12282,7 @@ await client.bulkSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "24
 <dl>
 <dd>
 
-**exec_id:** `string` — Unique identifier of the execution.
+**exec_id:** `string` — Unique identifier of the execution
     
 </dd>
 </dl>
@@ -12346,7 +12351,7 @@ await client.bulkSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", 
 <dl>
 <dd>
 
-**id:** `string` — The bulk sync ID.
+**id:** `string` — The bulk sync ID
     
 </dd>
 </dl>
@@ -12354,7 +12359,7 @@ await client.bulkSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", 
 <dl>
 <dd>
 
-**exec_id:** `string` — The execution ID to cancel.
+**exec_id:** `string` — The execution ID to cancel
     
 </dd>
 </dl>
@@ -12420,7 +12425,7 @@ await client.bulkSync.executions.getConsoleLogs("248df4b7-aa70-47b8-a036-33ac447
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Bulk sync ID
     
 </dd>
 </dl>
@@ -12428,7 +12433,7 @@ await client.bulkSync.executions.getConsoleLogs("248df4b7-aa70-47b8-a036-33ac447
 <dl>
 <dd>
 
-**execution_id:** `string` 
+**execution_id:** `string` — Bulk sync execution ID
     
 </dd>
 </dl>
@@ -12508,7 +12513,7 @@ await client.bulkSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the bulk sync.
+**sync_id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -12516,7 +12521,7 @@ await client.bulkSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**execution_id:** `string` — Unique identifier of the execution whose log files should be listed.
+**execution_id:** `string` — Unique identifier of the execution whose log files should be listed
     
 </dd>
 </dl>
@@ -12593,7 +12598,7 @@ await client.bulkSync.executions.exportLogs("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the bulk sync.
+**sync_id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -12601,7 +12606,7 @@ await client.bulkSync.executions.exportLogs("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**execution_id:** `string` — Unique identifier of the execution whose logs should be exported.
+**execution_id:** `string` — Unique identifier of the execution whose logs should be exported
     
 </dd>
 </dl>
@@ -12675,7 +12680,7 @@ await client.bulkSync.executions.getSchemaConsoleLogs("248df4b7-aa70-47b8-a036-3
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Bulk sync ID
     
 </dd>
 </dl>
@@ -12683,7 +12688,7 @@ await client.bulkSync.executions.getSchemaConsoleLogs("248df4b7-aa70-47b8-a036-3
 <dl>
 <dd>
 
-**execution_id:** `string` 
+**execution_id:** `string` — Bulk sync execution ID
     
 </dd>
 </dl>
@@ -12691,7 +12696,7 @@ await client.bulkSync.executions.getSchemaConsoleLogs("248df4b7-aa70-47b8-a036-3
 <dl>
 <dd>
 
-**schema_id:** `string` — Schema identifier for schema-scoped console logs.
+**schema_id:** `string` — Schema identifier for schema-scoped console logs
     
 </dd>
 </dl>
@@ -12766,7 +12771,7 @@ await client.bulkSync.executions.getIngestConsoleLogs("248df4b7-aa70-47b8-a036-3
 <dl>
 <dd>
 
-**connection_id:** `string` 
+**connection_id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -12838,7 +12843,7 @@ await client.bulkSync.errorHandling.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -12901,7 +12906,7 @@ await client.bulkSync.errorHandling.update("248df4b7-aa70-47b8-a036-33ac447e668d
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -12984,7 +12989,7 @@ await client.bulkSync.schemas.list("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -13033,7 +13038,16 @@ sync's schema configuration.
 
 Within each provided schema, omitting `fields` enables all available fields on
 that schema. To control which fields are enabled, include the `fields` array
-with explicit `enabled` values for each field.
+with explicit `enabled` values for each field. Primary-key fields stay enabled
+while their schema is enabled, even when the request sets `enabled: false` for
+them.
+
+`output_name` and `destination_history_output_name` on a schema, and
+`output_name` on a field, are computed by Polytomic and ignored on input. Set
+`user_output_name` to rename a destination object or field.
+
+The response contains every schema on the bulk sync after the update, not only
+the schemas included in the request.
 
 > 📘 To replace a single schema's configuration in full (clearing any fields you
 > omit), use
@@ -13069,7 +13083,7 @@ await client.bulkSync.schemas.patch("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -13149,7 +13163,7 @@ await client.bulkSync.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "Conta
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -13157,7 +13171,7 @@ await client.bulkSync.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "Conta
 <dl>
 <dd>
 
-**schema_id:** `string` — Source-side schema identifier.
+**schema_id:** `string` — Source-side schema identifier
     
 </dd>
 </dl>
@@ -13199,6 +13213,8 @@ first if you want to preserve existing settings while changing only a subset.
 
 Omitting `fields` enables all available fields on the schema. To control which
 fields are enabled, include the `fields` array with explicit `enabled` values.
+Primary-key fields stay enabled while the schema is enabled, even when the
+request sets `enabled: false` for them.
 
 > 📘 To update multiple schemas in a single request without affecting others,
 > use the partial-update endpoint
@@ -13234,7 +13250,7 @@ await client.bulkSync.schemas.update("248df4b7-aa70-47b8-a036-33ac447e668d", "co
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the bulk sync.
+**id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -13242,7 +13258,7 @@ await client.bulkSync.schemas.update("248df4b7-aa70-47b8-a036-33ac447e668d", "co
 <dl>
 <dd>
 
-**schema_id:** `string` — Source-side schema identifier.
+**schema_id:** `string` — Source-side schema identifier
     
 </dd>
 </dl>
@@ -13320,7 +13336,7 @@ await client.bulkSync.schemas.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", "sc
 <dl>
 <dd>
 
-**id:** `string` — The bulk sync ID.
+**id:** `string` — The bulk sync ID
     
 </dd>
 </dl>
@@ -13328,7 +13344,7 @@ await client.bulkSync.schemas.cancel("248df4b7-aa70-47b8-a036-33ac447e668d", "sc
 <dl>
 <dd>
 
-**schema_id:** `string` — The schema ID to cancel for the bulk sync.
+**schema_id:** `string` — The schema ID to cancel for the bulk sync
     
 </dd>
 </dl>
@@ -13395,7 +13411,7 @@ await client.bulkSync.schedules.list("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the bulk sync whose schedules should be returned.
+**sync_id:** `string` — Unique identifier of the bulk sync whose schedules should be returned
     
 </dd>
 </dl>
@@ -13469,7 +13485,7 @@ await client.bulkSync.schedules.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the bulk sync to add a schedule to.
+**sync_id:** `string` — Unique identifier of the bulk sync to add a schedule to
     
 </dd>
 </dl>
@@ -13547,7 +13563,7 @@ await client.bulkSync.schedules.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the bulk sync.
+**sync_id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -13555,7 +13571,7 @@ await client.bulkSync.schedules.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248
 <dl>
 <dd>
 
-**schedule_id:** `string` — Unique identifier of the schedule.
+**schedule_id:** `string` — Unique identifier of the schedule
     
 </dd>
 </dl>
@@ -13626,7 +13642,7 @@ await client.bulkSync.schedules.update("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the bulk sync.
+**sync_id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -13634,7 +13650,7 @@ await client.bulkSync.schedules.update("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**schedule_id:** `string` — Unique identifier of the schedule to update.
+**schedule_id:** `string` — Unique identifier of the schedule to update
     
 </dd>
 </dl>
@@ -13708,7 +13724,7 @@ await client.bulkSync.schedules.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the bulk sync.
+**sync_id:** `string` — Unique identifier of the bulk sync
     
 </dd>
 </dl>
@@ -13716,7 +13732,7 @@ await client.bulkSync.schedules.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "
 <dl>
 <dd>
 
-**schedule_id:** `string` — Unique identifier of the schedule to delete.
+**schedule_id:** `string` — Unique identifier of the schedule to delete
     
 </dd>
 </dl>
@@ -13823,7 +13839,7 @@ await client.connections.proxy.executeProxy("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection to proxy the request through.
+**id:** `string` — Unique identifier of the connection to proxy the request through
     
 </dd>
 </dl>
@@ -13914,7 +13930,7 @@ await client.connections.proxy.getProxyInfo("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection whose proxy contract should be returned.
+**id:** `string` — Unique identifier of the connection whose proxy contract should be returned
     
 </dd>
 </dl>
@@ -13982,7 +13998,7 @@ await client.connections.proxy.getProxySettings("248df4b7-aa70-47b8-a036-33ac447
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection whose proxy settings should be returned.
+**id:** `string` — Unique identifier of the connection whose proxy settings should be returned
     
 </dd>
 </dl>
@@ -14057,7 +14073,7 @@ await client.connections.proxy.updateProxySettings("248df4b7-aa70-47b8-a036-33ac
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection whose proxy settings should be updated.
+**id:** `string` — Unique identifier of the connection whose proxy settings should be updated
     
 </dd>
 </dl>
@@ -14158,7 +14174,7 @@ await client.connections.sharedConnections.listSharedConnections("248df4b7-aa70-
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the parent connection whose shared copies should be listed.
+**id:** `string` — Unique identifier of the parent connection whose shared copies should be listed
     
 </dd>
 </dl>
@@ -14250,7 +14266,7 @@ await client.connections.sharedConnections.listSharedConnectionsForPartner("248d
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization that owns the parent connection.
+**org_id:** `string` — Unique identifier of the organization that owns the parent connection
     
 </dd>
 </dl>
@@ -14258,7 +14274,7 @@ await client.connections.sharedConnections.listSharedConnectionsForPartner("248d
 <dl>
 <dd>
 
-**connection_id:** `string` — Unique identifier of the parent connection whose shared copies should be listed.
+**connection_id:** `string` — Unique identifier of the parent connection whose shared copies should be listed
     
 </dd>
 </dl>
@@ -14323,7 +14339,7 @@ await client.connections.sharedConnections.createSharedConnection("248df4b7-aa70
 <dl>
 <dd>
 
-**org_id:** `string` — Unique identifier of the organization that owns the parent connection.
+**org_id:** `string` — Unique identifier of the organization that owns the parent connection
     
 </dd>
 </dl>
@@ -14331,7 +14347,7 @@ await client.connections.sharedConnections.createSharedConnection("248df4b7-aa70
 <dl>
 <dd>
 
-**connection_id:** `string` — Unique identifier of the parent connection to share.
+**connection_id:** `string` — Unique identifier of the parent connection to share
     
 </dd>
 </dl>
@@ -14422,7 +14438,7 @@ await client.harbors.actions.getExecution("248df4b7-aa70-47b8-a036-33ac447e668d"
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -14430,7 +14446,7 @@ await client.harbors.actions.getExecution("248df4b7-aa70-47b8-a036-33ac447e668d"
 <dl>
 <dd>
 
-**execution_id:** `string` 
+**execution_id:** `string` — Action execution ID
     
 </dd>
 </dl>
@@ -14537,7 +14553,7 @@ await client.harbors.actions.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -14645,7 +14661,7 @@ await client.harbors.actions.describe("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -14770,7 +14786,7 @@ await client.harbors.actions.execute("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -14879,7 +14895,7 @@ await client.harbors.actions.lookup("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -15005,7 +15021,7 @@ await client.harbors.actions.prepare("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**harbor_id:** `string` — Unique identifier of the Harbor.
+**harbor_id:** `string` — Unique identifier of the Harbor
     
 </dd>
 </dl>
@@ -15121,7 +15137,7 @@ await client.modelSync.targets.getTargetFields("248df4b7-aa70-47b8-a036-33ac447e
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the connection.
+**id:** `string` — Unique identifier of the connection
     
 </dd>
 </dl>
@@ -15212,7 +15228,7 @@ await client.modelSync.targets.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -15314,7 +15330,7 @@ await client.modelSync.targets.getCreateProperty("248df4b7-aa70-47b8-a036-33ac44
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Connection ID
     
 </dd>
 </dl>
@@ -15322,7 +15338,7 @@ await client.modelSync.targets.getCreateProperty("248df4b7-aa70-47b8-a036-33ac44
 <dl>
 <dd>
 
-**property:** `string` 
+**property:** `string` — Target-creation property ID
     
 </dd>
 </dl>
@@ -15386,7 +15402,7 @@ await client.modelSync.errorHandling.get("248df4b7-aa70-47b8-a036-33ac447e668d")
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the model sync.
+**id:** `string` — Unique identifier of the model sync
     
 </dd>
 </dl>
@@ -15449,7 +15465,7 @@ await client.modelSync.errorHandling.update("248df4b7-aa70-47b8-a036-33ac447e668
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the model sync.
+**id:** `string` — Unique identifier of the model sync
     
 </dd>
 </dl>
@@ -15535,7 +15551,7 @@ await client.modelSync.executions.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -15610,7 +15626,7 @@ await client.modelSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "2
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -15618,7 +15634,7 @@ await client.modelSync.executions.get("248df4b7-aa70-47b8-a036-33ac447e668d", "2
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Execution ID
     
 </dd>
 </dl>
@@ -15681,7 +15697,7 @@ await client.modelSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -15689,7 +15705,7 @@ await client.modelSync.executions.cancel("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**id:** `string` — The ID of the execution to cancel.
+**id:** `string` — The ID of the execution to cancel
     
 </dd>
 </dl>
@@ -15755,7 +15771,7 @@ await client.modelSync.executions.getConsoleLogs("248df4b7-aa70-47b8-a036-33ac44
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -15763,7 +15779,7 @@ await client.modelSync.executions.getConsoleLogs("248df4b7-aa70-47b8-a036-33ac44
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Execution ID
     
 </dd>
 </dl>
@@ -15834,7 +15850,7 @@ await client.modelSync.executions.getLogsIndex("248df4b7-aa70-47b8-a036-33ac447e
 <dl>
 <dd>
 
-**sync_id:** `string` — Unique identifier of the model sync.
+**sync_id:** `string` — Unique identifier of the model sync
     
 </dd>
 </dl>
@@ -15842,7 +15858,7 @@ await client.modelSync.executions.getLogsIndex("248df4b7-aa70-47b8-a036-33ac447e
 <dl>
 <dd>
 
-**id:** `string` — Unique identifier of the execution whose logs are being indexed.
+**id:** `string` — Unique identifier of the execution whose logs are being indexed
     
 </dd>
 </dl>
@@ -15912,7 +15928,7 @@ await client.modelSync.executions.getLogUrls("248df4b7-aa70-47b8-a036-33ac447e66
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -15920,7 +15936,7 @@ await client.modelSync.executions.getLogUrls("248df4b7-aa70-47b8-a036-33ac447e66
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Execution ID
     
 </dd>
 </dl>
@@ -15928,7 +15944,7 @@ await client.modelSync.executions.getLogUrls("248df4b7-aa70-47b8-a036-33ac447e66
 <dl>
 <dd>
 
-**type:** `Polytomic.ExecutionLogType` 
+**type:** `Polytomic.ExecutionLogType` — Log category
     
 </dd>
 </dl>
@@ -15996,7 +16012,7 @@ await client.modelSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d"
 <dl>
 <dd>
 
-**sync_id:** `string` 
+**sync_id:** `string` — Model sync ID
     
 </dd>
 </dl>
@@ -16004,7 +16020,7 @@ await client.modelSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d"
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Execution ID
     
 </dd>
 </dl>
@@ -16012,7 +16028,7 @@ await client.modelSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d"
 <dl>
 <dd>
 
-**type:** `Polytomic.ExecutionLogType` 
+**type:** `Polytomic.ExecutionLogType` — Log category
     
 </dd>
 </dl>
@@ -16020,7 +16036,7 @@ await client.modelSync.executions.getLogs("248df4b7-aa70-47b8-a036-33ac447e668d"
 <dl>
 <dd>
 
-**filename:** `string` 
+**filename:** `string` — Log file name
     
 </dd>
 </dl>
@@ -16218,7 +16234,7 @@ await client.permissions.policies.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Policy ID
     
 </dd>
 </dl>
@@ -16289,7 +16305,7 @@ await client.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d",
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Policy ID
     
 </dd>
 </dl>
@@ -16363,7 +16379,7 @@ await client.permissions.policies.delete("248df4b7-aa70-47b8-a036-33ac447e668d")
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Policy ID
     
 </dd>
 </dl>
@@ -16562,7 +16578,7 @@ await client.permissions.roles.get("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Role ID
     
 </dd>
 </dl>
@@ -16632,7 +16648,7 @@ await client.permissions.roles.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Role ID
     
 </dd>
 </dl>
@@ -16711,7 +16727,7 @@ await client.permissions.roles.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dl>
 <dd>
 
-**id:** `string` 
+**id:** `string` — Role ID
     
 </dd>
 </dl>

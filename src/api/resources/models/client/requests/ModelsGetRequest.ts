@@ -7,5 +7,6 @@
  *     }
  */
 export interface ModelsGetRequest {
+    /** Deprecated; has no effect */
     async?: boolean;
 }

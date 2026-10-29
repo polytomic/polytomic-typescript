@@ -3,15 +3,24 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncSearchHit {
+    /** Bulk sync ID */
     bulk_sync_id: string;
+    /** Bulk sync name */
     bulk_sync_name: string;
+    /** API paths of the bulk sync and its source and target connections */
     links: Polytomic.SearchResultLinks;
-    /** Contributing attributes grouped by saved mapping or schema context, with one group for resource metadata. */
+    /** Contributing attributes grouped by saved mapping or schema context, with one group for resource metadata */
     matches?: Polytomic.SearchMatch[] | undefined;
+    /** Source connection ID */
     source_connection_id: string;
+    /** Source connection name */
     source_connection_name: string;
+    /** Source connection type */
     source_connection_type: string;
+    /** Target connection ID */
     target_connection_id: string;
+    /** Target connection name */
     target_connection_name: string;
+    /** Target connection type */
     target_connection_type: string;
 }

@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface GetExecutionResponseEnvelope {
+    /** The execution */
     data?: Polytomic.GetExecutionResponseSchema | undefined;
 }

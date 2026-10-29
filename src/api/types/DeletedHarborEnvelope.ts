@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface DeletedHarborEnvelope {
+    /** The deleted Harbor */
     data?: Polytomic.DeletedHarborResponse | undefined;
 }

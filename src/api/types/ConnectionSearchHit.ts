@@ -3,10 +3,14 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectionSearchHit {
+    /** Connection ID */
     connection_id: string;
+    /** Connection name */
     connection_name: string;
+    /** Connection type */
     connection_type: string;
+    /** API path of the connection */
     links: Polytomic.SearchResultLinks;
-    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata. */
+    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata */
     matches?: Polytomic.SearchMatch[] | undefined;
 }

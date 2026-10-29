@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncSourceEnvelope {
+    /** Bulk sync source details for the connection */
     data?: Polytomic.BulkSyncSource | undefined;
 }

@@ -6,10 +6,10 @@
 export interface OverrideField {
     /** New is set to true if the target field should be created by Polytomic. This is not supported by all backends. */
     "new"?: boolean | undefined;
-    /** Value written to the target field for every record. */
+    /** Value written to the target field for every record */
     override_value: string;
     /** Sync mode for the field; defaults to 'updateOrCreate'. If set to 'create', the field will not be synced if it already has a value. This is not supported by all backends. */
     sync_mode?: string | undefined;
-    /** Target field ID the value will be written to. */
+    /** Target field ID the value will be written to */
     target: string;
 }

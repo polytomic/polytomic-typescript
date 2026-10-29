@@ -3,35 +3,35 @@
 import type * as Polytomic from "../index";
 
 export interface TargetField {
-    /** True if this field is an association (foreign key) to another object rather than a value column. */
+    /** True if this field is an association (foreign key) to another object rather than a value column */
     association?: boolean | undefined;
-    /** True if this field can be written when creating a new record. */
+    /** True if this field can be written when creating a new record */
     createable?: boolean | undefined;
-    /** Description of the field, when the backend provides one. */
+    /** Description of the field, when the backend provides one */
     description?: string | undefined;
-    /** True if this field supports field-level encryption. */
+    /** True if this field supports field-level encryption */
     encryptable?: boolean | undefined;
     /** Comparisons this field accepts in a target filter. A condition whose function is absent from this list is rejected when the sync is saved. Empty when the destination publishes no per-field list, in which case any comparison is accepted. */
     filter_functions?: Polytomic.SupportedFilterFunction[] | undefined;
-    /** True if this field can be used in a target filter. */
+    /** True if this field can be used in a target filter */
     filterable?: boolean | undefined;
     /** Backend-specific identifier of the field; use this value when configuring field mappings. */
     id?: string | undefined;
-    /** Identity match functions supported when this field is used as the sync identity (e.g. exact match, hashed match). */
+    /** Identity match functions supported when this field is used as the sync identity (e.g. exact match, hashed match) */
     identity_functions?: Polytomic.IdentityFunction[] | undefined;
     /** True if this association field holds a set of references rather than one; every value mapped to it is a member of the set. False for a field that is not an association, and for one whose destination has not declared how many references the relationship holds. */
     multiple_associations?: boolean | undefined;
-    /** Human-readable name of the field. */
+    /** Human-readable name of the field */
     name?: string | undefined;
-    /** True if a model sync must map a value to this field for records to be accepted. */
+    /** True if a model sync must map a value to this field for records to be accepted */
     required?: boolean | undefined;
-    /** Native type reported by the destination system. */
+    /** Native type reported by the destination system */
     source_type?: string | undefined;
-    /** True if this field may be used as the identity (match key) for syncs that require one. */
+    /** True if this field may be used as the identity (match key) for syncs that require one */
     supports_identity?: boolean | undefined;
-    /** Polytomic-normalized type used when mapping values to this field. */
+    /** Polytomic-normalized type used when mapping values to this field */
     type?: string | undefined;
-    /** True if this field can be written when updating an existing record. */
+    /** True if this field can be written when updating an existing record */
     updateable?: boolean | undefined;
     /** Stored field options as value and label pairs. Use value when configuring mappings. Omitted when no options are available; enumeration fields may still omit options. */
     values?: Polytomic.PickValue[] | undefined;

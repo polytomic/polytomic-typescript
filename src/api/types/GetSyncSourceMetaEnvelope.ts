@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface GetSyncSourceMetaEnvelope {
+    /** Source configuration choices for the connection */
     data?: Polytomic.SyncSourceMetaResponse | undefined;
 }

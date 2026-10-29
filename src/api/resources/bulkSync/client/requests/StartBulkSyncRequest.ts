@@ -7,7 +7,9 @@ import type * as Polytomic from "../../../../index";
  *     {}
  */
 export interface StartBulkSyncRequest {
+    /** Selective fetch mode. Controls whether the execution runs a full fetch, only incremental fields, or only non-incremental fields. */
     fetch_mode?: Polytomic.BulkFetchMode;
+    /** Controls how the destination is handled during a resync. Valid values: refetch (retain destination data), resync (truncate destination data), rebuild (drop and recreate destination tables). */
     resync_mode?: Polytomic.BulkResyncMode;
     /** Optional list of schema IDs to include in this execution. If empty, all enabled schemas are included. */
     schemas?: string[];

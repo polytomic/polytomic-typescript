@@ -14,14 +14,18 @@ import type * as Polytomic from "../../../../../../index";
  *     }
  */
 export interface PrepareHarborActionRequest {
+    /** Harbor session token; when supplied, the session must be active and bound to this credential and Harbor. */
     "X-Polytomic-Harbor-Session"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
     /** Explicit destination connection ID from action discovery. Must have this action and its submitted fields enabled in this Harbor. */
     connection_id: string;
+    /** Nonempty map of enabled input fields to JSON scalars. Omission leaves fields unchanged; null requires advertised nullability; empty strings follow field constraints. Numbers must use integer JSON notation (no decimal point or exponent) within +/-9007199254740991; opaque IDs remain strings. Arrays, objects, and coercion are unsupported. */
     input: Polytomic.SchemaRecord;
+    /** One advertised lookup field and exact scalar value. Required when lookup_fields is nonempty; otherwise omit. */
     lookup?: Polytomic.ActionLookup;
-    /** Exact operation_id from action discovery. */
+    /** Exact operation_id from action discovery */
     operation_id: string;
-    /** Exact schema_id from action discovery. */
+    /** Exact schema_id from action discovery */
     schema_id: string;
 }

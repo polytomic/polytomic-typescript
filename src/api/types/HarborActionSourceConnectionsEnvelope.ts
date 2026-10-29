@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionSourceConnectionsEnvelope {
+    /** Connections eligible for action configuration */
     data?: Polytomic.HarborActionSourceConnectionResponse[] | undefined;
 }

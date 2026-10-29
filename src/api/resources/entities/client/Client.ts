@@ -227,7 +227,7 @@ export class EntitiesClient {
      * If the UUID does not exist, or exists outside the caller's scoped
      * organization, the endpoint returns `404`.
      *
-     * @param {string} id - UUID of the entity to resolve.
+     * @param {string} id - UUID of the entity to resolve
      * @param {EntitiesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}
@@ -360,7 +360,7 @@ export class EntitiesClient {
      *
      * If the UUID does not exist, the endpoint returns `404`.
      *
-     * @param {string} id - UUID of the entity to resolve.
+     * @param {string} id - UUID of the entity to resolve
      * @param {EntitiesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}

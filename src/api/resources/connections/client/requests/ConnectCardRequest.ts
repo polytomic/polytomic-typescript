@@ -3,23 +3,23 @@
 /**
  * @example
  *     {
- *         name: "Salesforce Connection",
- *         redirect_url: "redirect_url"
+ *         name: "Salesforce Connection"
  *     }
  */
 export interface ConnectCardRequest {
-    /** The id of an existing connection to update. */
+    /** The id of an existing connection to update */
     connection?: string;
-    /** Whether to use the dark theme for the Connect modal. */
+    /** Whether to use the dark theme for the Connect modal */
     dark?: boolean;
     /** Name of the new connection. Must be unique per organization. */
     name: string;
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
-    /** URL to redirect to after connection is created. */
-    redirect_url: string;
+    /** URL to redirect to after the hosted Connect flow finishes. Required for hosted Connect; omit it to mint a session for the embedded form (@polytomic/connect-react). */
+    redirect_url?: string;
     /** Connect session lifetime in seconds. Defaults to 300 and cannot exceed 604800. */
     ttl?: number;
-    /** Connection type to create. */
+    /** Connection type to create */
     type?: string;
     /** Whether to display the target organization name instead of the partner name in the Connect modal. Defaults to false; organizations without a partner always display their organization name. */
     use_organization_name?: boolean;

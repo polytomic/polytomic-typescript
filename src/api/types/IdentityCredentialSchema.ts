@@ -3,16 +3,18 @@
 import type * as Polytomic from "../index";
 
 export interface IdentityCredentialSchema {
+    /** Profile metadata and capabilities for profile-backed API keys */
     api_key_profile?: Polytomic.IdentityCredentialApiKeyProfileSchema | undefined;
-    /** Provider expiry of a temporary API key. */
+    /** Provider expiry of a temporary API key */
     expires_at?: string | undefined;
+    /** Authoritative Harbor identity for credentials backed by a Harbor-owned profile */
     harbor?: Polytomic.IdentityCredentialHarborSchema | undefined;
-    /** Authentication method used for the request. */
+    /** Authentication method used for the request */
     method?: string | undefined;
-    /** API key mode applied to the credential when available. */
+    /** API key mode applied to the credential when available */
     mode?: string | undefined;
-    /** OAuth client ID for OAuth-issued API keys. */
+    /** OAuth client ID for OAuth-issued API keys */
     oauth_client_id?: string | undefined;
-    /** Protected resource URL this OAuth-issued credential is bound to. */
+    /** Protected resource URL this OAuth-issued credential is bound to */
     oauth_resource?: string | undefined;
 }

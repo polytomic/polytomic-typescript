@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface CancelSyncExecutionResponseEnvelope {
+    /** Result of the cancellation request */
     data?: Polytomic.CancelSyncExecutionResponse | undefined;
 }

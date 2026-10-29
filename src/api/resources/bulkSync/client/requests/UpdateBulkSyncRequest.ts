@@ -21,26 +21,31 @@ export interface UpdateBulkSyncRequest {
     active?: boolean;
     /** Additional bulk sync schedules. Schedule times are interpreted in UTC. */
     additional_schedules?: Polytomic.BulkSyncAdditionalScheduleRequest[];
+    /** Controls whether Polytomic automatically enables newly discovered fields on existing objects. Valid values depend on the source backend. */
     automatically_add_new_fields?: Polytomic.BulkDiscover;
+    /** Controls whether Polytomic automatically enables newly discovered source objects (tables). Valid values depend on the source backend. */
     automatically_add_new_objects?: Polytomic.BulkDiscover;
     /** Override the default concurrency limit for this sync. */
     concurrency_limit?: number;
     /** Global cutoff applied across schemas. Source records older than this timestamp are excluded from sync runs. */
     data_cutoff_timestamp?: string;
+    /** The default bulk sync schedule. This schedule applies to all fields and schemas. Schedules are interpreted in UTC. */
     default_schedule: Polytomic.BulkSyncDefaultScheduleRequest;
     /** Destination-specific bulk sync configuration (e.g. output schema name, file format). The accepted keys depend on the destination connection type. */
     destination_configuration: Record<string, unknown>;
-    /** Unique identifier of the connection rows are written to. */
+    /** Unique identifier of the connection rows are written to */
     destination_connection_id: string;
     /** When true, Polytomic will not add its own timestamp columns to destination rows. */
     disable_record_timestamps?: boolean;
+    /** How source data is written to the destination. replicate keeps the destination in sync with the source; snapshot writes a timestamped copy per execution; append adds every delivered record, including full reads, without updating existing rows. */
     mode?: Polytomic.BulkSyncTargetMode;
-    /** Human-readable name for the bulk sync. */
+    /** Human-readable name for the bulk sync */
     name: string;
+    /** Controls whether destination object and field names are normalized (e.g. lowercased, special characters replaced). Valid values depend on the destination backend. */
     normalize_names?: Polytomic.BulkNormalizeNames;
-    /** Organization the sync belongs to. Only used by partner callers; normal callers are always scoped to their own organization. */
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
-    /** Identifiers of permissions policies applied to the bulk sync. */
+    /** Permissions policy IDs applied to the bulk sync. On update, a non-empty list replaces the bulk sync's policies and an empty or omitted list leaves them unchanged. */
     policies?: string[];
     /** Override the default resync concurrency limit for this sync. */
     resync_concurrency_limit?: number;
@@ -48,7 +53,7 @@ export interface UpdateBulkSyncRequest {
     schemas?: UpdateBulkSyncRequest.Schemas.Item[];
     /** Source-specific bulk sync configuration (e.g. replication slot name, sync lookback). The accepted keys depend on the source connection type. */
     source_configuration?: Record<string, unknown>;
-    /** Unique identifier of the connection rows are read from. */
+    /** Unique identifier of the connection rows are read from */
     source_connection_id: string;
 }
 

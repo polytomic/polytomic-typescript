@@ -7,10 +7,12 @@ import type * as Polytomic from "../../../../index";
  *     {}
  */
 export interface StartModelSyncRequest {
-    /** Values of the sync's identity source field naming the records to sync. A sync with more than one identity mapping requires 'source_identities' instead. */
+    /** Values of the sync's identity source field naming the records to sync. A sync with more than one identity mapping requires 'source_identities' instead. Cannot be combined with 'resync'. */
     identities?: string[];
+    /** Whether the execution ignores change tracking and syncs every record; on a sync that skips the initial backfill, it instead restarts change tracking from the current position without syncing existing records */
     resync?: boolean;
-    /** Records to sync, each identified by every source and value its entry lists. The sources of an entry are identity mapping sources of one model, and an entry for a sync whose identities strategy is 'and' lists all of them. Cannot be combined with 'identities'; at most 1000 entries. */
+    /** Records to sync, each identified by every source and value its entry lists. The sources of an entry are identity mapping sources of one model, and an entry for a sync whose identities strategy is 'and' lists all of them. Cannot be combined with 'identities' or 'resync'; at most 1000 entries. */
     source_identities?: Polytomic.ModelSyncSourceIdentity[][];
+    /** Whether the execution is a test that syncs at most 5 records. Cannot be combined with 'resync'. */
     test?: boolean;
 }

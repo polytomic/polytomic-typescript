@@ -9,6 +9,7 @@
  */
 export interface CreateWebhooksSchema {
     endpoint: string;
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
     secret: string;
 }

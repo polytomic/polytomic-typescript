@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface ModelFieldResponse {
+    /** Fields the source connection provides for the given configuration */
     data?: Polytomic.ModelField[] | undefined;
 }

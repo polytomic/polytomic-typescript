@@ -3,17 +3,23 @@
 import type * as Polytomic from "../index";
 
 export interface SchemaConfiguration {
+    /** Per-schema cutoff; source records older than this are excluded */
     data_cutoff_timestamp?: string | undefined;
-    /** Whether data cutoff is disabled for this schema. */
+    /** Whether data cutoff is disabled for this schema */
     disable_data_cutoff?: boolean | undefined;
-    /** Whether the schema is enabled for syncing. */
+    /** Whether the schema is enabled for syncing */
     enabled?: boolean | undefined;
+    /** Field IDs or field configurations for this schema; an empty list enables every field */
     fields?: SchemaConfiguration.Fields.Item[] | undefined;
+    /** Filters applied to records read from this schema */
     filters?: Polytomic.BulkFilter[] | undefined;
     /** Whether a companion history table is maintained beside this schema's output, recording every version observed on successive runs. Requires a replicate-mode sync to a destination reporting supports_history_mode. Omit to keep the current value. */
     history_enabled?: boolean | undefined;
+    /** Source schema ID */
     id?: string | undefined;
+    /** Source field used to partition rows in the destination */
     partition_key?: string | undefined;
+    /** Source field used to detect changes between incremental runs */
     tracking_field?: string | undefined;
     /** User-specified override for the destination object name. Omit to keep the current value; send an empty string to clear it. */
     user_output_name?: string | undefined;

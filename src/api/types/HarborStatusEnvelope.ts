@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborStatusEnvelope {
+    /** The Harbor status */
     data: Polytomic.HarborStatusResponse;
 }

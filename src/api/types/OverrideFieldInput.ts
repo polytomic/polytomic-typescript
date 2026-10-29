@@ -10,12 +10,12 @@ export interface OverrideFieldInput {
     encryption_enabled?: boolean | undefined;
     /** New is set to true if the target field should be created by Polytomic. This is not supported by all backends. */
     "new"?: boolean | undefined;
-    /** Value written to the target field for every record; required unless a source is provided. */
+    /** Value written to the target field for every record; required unless a source is provided */
     override_value?: string | undefined;
     /** Deprecated. Override fields have no source; entries which name one are stored as a field mapping instead. Use 'fields' to map a source field. */
     source?: Polytomic.Source | undefined;
     /** Sync mode for the field; defaults to 'updateOrCreate'. If set to 'create', the field will not be synced if it already has a value. This is not supported by all backends. */
     sync_mode?: string | undefined;
-    /** Target field ID the value will be written to. */
+    /** Target field ID the value will be written to */
     target: string;
 }

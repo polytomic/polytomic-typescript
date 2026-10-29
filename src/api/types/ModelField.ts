@@ -3,16 +3,28 @@
 import type * as Polytomic from "../index";
 
 export interface ModelField {
+    /** When the field was created */
     created_at?: string | undefined;
+    /** Actor that created the field */
     created_by?: Polytomic.OutputActor | undefined;
+    /** Description of the field */
     description?: string | undefined;
+    /** Example value for the field */
     example?: unknown | undefined;
+    /** Model field ID */
     id?: string | undefined;
+    /** Display label for the field */
     label?: string | undefined;
+    /** Source field name */
     name?: string | undefined;
+    /** Field type reported by the source */
     remote_type?: string | undefined;
+    /** Polytomic field type */
     type?: string | undefined;
+    /** Whether the field uniquely identifies records */
     unique?: boolean | undefined;
+    /** When the field was last updated */
     updated_at?: string | undefined;
+    /** Whether the field is user-defined rather than discovered from the source */
     user_added?: boolean | undefined;
 }

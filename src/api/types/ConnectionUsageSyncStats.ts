@@ -3,16 +3,16 @@
 import type * as Polytomic from "../index";
 
 export interface ConnectionUsageSyncStats {
-    /** Per-category breakdown of the sync's calls, sorted by calls descending. */
+    /** Per-category breakdown of the sync's calls, sorted by calls descending */
     categories?: Polytomic.ConnectionUsageCategoryStats[] | undefined;
-    /** Start time of the sync's most recent execution, or null if it has never run. */
+    /** Start time of the sync's most recent execution, or null if it has never run */
     lastRunAt?: string | undefined;
-    /** Unique identifier of the sync that spent the calls. */
+    /** Unique identifier of the sync that spent the calls */
     syncId?: string | undefined;
-    /** Human-readable name of the sync, or empty if it could not be resolved. */
+    /** Human-readable name of the sync, or empty if it could not be resolved */
     syncName?: string | undefined;
-    /** Kind of sync that spent the calls (model or bulk). */
+    /** Kind of sync that spent the calls (model or bulk) */
     syncType?: string | undefined;
-    /** Total API calls the sync spent against this connection in the last 24 hours. */
+    /** Total API calls the sync spent against this connection in the last 24 hours */
     totalCalls?: number | undefined;
 }

@@ -3,9 +3,9 @@
 export interface ModelSyncProblem {
     /** Stable identifier for the kind of problem. Branch on this rather than on 'message'. */
     code?: string | undefined;
-    /** Description of the problem, suitable for showing to a person. */
+    /** Description of the problem, suitable for showing to a person */
     message?: string | undefined;
-    /** JSON path of the part of this configuration the problem is about, relative to the sync object. */
+    /** JSON path of the part of this configuration the problem is about, relative to the sync object */
     path?: string | undefined;
     /** How serious the problem is. Every problem reported today is an error, which stops the sync from running; read this rather than assuming. */
     severity?: "error" | undefined;

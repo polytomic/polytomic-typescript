@@ -286,7 +286,7 @@ describe("ModelSyncClient", () => {
                     schedule: {
                         connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                         day_of_month: "1",
-                        day_of_week: "monday",
+                        day_of_week: "1",
                         hour: "12",
                         minute: "30",
                         month: "1",
@@ -493,7 +493,7 @@ describe("ModelSyncClient", () => {
                 schedule: {
                     connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     day_of_month: "1",
-                    day_of_week: "monday",
+                    day_of_week: "1",
                     frequency: "manual",
                     hour: "12",
                     job_id: 1,

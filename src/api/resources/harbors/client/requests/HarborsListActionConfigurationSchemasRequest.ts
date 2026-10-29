@@ -11,8 +11,8 @@
 export interface HarborsListActionConfigurationSchemasRequest {
     /** Filter action schemas by ID or name. */
     search?: string;
-    /** Maximum number of schemas to return. */
+    /** Maximum number of schemas to return */
     limit?: number;
-    /** Opaque cursor returned by the previous request. */
+    /** Opaque cursor returned by the previous request */
     page_token?: string;
 }

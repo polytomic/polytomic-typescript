@@ -3,13 +3,20 @@
 import type * as Polytomic from "../index";
 
 export interface ModelSyncSearchHit {
+    /** API paths of the model sync and its target connection */
     links: Polytomic.SearchResultLinks;
-    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata. */
+    /** Contributing attributes grouped by saved mapping context, with one group for resource metadata */
     matches?: Polytomic.SearchMatch[] | undefined;
+    /** Connections of the models this sync maps from */
     source_connections: Polytomic.ModelSyncSourceConnection[];
+    /** Model sync ID */
     sync_id: string;
+    /** Model sync name */
     sync_name: string;
+    /** Target connection ID */
     target_connection_id: string;
+    /** Target connection name */
     target_connection_name: string;
+    /** Target connection type */
     target_connection_type: string;
 }

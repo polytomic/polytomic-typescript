@@ -28,7 +28,7 @@ export class ErrorHandlingClient {
     /**
      * Returns the error handling settings for a model sync.
      *
-     * @param {string} id - Unique identifier of the model sync.
+     * @param {string} id - Unique identifier of the model sync
      * @param {ErrorHandlingClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -117,7 +117,7 @@ export class ErrorHandlingClient {
     /**
      * Updates the error handling settings for a model sync.
      *
-     * @param {string} id - Unique identifier of the model sync.
+     * @param {string} id - Unique identifier of the model sync
      * @param {Polytomic.modelSync.UpdateSyncErrorHandlingRequest} request
      * @param {ErrorHandlingClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *

@@ -5,10 +5,16 @@
  *     {}
  */
 export interface HarborsCloseSessionRequest {
+    /** ID of the key that signed the attestation */
     "X-Polytomic-MCP-Key-ID"?: string;
+    /** Unix time, in seconds, when the attestation was signed */
     "X-Polytomic-MCP-Timestamp"?: number;
+    /** Single-use value of at least 16 characters included in the signature */
     "X-Polytomic-MCP-Nonce"?: string;
+    /** Attestation signature */
     "X-Polytomic-MCP-Signature"?: string;
+    /** New nonzero UUID for each request, required for scoped credentials; a reused value is rejected. */
     "X-Polytomic-Activity-Request-ID"?: string;
+    /** Token issued when the session was registered */
     "X-Polytomic-Harbor-Session"?: string;
 }

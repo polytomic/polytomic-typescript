@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface TargetResponseEnvelope {
+    /** The target object and its fields */
     data?: Polytomic.TargetResponse | undefined;
 }

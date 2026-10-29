@@ -499,7 +499,7 @@ export class OrganizationClient {
      * > Check each endpoint's description for the caller scope that applies in that
      * > API version.
      *
-     * @param {string} id - Unique identifier of the organization.
+     * @param {string} id - Unique identifier of the organization
      * @param {OrganizationClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -590,7 +590,7 @@ export class OrganizationClient {
      * > 📘 SSO and OIDC configuration is replaced in full on each update. Include all
      * > desired settings in the request body, not just the fields you want to change.
      *
-     * @param {string} id - Unique identifier of the organization to update.
+     * @param {string} id - Unique identifier of the organization to update
      * @param {Polytomic.UpdateOrganizationRequestSchema} request
      * @param {OrganizationClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -691,7 +691,7 @@ export class OrganizationClient {
      *
      * Partner callers cannot delete their own owner organization.
      *
-     * @param {string} id - Unique identifier of the organization.
+     * @param {string} id - Unique identifier of the organization
      * @param {OrganizationClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}

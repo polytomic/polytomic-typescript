@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface HarborKeyEnvelope {
+    /** The created credential */
     data?: Polytomic.HarborApiKeyCreatedResponse | undefined;
 }

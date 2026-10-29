@@ -3,13 +3,22 @@
 import type * as Polytomic from "../index";
 
 export interface HarborActionCapability {
+    /** Description of the operation */
     description?: string | undefined;
+    /** Whether the operation only reads records (read_only) or changes them (mutating) */
     effect?: string | undefined;
+    /** Provider deduplication guarantee for repeated executions; null when the operation has none and an uncertain outcome must not be retried */
     idempotency?: Polytomic.SchemaOperationIdempotency | undefined;
+    /** Fields the operation accepts as input */
     input_fields?: Polytomic.HarborActionField[] | undefined;
+    /** Fields that can identify the record to act on */
     lookup_fields?: Polytomic.HarborActionField[] | undefined;
+    /** Display name of the operation */
     name?: string | undefined;
+    /** Operation ID */
     operation_id?: string | undefined;
+    /** Fields the operation returns */
     output_fields?: Polytomic.HarborActionField[] | undefined;
+    /** Schema ID */
     schema_id?: string | undefined;
 }

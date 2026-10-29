@@ -7,5 +7,6 @@
  *     }
  */
 export interface BulkSyncDeleteRequest {
+    /** Deprecated; has no effect */
     refresh_schemas?: boolean;
 }

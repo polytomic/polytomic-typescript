@@ -3,22 +3,28 @@
 import type * as Polytomic from "../index";
 
 export interface SchemaField {
+    /** Reference this field holds to records in other schemas */
     association?: Polytomic.SchemaAssociation | undefined;
+    /** Schema field ID */
     id?: string | undefined;
-    /** Whether this field is part of the schema's primary key, including any user override. */
+    /** Whether this field is part of the schema's primary key, including any user override */
     is_primary_key?: boolean | undefined;
+    /** Display name of the field */
     name?: string | undefined;
-    /** JSONPath used to extract the field from each source record; only meaningful for document-style backends. */
+    /** JSONPath used to extract the field from each source record; only meaningful for document-style backends */
     path?: string | undefined;
-    /** The user-set primary key status for this field, which takes precedence over source_primary_key; omitted when no override is set. */
+    /** The user-set primary key status for this field, which takes precedence over source_primary_key; omitted when no override is set */
     primary_key_override?: boolean | undefined;
-    /** The type of the field from the remote system. */
+    /** The type of the field from the remote system */
     remote_type?: string | undefined;
-    /** Whether the source system reports this field as part of the schema's primary key. */
+    /** Whether the source system reports this field as part of the schema's primary key */
     source_primary_key?: boolean | undefined;
+    /** The type classification for the field */
     type?: Polytomic.UtilFieldType | undefined;
+    /** The type specification for the field */
     type_spec?: Polytomic.TypesType | undefined;
-    /** True when the field's effective definition came from a user override. */
+    /** True when the field's effective definition came from a user override */
     user_managed?: boolean | undefined;
+    /** Allowed values for the field */
     values?: Polytomic.PickValue[] | undefined;
 }

@@ -3,33 +3,36 @@
 import type * as Polytomic from "../index";
 
 export interface ListSyncItem {
-    /** Whether the sync runs on its schedule. */
+    /** Whether the sync runs on its schedule */
     active?: boolean | undefined;
-    /** Timestamp the sync was created. */
+    /** Timestamp the sync was created */
     created_at?: string | undefined;
+    /** Actor that created the sync */
     created_by?: Polytomic.OutputActor | undefined;
-    /** Unique identifier of the sync. */
+    /** Unique identifier of the sync */
     id?: string | undefined;
-    /** How source records are written to the target (e.g. create, updateOrCreate, enrich). */
+    /** How source records are written to the target (e.g. create, updateOrCreate, enrich) */
     mode?: string | undefined;
-    /** Model IDs used in the sync. */
+    /** Model IDs used in the sync */
     model_ids?: string[] | undefined;
-    /** Human-readable name of the sync. */
+    /** Human-readable name of the sync */
     name?: string | undefined;
     /** For enrichment syncs, only process records that have been updated since the previous run. */
     only_enrich_updates?: boolean | undefined;
-    /** Organization the sync belongs to. */
+    /** Organization the sync belongs to */
     organization_id?: string | undefined;
+    /** Schedule that controls when the sync runs */
     schedule?: Polytomic.Schedule | undefined;
     /** When true, the first execution of the sync skips the initial backfill and only processes new changes. */
     skip_initial_backfill?: boolean | undefined;
     /** When true, every execution syncs the full set of source records rather than only changes since the previous run. */
     sync_all_records?: boolean | undefined;
-    /** Connection the sync writes to. */
+    /** Connection the sync writes to */
     target_connection_id?: string | undefined;
-    /** Destination object (e.g. table, SaaS object) the sync writes to. */
+    /** Destination object (e.g. table, SaaS object) the sync writes to */
     target_object?: string | undefined;
-    /** Timestamp the sync was last updated. */
+    /** Timestamp the sync was last updated */
     updated_at?: string | undefined;
+    /** Actor that most recently updated the sync */
     updated_by?: Polytomic.OutputActor | undefined;
 }

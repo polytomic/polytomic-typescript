@@ -17,11 +17,11 @@ import type * as Polytomic from "../../../../index";
  *     }
  */
 export interface CreateModelSyncV5Request {
-    /** Whether the sync is enabled and scheduled. */
+    /** Whether the sync is enabled and scheduled */
     active?: boolean;
-    /** Passphrase for encrypting the sync data. */
+    /** Passphrase for encrypting the sync data */
     encryption_passphrase?: string;
-    /** Fields to sync from source to destination. */
+    /** Fields to sync from source to destination */
     fields: Polytomic.SyncField[];
     /** Deprecated. Use 'model_filters.logic'. Combines the model filters in 'filters' only. */
     filter_logic?: string;
@@ -31,23 +31,30 @@ export interface CreateModelSyncV5Request {
     identities?: Polytomic.ModelSyncIdentities;
     /** Deprecated. Use 'identities'. Reports and accepts the first identity mapping only. */
     identity?: Polytomic.Identity;
+    /** How source records are written to the target */
     mode: Polytomic.ModelsyncSyncTargetMode;
+    /** Filters narrowing the records read from the source. When either filter object is present it governs both kinds, and an absent object means that kind has no filters. */
     model_filters?: Polytomic.ModelFilters;
+    /** Name of the model sync */
     name: string;
     /** Whether to use enrichment models as a source of possible changes to sync. If true, only changes to the base models will cause a record to sync. */
     only_enrich_updates?: boolean;
-    /** Organization ID for the sync; read-only with a partner key. */
+    /** Ignored for user and organization-scoped API keys, which always act in their own organization */
     organization_id?: string;
-    /** Target fields which are set to a fixed value for every record, rather than mapped from a model field. */
+    /** Target fields which are set to a fixed value for every record, rather than mapped from a model field */
     override_fields?: Polytomic.OverrideFieldInput[];
-    /** Conditional value replacement for fields. */
+    /** Conditional value replacement for fields */
     overrides?: Polytomic.Override[];
+    /** Permissions policy IDs applied to the sync. On update, a non-empty list replaces the sync's policies and an empty or omitted list leaves them unchanged. */
     policies?: string[];
+    /** Sync schedule. Schedule times are interpreted in UTC. */
     schedule: Polytomic.Schedule;
     /** Whether to skip the initial backfill of records; if true only records seen after the sync is enabled will be synced. */
     skip_initial_backfill?: boolean;
-    /** Whether to sync all records from the source, regardless of whether they've changed since the previous execution. */
+    /** Whether to sync all records from the source, regardless of whether they've changed since the previous execution */
     sync_all_records?: boolean;
+    /** Sync destination configuration */
     target: Polytomic.ModelSyncV5Target;
+    /** Filters narrowing the records written to the destination. When either filter object is present it governs both kinds, and an absent object means that kind has no filters. */
     target_filters?: Polytomic.TargetFilters;
 }

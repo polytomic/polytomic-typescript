@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface CurrentOrgUserEnvelope {
+    /** The user */
     data?: Polytomic.CurrentOrgUserResponse | undefined;
 }

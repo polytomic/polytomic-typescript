@@ -9,8 +9,9 @@ export interface TargetResponse {
     id?: string | undefined;
     /** Sync modes the target supports (e.g. create, update, upsert). The chosen mode determines which operations the sync may perform. */
     modes?: Polytomic.Mode[] | undefined;
-    /** Human-readable name of the target object. */
+    /** Human-readable name of the target object */
     name?: string | undefined;
+    /** Capability flags describing how the target behaves; controls which sync options are valid for this target */
     properties?: Polytomic.SyncDestinationProperties | undefined;
     /** Timestamp the target's cached schema was last refreshed. Zero for targets that do not have a cached schema (including not-yet-created targets). */
     refreshed_at?: string | undefined;

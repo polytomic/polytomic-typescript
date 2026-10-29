@@ -3,5 +3,6 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncListEnvelope {
+    /** Bulk syncs matching the filters */
     data?: Polytomic.BulkSyncResponse[] | undefined;
 }

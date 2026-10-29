@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface HarborSavedQueryListEnvelope {
+    /** Saved queries on this page */
     data?: Polytomic.HarborSavedQueryMetadataResponse[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
 }

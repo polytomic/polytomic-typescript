@@ -3,6 +3,8 @@
 import type * as Polytomic from "../index";
 
 export interface HarborContextListEnvelope {
+    /** Context documents on this page */
     data?: Polytomic.HarborContextMetadataResponse[] | undefined;
+    /** Pagination details for the next page */
     pagination?: Polytomic.PaginationDetails | undefined;
 }

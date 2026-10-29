@@ -124,7 +124,7 @@ export class ConnectionsClient {
      * The response is metadata about the shape of the configuration, not a live
      * connection instance and not a set of current credential values.
      *
-     * @param {string} id - Connection type identifier (e.g. postgresql, salesforce, hubspot).
+     * @param {string} id - Connection type identifier (e.g. postgresql, salesforce, hubspot)
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -210,11 +210,12 @@ export class ConnectionsClient {
      * Polytomic returns an error instead of guessing. In that case, complete the
      * authorization flow first and call the endpoint again.
      *
-     * @param {string} type
+     * @param {string} type - Connection type ID
      * @param {Polytomic.GetConnectionTypeParameterValuesRequestSchema} request
      * @param {ConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
@@ -278,6 +279,11 @@ export class ConnectionsClient {
             switch (_response.error.statusCode) {
                 case 400:
                     throw new Polytomic.BadRequestError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
@@ -560,8 +566,7 @@ export class ConnectionsClient {
      *
      * @example
      *     await client.connections.connect({
-     *         name: "Salesforce Connection",
-     *         redirect_url: "redirect_url"
+     *         name: "Salesforce Connection"
      *     })
      */
     public connect(
@@ -754,6 +759,7 @@ export class ConnectionsClient {
      * @param {ConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.BadRequestError}
+     * @throws {@link Polytomic.ForbiddenError}
      * @throws {@link Polytomic.NotFoundError}
      * @throws {@link Polytomic.InternalServerError}
      * @throws {@link errors.PolytomicError}
@@ -820,6 +826,11 @@ export class ConnectionsClient {
                         _response.error.body as Polytomic.ApiError,
                         _response.rawResponse,
                     );
+                case 403:
+                    throw new Polytomic.ForbiddenError(
+                        _response.error.body as Polytomic.ApiError,
+                        _response.rawResponse,
+                    );
                 case 404:
                     throw new Polytomic.NotFoundError(
                         _response.error.body as Polytomic.ApiError,
@@ -871,7 +882,7 @@ export class ConnectionsClient {
      * If any required lookup is unavailable, `rate_limit` is `null`. This does not change
      * `status` or `status_error`, and the Connection response is still returned.
      *
-     * @param {string} id
+     * @param {string} id - Connection ID
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -966,7 +977,7 @@ export class ConnectionsClient {
      * Syncs that are already running when the update is submitted are not
      * interrupted; the updated configuration takes effect on their next execution.
      *
-     * @param {string} id
+     * @param {string} id - Connection ID
      * @param {Polytomic.UpdateConnectionRequestSchema} request
      * @param {ConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1104,7 +1115,7 @@ export class ConnectionsClient {
      * > `force=true`. With `force=true`, the API deletes those dependent
      * > resources before removing the connection.
      *
-     * @param {string} id
+     * @param {string} id - Connection ID
      * @param {Polytomic.ConnectionsDeleteRequest} request
      * @param {ConnectionsClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -1229,7 +1240,7 @@ export class ConnectionsClient {
      * [`POST /api/connection_types/{type}/parameter_values`](../../../../api-reference/connections/get-type-parameter-values),
      * which lets you resolve completions before the connection has been created.
      *
-     * @param {string} id
+     * @param {string} id - Connection ID
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.NotFoundError}
@@ -1329,7 +1340,7 @@ export class ConnectionsClient {
      * as an opaque, backend-defined identifier and use `label` for display; do not
      * assume a fixed vocabulary across connection types.
      *
-     * @param {string} id - Unique identifier of the connection whose API consumption should be returned.
+     * @param {string} id - Unique identifier of the connection whose API consumption should be returned
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.UnauthorizedError}

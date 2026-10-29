@@ -3,7 +3,10 @@
 import type * as Polytomic from "../index";
 
 export interface BulkSyncSource {
+    /** Bulk sync features the source supports */
     capabilities?: Polytomic.BulkSyncSourceCapabilities | undefined;
+    /** Options accepted in a bulk sync's source_configuration, keyed by option name */
     configuration?: unknown | undefined;
+    /** Schemas available on the connection */
     schemas?: Polytomic.Schema[] | undefined;
 }

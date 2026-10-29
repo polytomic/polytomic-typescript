@@ -3,16 +3,16 @@
 export interface HarborSavedQueryParameter {
     /** JSON scalar used when the parameter is omitted, matching the declared type. Use default_value, not default. Optional parameters without a default bind SQL NULL. */
     default_value?: unknown | undefined;
-    /** Template parameter name referenced as {{start_date}}. */
+    /** Template parameter name referenced as {{start_date}} */
     name: string;
-    /** When true, rejects explicit null during validation and execution and allows omission only when default_value is present. */
+    /** When true, rejects explicit null during validation and execution and allows omission only when default_value is present */
     required?: boolean | undefined;
-    /** Scalar parameter type. */
+    /** Scalar parameter type */
     type: HarborSavedQueryParameter.Type;
 }
 
 export namespace HarborSavedQueryParameter {
-    /** Scalar parameter type. */
+    /** Scalar parameter type */
     export const Type = {
         String: "string",
         Number: "number",

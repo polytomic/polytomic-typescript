@@ -31,7 +31,7 @@ export class SchedulesClient {
      * A bulk sync can have multiple schedules attached; this endpoint returns all
      * of them. Schedule times are returned in UTC.
      *
-     * @param {string} sync_id - Unique identifier of the bulk sync whose schedules should be returned.
+     * @param {string} sync_id - Unique identifier of the bulk sync whose schedules should be returned
      * @param {SchedulesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -127,7 +127,7 @@ export class SchedulesClient {
      * sync immediately, call
      * [`POST /api/bulk/syncs/{id}/executions`](../../../../../api-reference/bulk-sync/start).
      *
-     * @param {string} sync_id - Unique identifier of the bulk sync to add a schedule to.
+     * @param {string} sync_id - Unique identifier of the bulk sync to add a schedule to
      * @param {Polytomic.bulkSync.CreateScheduleRequest} request
      * @param {SchedulesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -240,8 +240,8 @@ export class SchedulesClient {
      * To update the schedule, use
      * [`PUT /api/bulk/syncs/{sync_id}/schedules/{schedule_id}`](../../../../../../api-reference/bulk-sync/schedules/update).
      *
-     * @param {string} sync_id - Unique identifier of the bulk sync.
-     * @param {string} schedule_id - Unique identifier of the schedule.
+     * @param {string} sync_id - Unique identifier of the bulk sync
+     * @param {string} schedule_id - Unique identifier of the schedule
      * @param {SchedulesClient.RequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
@@ -336,8 +336,8 @@ export class SchedulesClient {
      * rather than only the field you want to change. Schedule times are
      * interpreted in UTC.
      *
-     * @param {string} sync_id - Unique identifier of the bulk sync.
-     * @param {string} schedule_id - Unique identifier of the schedule to update.
+     * @param {string} sync_id - Unique identifier of the bulk sync
+     * @param {string} schedule_id - Unique identifier of the schedule to update
      * @param {Polytomic.bulkSync.UpdateScheduleRequest} request
      * @param {SchedulesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
@@ -448,8 +448,8 @@ export class SchedulesClient {
      * Deleting a schedule only stops future automatic executions. It does not
      * cancel an execution that is already running.
      *
-     * @param {string} sync_id - Unique identifier of the bulk sync.
-     * @param {string} schedule_id - Unique identifier of the schedule to delete.
+     * @param {string} sync_id - Unique identifier of the bulk sync
+     * @param {string} schedule_id - Unique identifier of the schedule to delete
      * @param {SchedulesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.
      *
      * @throws {@link Polytomic.ForbiddenError}
