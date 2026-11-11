@@ -5,7 +5,11 @@ import type * as Polytomic from "../../../../../../index";
 /**
  * @example
  *     {
- *         name: "Custom"
+ *         name: "Custom",
+ *         policy_actions: [{
+ *                 action: "edit",
+ *                 role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
+ *             }]
  *     }
  */
 export interface CreatePolicyRequest {

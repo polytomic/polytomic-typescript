@@ -15,6 +15,5 @@ export interface BulkSyncScheduleApi {
     minute?: string | undefined;
     /** Month of the year for custom and builder schedules */
     month?: string | undefined;
-    /** Whether this schedule runs a full fetch, only incremental fields, or only non-incremental fields */
     selectiveMode?: Polytomic.BulkSelectiveMode | undefined;
 }

@@ -12,4 +12,6 @@ export type EventPayload =
     | Polytomic.EventingBulkSyncCompletedEvent
     | Polytomic.EventingBulkSyncCanceledEvent
     | Polytomic.EventingBulkSyncCompletedWithErrorEvent
-    | Polytomic.EventingBulkSyncFailedEvent;
+    | Polytomic.EventingBulkSyncFailedEvent
+    | Polytomic.EventingIngestionStalledEvent
+    | Polytomic.EventingIngestionRecoveredEvent;

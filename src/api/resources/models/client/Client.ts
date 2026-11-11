@@ -371,14 +371,8 @@ export class ModelsClient {
     /**
      * Lists all models in the caller's organization.
      *
-     * Results are ordered by `updated_at` descending, with `id` used as a tiebreaker.
-     * If more results are available, the response includes `pagination.next_page_token`.
-     * Pass that token back unchanged to continue from the last item you received.
-     *
-     * The token is opaque. Do not construct or edit it yourself.
-     *
-     * The `limit` is capped at 50. Values above that cap are reduced to 50, and
-     * non-positive values fall back to the same default.
+     * Results are returned as a single `data` array. This endpoint does not support
+     * pagination, `limit`, or `page_token` query parameters.
      *
      * @param {ModelsClient.RequestOptions} requestOptions - Request-specific configuration.
      *

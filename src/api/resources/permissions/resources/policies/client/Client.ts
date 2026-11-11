@@ -123,7 +123,11 @@ export class PoliciesClient {
      *
      * @example
      *     await client.permissions.policies.create({
-     *         name: "Custom"
+     *         name: "Custom",
+     *         policy_actions: [{
+     *                 action: "edit",
+     *                 role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
+     *             }]
      *     })
      */
     public create(
@@ -312,7 +316,11 @@ export class PoliciesClient {
      *
      * @example
      *     await client.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
-     *         name: "Custom"
+     *         name: "Custom",
+     *         policy_actions: [{
+     *                 action: "edit",
+     *                 role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
+     *             }]
      *     })
      */
     public update(

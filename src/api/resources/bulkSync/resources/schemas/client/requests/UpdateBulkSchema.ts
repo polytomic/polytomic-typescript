@@ -13,6 +13,8 @@ export interface UpdateBulkSchema {
     disable_data_cutoff?: boolean;
     /** Whether this schema is included in sync runs */
     enabled?: boolean;
+    /** IDs of fields that are never synced, even when automatically_add_new_fields would add them. Each must be an existing field that is not part of the primary key, the tracking field, or the partition key. Omit to keep the current list; send an empty list to clear it. */
+    excluded_fields?: string[];
     /** Field-level configuration. Supplying an empty list enables every field discovered on the source. */
     fields?: Polytomic.UpdateBulkField[];
     /** Row-level filters applied when reading from the source */

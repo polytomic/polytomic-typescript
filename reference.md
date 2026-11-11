@@ -14,15 +14,12 @@
 
 Lists bulk syncs in the caller's organization.
 
-Results are ordered by `updated_at` descending, with `id` as a tiebreaker for
-syncs modified at the same instant. Pagination uses an opaque
-`pagination.next_page_token` returned in the response; pass it back as the
-`page_token` query parameter to fetch the next page. The `limit` parameter is
-optional, and the default and maximum page size is 50 syncs.
+Results are returned as a single `data` array. You can filter by `active`, but
+this endpoint does not support pagination, `limit`, or `page_token` query
+parameters.
 
-> 📘 To retrieve a specific sync, use
-> [`GET /api/bulk/syncs/{id}`](../../../api-reference/bulk-sync/get)
-> instead of filtering the list client-side.
+To retrieve a specific Bulk Sync, use
+[`GET /api/bulk/syncs/{id}`](../../../api-reference/bulk-sync/get).
 </dd>
 </dl>
 </dd>
@@ -129,6 +126,17 @@ When omitted, automatic discovery defaults are conservative:
 - `automatically_add_new_fields` defaults to enabling newly discovered fields
   on already selected objects.
 - `normalize_names` defaults to enabled.
+
+## Scheduling
+
+To sync the two selective groups of objects at different frequencies, add one
+entry to `additional_schedules` with `selective_mode` set to
+`incrementalFields` and another with `nonincrementalFields`. Set
+`default_schedule.frequency` to `manual` to avoid an additional automatic run
+covering all selected objects. The default schedule does not accept a
+selective mode. Check `capabilities.supports_selective_modes` on
+[`GET /api/connections/{id}/bulksync/source`](../../../api-reference/bulk-sync/get-source)
+for the source connection first.
 </dd>
 </dl>
 </dd>
@@ -863,7 +871,7 @@ await client.bulkSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
-<details><summary><code>client.bulkSync.<a href="/src/api/resources/bulkSync/client/Client.ts">getDestination</a>(id) -> Polytomic.BulkSyncDestEnvelope</code></summary>
+<details><summary><code>client.bulkSync.<a href="/src/api/resources/bulkSync/client/Client.ts">getDestination</a>(id, { ...params }) -> Polytomic.BulkSyncDestEnvelope</code></summary>
 <dl>
 <dd>
 
@@ -877,15 +885,28 @@ await client.bulkSync.getSource("248df4b7-aa70-47b8-a036-33ac447e668d", {
 
 Describes the destination configuration schema a connection accepts when used as a bulk sync destination.
 
-The response is a JSON Schema object describing the shape of the
-`destination_configuration` field you must supply when
-[creating](../../../../../api-reference/bulk-sync/create) or
-[updating](../../../../../api-reference/bulk-sync/update) a bulk sync that uses this
-connection as its destination. Required fields vary by connection type.
+Use `configuration` to discover the fields accepted by
+`destination_configuration` when you [create](../../../../../api-reference/bulk-sync/create)
+or [update](../../../../../api-reference/bulk-sync/update) a Bulk Sync. Required fields vary
+by Connection type. Use `modes` to choose a mode supported by this destination.
 
-> 📘 Fetch this endpoint once per connection type rather than once per sync.
-> The configuration schema is the same for all syncs sharing the same
-> destination connection.
+## Suggested initial configuration
+
+Supply `source_connection_id` to request suggested values for a new Bulk Sync.
+For example, Snowflake suggests an output schema based on the source Connection
+name. You must be able to read both Connections, and they must belong to the
+same Organization.
+
+When the destination generates suggestions, `initial_configuration` contains
+values using the same field names as `destination_configuration`. Use these
+values as a starting point, preserving any explicit choices. This request does
+not change a Connection or an existing Bulk Sync. Omit `source_connection_id`
+to retrieve metadata without contextual suggestions.
+
+> ℹ️ Configuration field metadata is reusable for the destination Connection.
+> Initial values depend on the source and destination Connections. Fetch them
+> for each new source/destination pair rather than caching them by Connection
+> type. Do not apply them over an existing configuration.
 </dd>
 </dl>
 </dd>
@@ -900,7 +921,9 @@ connection as its destination. Required fields vary by connection type.
 <dd>
 
 ```typescript
-await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d");
+await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+});
 
 ```
 </dd>
@@ -917,6 +940,14 @@ await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dd>
 
 **id:** `string` — Connection ID
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.BulkSyncGetDestinationRequest` 
     
 </dd>
 </dl>
@@ -951,12 +982,9 @@ await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 Lists all connection types supported by this deployment.
 
-Each entry includes per-type metadata:
-
-- The available operations the connection type supports.
-- Its category.
-- Whether the connection type is enabled for the caller's organization.
-- Which modes (source, destination, enrichment) it can act as.
+Each entry includes the Connection type's ID, name, capabilities, and
+configuration schema. Capabilities indicate whether it supports use as a
+source, destination, enrichment source, scheduler, or sync event log target.
 </dd>
 </dl>
 </dd>
@@ -1105,7 +1133,11 @@ authorization flow first and call the endpoint again.
 
 ```typescript
 await client.connections.getTypeParameterValues("type", {
-    field: "field"
+    field: "field",
+    parameters: {
+        "byo_app_token": "secret",
+        "name": "Example"
+    }
 });
 
 ```
@@ -2809,18 +2841,11 @@ await client.schemas.get("248df4b7-aa70-47b8-a036-33ac447e668d", "public.users")
 <dl>
 <dd>
 
-Returns a sample of records from a schema on a connection.
+Returns all records from a supported schema on a Connection.
 
-The sample is intended for previewing the shape and values of data before
-committing to a sync configuration, not for full data export.
-
-> 🚧 The sample is not guaranteed to be representative of the full dataset.
-> Row selection is implementation-defined and may differ across connection
-> types.
-
-> 📘 If the schema's field definitions are stale, refresh them first with
-> [`POST /api/connections/{id}/schemas/refresh`](../../../../../../api-reference/schemas/refresh) to ensure
-> the sample aligns with the current schema structure.
+This endpoint supports only the HubSpot `deals_pipelines` schema. It returns
+all records from that schema in a single response, without sampling or
+pagination. Other backends and schemas are unsupported.
 </dd>
 </dl>
 </dd>
@@ -3134,14 +3159,8 @@ await client.models.preview({
 
 Lists all models in the caller's organization.
 
-Results are ordered by `updated_at` descending, with `id` used as a tiebreaker.
-If more results are available, the response includes `pagination.next_page_token`.
-Pass that token back unchanged to continue from the last item you received.
-
-The token is opaque. Do not construct or edit it yourself.
-
-The `limit` is capped at 50. Values above that cap are reduced to 50, and
-non-positive values fall back to the same default.
+Results are returned as a single `data` array. This endpoint does not support
+pagination, `limit`, or `page_token` query parameters.
 </dd>
 </dl>
 </dd>
@@ -4904,15 +4923,18 @@ await client.entities.getForPartner("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 Lists audit events for the caller's organization.
 
-Results are paginated. If more events are available, the response includes
-`pagination.next_page_token`; pass that token back unchanged to continue from
-the last item you received.
+Results are ordered by `created_at` descending. Use `limit` to control how many
+events are returned. The response does not include a pagination token.
 
-Filter by event type using the `event_type` query parameter. Pass one of the
-identifiers returned by [`GET /api/events_types`](../../api-reference/events/get-types) to
-narrow results to a specific category of activity.
+Filter by event type using the `type` query parameter. Pass one of the
+identifiers returned by [`GET /api/events_types`](../../api-reference/events/get-types)
+to narrow results to a specific category of activity.
 
-> 📘 Events reflect audit activity scoped to the caller's organization.
+Use `starting_after` and `ending_before` to restrict results to events created
+strictly after or before a timestamp. Results remain newest first when you use
+either filter.
+
+> ℹ️ Events reflect audit activity scoped to your Organization.
 > The log captures both user-initiated and API-initiated actions.
 </dd>
 </dl>
@@ -5029,225 +5051,6 @@ await client.events.getTypes();
 </details>
 
 ## Harbors
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listAuthorizedConnections</a>({ ...params }) -> Polytomic.HarborConnectionListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists profile-authorized connections and capabilities for the current Harbor credential.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listAuthorizedConnections({
-    limit: 1,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListAuthorizedConnectionsRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listAuthorizedSchemas</a>(connection_id, { ...params }) -> Polytomic.HarborSchemaListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists one bounded page of schema resources authorized by the current Harbor profile.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listAuthorizedSchemas("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 1,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Connection ID
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListAuthorizedSchemasRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getAuthorizedSchema</a>(connection_id, schema_id, { ...params }) -> Polytomic.HarborConnectionSchemaEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns one schema resource authorized by the current Harbor profile.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.getAuthorizedSchema("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Connection ID
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**schema_id:** `string` — Schema ID
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsGetAuthorizedSchemaRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">registerSession</a>({ ...params }) -> Polytomic.RegisterHarborSessionEnvelope</code></summary>
 <dl>
 <dd>
@@ -5740,1933 +5543,6 @@ await client.harbors.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 </dl>
 </details>
 
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getActionConfiguration</a>(harbor_id) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns configured action grants and revisions for a Harbor.
-
-You must be an Organization administrator with permission to edit the Harbor.
-Use a writable API credential, not a Harbor profile credential. Read-only keys
-are denied because this endpoint requires Harbor edit permission.
-
-This response includes grants for Connections that no longer populate the
-Harbor. You can remove those stale grants without reattaching the Connection.
-Reading configuration does not require the Harbor Actions entitlement.
-
-Use each Connection's `revision` as `expected_revision` when replacing or
-removing its grants. Configuration responses contain metadata only, not provider
-credentials or record values.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.getActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">disableActionConfiguration</a>(harbor_id) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Disables all configured actions for a Harbor.
-
-You must be an Organization administrator with permission to edit the Harbor.
-Use a normal writable API credential, not a Harbor profile credential. Your
-Organization must have the Harbor Actions entitlement.
-
-> 🚧 Disable all actions
->
-> This removes every configured action grant from the Harbor, including grants
-> for detached Connections. There is no per-Connection revision check.
-
-The response contains the empty configuration. This request does not delete
-Connections, syncs, or provider records.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.disableActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listActionSourceConnections</a>(harbor_id) -> Polytomic.HarborActionSourceConnectionsEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists action-capable source Connections that populate a Harbor.
-
-You must be an Organization administrator with permission to edit the Harbor.
-Use a writable API credential, not a Harbor profile credential. Read-only keys
-are denied because this endpoint requires Harbor edit permission. Discovery does
-not require the Harbor Actions entitlement.
-
-A Connection is eligible when it supports actions and is a source of a
-non-deleted Bulk Sync or Model Sync targeting the Harbor's backing Connection.
-Only saved, non-shared Connections in your Organization that you can query are
-included. Disabled syncs still establish source membership.
-
-Discover schemas and operations before choosing the grants to configure.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listActionSourceConnections("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">setActionConfiguration</a>(harbor_id, connection_id, { ...params }) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Creates or replaces action grants for an eligible Harbor source Connection.
-
-You must be an Organization administrator with permission to edit both the
-Harbor and the source Connection. Use a normal writable API credential, not a
-Harbor profile credential. Your Organization must have the Harbor Actions
-entitlement.
-
-The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
-Sync targeting its backing Connection. This requirement applies to new grants
-and replacements, even when you only remove fields from an existing grant.
-
-Submit the complete grant set for this Connection. Omit `expected_revision` to
-create it, or supply the current revision to replace it. A missing, stale, or
-unexpected revision returns `409 Conflict`; read configuration again before
-retrying. Successful replacement creates a new revision.
-
-For mutating operations, `field_ids` selects input fields and
-`lookup_field_ids` must be omitted. For read-only operations, `field_ids`
-selects output fields and `lookup_field_ids` selects allowed lookup fields.
-Duplicate operations or field IDs are invalid. An empty grant set is invalid;
-remove the Connection's grants instead.
-
-This request changes permissions only. It does not execute provider actions.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.setActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Source Connection whose action grants you want to manage
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.SetHarborActionConfigurationRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">removeActionConfiguration</a>(harbor_id, connection_id, { ...params }) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Removes a Connection's action grants from a Harbor.
-
-You must be an Organization administrator with permission to edit the Harbor.
-Use a normal writable API credential, not a Harbor profile credential. Your
-Organization must have the Harbor Actions entitlement.
-
-Supply the current `expected_revision` as a query parameter. A stale revision
-returns `409 Conflict`; read configuration again before retrying.
-
-You can remove grants after the Connection stops populating the Harbor, or after
-the Connection is deleted. The response contains the remaining configured action
-Connections. This request does not delete the Connection or provider records.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.removeActionConfiguration("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-    expected_revision: "248df4b7-aa70-47b8-a036-33ac447e668d"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Source Connection whose action grants you want to manage
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsRemoveActionConfigurationRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listActionConfigurationSchemas</a>(harbor_id, connection_id, { ...params }) -> Polytomic.HarborActionConfigurationSchemasEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists available action schemas for an eligible Harbor source Connection.
-
-You must be an Organization administrator with permission to edit the Harbor
-and query the source Connection. Use a writable API credential, not a Harbor
-profile credential. Read-only keys are denied because this endpoint requires
-Harbor edit permission. Discovery does not require the Harbor Actions entitlement.
-
-The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
-Sync targeting its backing Connection. The response lists action schemas, not
-records. Use the next page token with the same search filter to continue.
-
-Operation IDs in the catalog are hints. Operation discovery returns the current
-configurable fields for a schema.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listActionConfigurationSchemas("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-    search: "search",
-    limit: 1,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Source Connection whose action grants you want to manage
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListActionConfigurationSchemasRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listActionConfigurationOperations</a>(harbor_id, connection_id, schema_id) -> Polytomic.HarborActionConfigurationOperationsEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists operations and configurable fields for an eligible Harbor action schema.
-
-You must be an Organization administrator with permission to edit the Harbor
-and query the source Connection. Use a writable API credential, not a Harbor
-profile credential. Read-only keys are denied because this endpoint requires
-Harbor edit permission. Discovery does not require the Harbor Actions entitlement.
-
-The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
-Sync targeting its backing Connection. This request returns operation metadata,
-not provider records, and does not execute an action.
-
-For a mutating operation, choose input field IDs. For a read-only operation,
-choose output field IDs and at least one lookup field ID. Required input fields
-must be included in the grant.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listActionConfigurationOperations("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**connection_id:** `string` — Source Connection whose action grants you want to manage
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**schema_id:** `string` — Exact action schema ID returned by schema discovery
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listContexts</a>(harbor_id, { ...params }) -> Polytomic.HarborContextListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists context document metadata for a Harbor without returning document content.
-
-Collection items include the current published `version` number and omit
-`content`. Use the context item endpoint to retrieve a complete document.
-
-A Harbor profile credential can read context only when `harbor_id` identifies
-its own Harbor.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listContexts("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 50,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListContextsRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">createContext</a>(harbor_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Creates and attaches a context document to a Harbor.
-
-The new document belongs only to this Harbor. Context documents cannot be attached to multiple Harbors.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.createContext("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    content: "Bookings use the contract signed date...",
-    title: "Revenue definitions"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.CreateHarborContextRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listContextDrafts</a>(harbor_id, { ...params }) -> Polytomic.HarborContextDraftListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists mutable Harbor context drafts without returning document content.
-
-The collection includes drafts for published context documents and initial drafts
-that have not yet been published. Use `context_id` with the draft detail,
-replacement, promotion, and discard endpoints.
-
-Draft metadata does not include `content`. Fetch a selected draft through its
-detail endpoint to read the complete candidate. Normal context list and detail
-operations continue to return published content only.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listContextDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 50,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListContextDraftsRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">createContextDraft</a>(harbor_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Creates an unpublished context document with its initial mutable draft.
-
-Creates a stable context identity and its initial mutable draft without publishing
-content to the Harbor. The response includes `context_id`, which identifies the
-draft replacement, promotion, and discard routes.
-
-The initial draft has a null `base_revision_id`. It remains absent from normal
-context list/detail, GraphQL, entity lookup, and Harbor MCP reads until promoted.
-Use the regular context creation endpoint instead when the initial payload should
-be published immediately.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.createContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    content: "Bookings use the contract signed date...",
-    title: "Revenue definitions"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.CreateHarborContextDraftRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getContext</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns one complete Harbor context document.
-
-The response includes the current published `version` number and complete
-plain-text `content`.
-
-A Harbor profile credential can read context only when `harbor_id` identifies
-its own Harbor.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.getContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsGetContextRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">updateContext</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Replaces one Harbor context document.
-
-Each successful request publishes the next immutable version. You can omit
-`change_note`.
-
-A direct publication leaves an existing draft unchanged.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.updateContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-    content: "Bookings use the contract signed date...",
-    title: "Revenue definitions"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.SaveHarborContextRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteContext</a>(harbor_id, context_id, { ...params }) -> Polytomic.DeletedHarborContextEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Deletes one context document from a Harbor.
-
-Deleting a context document does not affect the Harbor or its other context documents.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.deleteContext("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsDeleteContextRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns the mutable draft for a Harbor context document.
-
-Drafts are available only through the draft endpoints. `base_revision_id`
-identifies the published revision from which the candidate was created. Normal
-context reads and Harbor MCP tools continue to return the current published
-version. Creator and updater IDs are null when their actor type is `system`.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.getContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsGetContextDraftRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">saveContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Creates or completely replaces the mutable draft for a Harbor context document.
-
-The request supplies the complete draft payload. If a draft already exists,
-this request replaces it while preserving the draft ID, creation metadata, and
-`base_revision_id`.
-
-A new draft for a published document records the current revision as its base.
-An unpublished document's initial draft keeps a null base when replaced. Saving
-a draft does not change published content or its `updated_at`. Creator and
-updater provenance comes from the request actor; system actors have a null actor
-ID.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.saveContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-    content: "Bookings use the contract signed date...",
-    title: "Revenue definitions"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.SaveHarborContextDraftRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.DeletedHarborContextDraftEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Discards the mutable draft for a Harbor context document.
-
-Discarding a draft does not change the current published version or its
-history. If the draft belongs to a context that has never been published,
-discarding it also removes the otherwise empty context identity.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.deleteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsDeleteContextDraftRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">promoteContextDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextVersionEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Promotes the draft to the next immutable published context version.
-
-Promotion publishes the draft's exact title, description, content, and optional
-change note as the next version. An unpublished context's initial draft becomes
-version 1. The draft is removed after publication.
-
-Promotion returns a conflict when the current published revision differs from
-the draft's `base_revision_id`. The stale draft remains available so an author
-can compare it with the current version before discarding and recreating it.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.promoteContextDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsPromoteContextDraftRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listContextVersions</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextVersionListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists immutable published versions of a Harbor context document without returning content.
-
-Versions are ordered from newest to oldest. Collection items omit `content`,
-and the draft is never included. Pagination tokens continue from the last
-returned version, so publishing a newer version between requests does not shift
-or duplicate older results.
-
-Published revision IDs are durable artifact identities intended for future
-Harbor activity and audit records. Publisher IDs are paired with actor types.
-System publications have `published_by_type: "system"` and a null
-`published_by` because the system actor has no UUID.
-
-A Harbor profile credential can read versions only when `harbor_id` identifies
-its own Harbor.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listContextVersions("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 50,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListContextVersionsRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getContextVersion</a>(harbor_id, context_id, version_id, { ...params }) -> Polytomic.HarborContextVersionEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns one immutable published version of a Harbor context document.
-
-The response includes the complete title, description, and plain-text
-`content` captured when the version was published.
-
-Published versions cannot be changed or deleted. System publications have
-`published_by_type: "system"` and a null `published_by`.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.getContextVersion("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**context_id:** `string` — Unique identifier of the context document
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**version_id:** `string` — Unique identifier of the published context version
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsGetContextVersionRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listKeys</a>(harbor_id, { ...params }) -> Polytomic.HarborKeyListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists active masked credentials for a Harbor.
-
-Each item contains a masked `key_hint`. Polytomic never returns a credential plaintext after creation.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listKeys("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 50,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListKeysRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">createKey</a>(harbor_id) -> Polytomic.HarborKeyEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Generates a new Harbor credential and returns its plaintext value once.
-
-Store the returned `value` securely. Polytomic returns it only in this response.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.createKey("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteKey</a>(harbor_id, key_id) -> Polytomic.RevokedHarborKeyEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Revokes one Harbor credential by its credential ID.
-
-Revocation affects only the selected credential. Other active Harbor credentials remain valid.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.deleteKey("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**key_id:** `string` — Unique identifier of the Harbor credential
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 <details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">runQuery</a>(harbor_id, { ...params }) -> Polytomic.RunQueryEnvelope</code></summary>
 <dl>
 <dd>
@@ -7692,6 +5568,11 @@ The response contains a query ID and an initial `created` status. Poll
 until the status is `done`, `failed`, or `unknown`. Follow the result endpoint's
 pagination links for additional rows. Results are temporary; check `expires`
 on the completed query.
+
+To open a result record in its source application, discover
+[record-view capabilities](../../../../api-reference/record-view-links/get-capabilities)
+and create a record-view link for the source Connection and schema. Record-view
+links are also available independently of Harbor.
 </dd>
 </dl>
 </dd>
@@ -7733,1020 +5614,6 @@ await client.harbors.runQuery("248df4b7-aa70-47b8-a036-33ac447e668d", {
 <dd>
 
 **request:** `Polytomic.RunHarborQueryRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listSavedQueries</a>(harbor_id, { ...params }) -> Polytomic.HarborSavedQueryListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists current published saved queries for a Harbor.
-
-Saved queries are supported only for Polytomic-managed Harbors whose backing
-Connection type is `polytomic_harbor`.
-
-Collection items contain current published metadata and omit SQL, parameter
-values, and unpublished drafts. A Harbor profile credential can list saved
-queries only when `harbor_id` identifies its own Harbor.
-
-## Harbor Activity
-
-When you use a Harbor profile credential, send a new nonzero UUID in
-`X-Polytomic-Activity-Request-ID` for each request, including each page. A
-missing or invalid ID returns `400 Bad Request`. Reusing a consumed ID returns
-`409 Conflict`.
-
-If you supply `X-Polytomic-Harbor-Session`, the session must be active and bound
-to your credential and Harbor. An invalid session returns `403 Forbidden`.
-Direct scoped REST requests may omit the session header.
-
-Polytomic records `saved_query.listed` before returning data. The event describes
-only the returned page, including saved-query IDs, immutable revision IDs,
-version numbers, and bounded name snapshots. Activity excludes SQL, parameter
-values, and expected column names. If Polytomic cannot record the event, the
-request returns `503 Service Unavailable` without saved-query data.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listSavedQueries("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 1,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListSavedQueriesRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">createSavedQueryDraft</a>(harbor_id, { ...params }) -> Polytomic.HarborSavedQueryDraftEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Creates a stable Harbor saved query with its initial mutable draft.
-
-Saved queries are supported only for Polytomic-managed Harbors whose backing
-Connection type is `polytomic_harbor`. Customer-managed Harbor backings return
-an unsupported-backing error.
-
-The saved query receives a stable ID, but it remains absent from published
-saved-query reads until an administrator publishes its initial draft.
-
-Use `{{parameter_name}}` references in `sql_template`. Each reference must have
-one scalar declaration. Validation values and defaults must match the declared
-`string`, `number`, `boolean`, `date`, `timestamp`, or `uuid` type.
-
-Unknown JSON fields, including fields inside parameter declarations, return
-`400 Bad Request` before the draft is saved. Use `default_value`, not `default`,
-for parameter defaults.
-
-When you omit a parameter during execution, Polytomic uses its published
-`default_value`, never its draft validation value. An omitted optional parameter
-without a default binds SQL `NULL`. A required parameter allows omission when a
-default exists, but rejects explicit `null` even with a default.
-
-For a report window, use a required parameter with a default so omission selects
-a useful window and explicit `null` is rejected:
-
-```json
-{"name": "days", "type": "number", "required": true, "default_value": 7}
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.createSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    name: "Monthly revenue",
-    sql_template: "SELECT account_id, sum(amount) AS revenue FROM orders WHERE created_at >= {{start_date}} GROUP BY account_id"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.CreateHarborSavedQueryDraftRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listSavedQueryDrafts</a>(harbor_id, { ...params }) -> Polytomic.HarborSavedQueryDraftListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists mutable Harbor saved-query drafts.
-
-Drafts are ordered from newest to oldest and include complete SQL, typed
-parameter declarations, and author-supplied validation values. Harbor profile
-credentials cannot access this endpoint.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listSavedQueryDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 1,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListSavedQueryDraftsRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">getSavedQuery</a>(harbor_id, saved_query_id, { ...params }) -> Polytomic.HarborSavedQueryEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns the current published version of one Harbor saved query.
-
-The response contains the current immutable `revision_id`, SQL template,
-parameter contract, expected columns, and publication provenance. Validation
-inputs are draft-only and are never part of a published response.
-
-A Harbor profile credential can retrieve a saved query only from its own Harbor.
-
-## Harbor Activity
-
-When you use a Harbor profile credential, send a new nonzero UUID in
-`X-Polytomic-Activity-Request-ID` for each request. A missing or invalid ID
-returns `400 Bad Request`. Reusing a consumed ID returns `409 Conflict`.
-
-If you supply `X-Polytomic-Harbor-Session`, the session must be active and bound
-to your credential and Harbor. An invalid session returns `403 Forbidden`.
-Direct scoped REST requests may omit the session header.
-
-Polytomic records `saved_query.fetched` before returning the definition. The
-event identifies the saved query, exact immutable revision, published version,
-and bounded name snapshot. It does not indicate query execution. Activity
-excludes SQL, parameter defaults and validation values, expected column names,
-and result rows. If Polytomic cannot record the event, the request returns
-`503 Service Unavailable` without saved-query data.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.getSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**saved_query_id:** `string` — Unique stable identifier of the saved query
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsGetSavedQueryRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteSavedQuery</a>(harbor_id, saved_query_id) -> Polytomic.DeletedHarborSavedQueryEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Archives one Harbor saved query and removes it from active reads.
-
-Archiving removes the saved query and any draft from active reads while
-retaining its immutable revisions for provenance. The operation does not run
-the saved SQL or modify the Harbor backing Connection. Archiving does not cancel
-in-flight execution requests or queued executions.
-
-This REST operation archives the saved query; it does not merely unpublish it.
-Unpublish is available only through the GraphQL `unpublishHarborSavedQuery`
-mutation. There is no REST unpublish endpoint.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.deleteSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**saved_query_id:** `string` — Unique stable identifier of the saved query
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">saveSavedQueryDraft</a>(harbor_id, saved_query_id, { ...params }) -> Polytomic.HarborSavedQueryDraftEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Creates or completely replaces the mutable draft for a Harbor saved query.
-
-Replacement is complete rather than partial. The next validation or publication
-uses the replacement SQL, parameter declarations, and validation values.
-
-Unknown JSON fields, including fields inside parameter declarations, return
-`400 Bad Request` before the draft is saved. Use `default_value`, not `default`,
-for parameter defaults.
-
-When you omit a parameter during execution, Polytomic uses its published
-`default_value`, never its draft validation value. An omitted optional parameter
-without a default binds SQL `NULL`. A required parameter allows omission when a
-default exists, but rejects explicit `null` even with a default.
-
-For a report window, use a required parameter with a default so omission selects
-a useful window and explicit `null` is rejected:
-
-```json
-{"name": "days", "type": "number", "required": true, "default_value": 7}
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.saveSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
-    name: "Monthly revenue",
-    sql_template: "SELECT account_id, sum(amount) AS revenue FROM orders WHERE created_at >= {{start_date}} GROUP BY account_id"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**saved_query_id:** `string` — Unique stable identifier of the saved query
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.SaveHarborSavedQueryDraftRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">deleteSavedQueryDraft</a>(harbor_id, saved_query_id) -> Polytomic.DeletedHarborSavedQueryDraftEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Discards the mutable draft for one Harbor saved query.
-
-Discarding an initial unpublished draft also removes its otherwise empty stable
-saved-query identity. Discarding a later draft preserves every immutable
-published version.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.deleteSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**saved_query_id:** `string` — Unique stable identifier of the saved query
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">publishSavedQueryDraft</a>(harbor_id, saved_query_id) -> Polytomic.HarborSavedQueryEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Validates and publishes the current draft as the next immutable saved-query version.
-
-Only organization administrators can publish. Publication executes and validates
-the current draft with the Polytomic-managed Harbor's MotherDuck `read_scaling`
-credential. It fails instead of using the Harbor writer credential when the
-reader credential is missing or incomplete.
-
-After execution, publication verifies that the draft did not change. A
-concurrent edit returns a conflict and remains a draft. Successful publication
-creates the next immutable revision, records the observed ordered columns as its
-output contract, removes validation inputs from the published definition, and
-deletes the mutable draft. The response includes the immutable `revision_id`
-that future executions use for exact provenance.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.publishSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**saved_query_id:** `string` — Unique stable identifier of the saved query
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">validateSavedQueryDraft</a>(harbor_id, saved_query_id) -> Polytomic.HarborSavedQueryValidationEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Validates the exact current saved-query draft and returns a bounded ephemeral preview.
-
-Only organization administrators can validate drafts. Named template references
-compile to DuckDB placeholders, and typed values are passed separately rather
-than interpolated into SQL.
-
-The query runs with the Polytomic-managed Harbor's MotherDuck `read_scaling`
-credential. Validation fails when that credential is missing or incomplete and
-never falls back to the Harbor writer credential. Preview rows and serialized
-response size are bounded. The preview and validation attempt are not persisted.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.validateSavedQueryDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**saved_query_id:** `string` — Unique stable identifier of the saved query
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">executeSavedQuery</a>(harbor_id, saved_query_id, { ...params }) -> Polytomic.ExecuteHarborSavedQueryEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Submits the current published Harbor saved query for asynchronous reader-only execution.
-
-Use a Harbor-bound scoped credential with query access to the Harbor's backing
-Connection. Administrator credentials cannot submit executions here. Saved
-queries require a Polytomic-managed Harbor.
-
-Polytomic selects the current published revision while processing your request.
-The response identifies that exact immutable revision. Selection happens before
-Polytomic accepts the execution. Drafts, unpublished queries, and archived
-queries are unavailable for selection. You cannot select a historical revision
-or supply SQL through this endpoint.
-
-> ⚠️ Concurrent publication changes
->
-> Publishing, unpublishing, or archiving a saved query after selection does not
-> change the selected revision. An in-flight request may still be accepted and
-> execute that revision. Unpublishing or archiving does not cancel in-flight
-> requests or queued executions. Query access is checked again before execution
-> and result retrieval.
-
-Parameter values are bound separately from SQL. Omitted parameters use the
-published `default_value`, never draft validation values. An omitted optional
-parameter without a default binds SQL `NULL`. Required parameters allow omission
-when a default exists, but reject explicit `null` even with a default. Missing
-required values without defaults, explicit `null` for required parameters,
-unknown parameter names, and invalid scalar types return
-`422 Unprocessable Entity` without accepting an execution. Execution requires
-reader credentials and never falls back to writer credentials.
-
-For report windows, define parameters with `required: true` and a
-`default_value`, such as `7` for a `days` parameter. This allows omission while
-preventing explicit `null` from turning a time filter into a SQL `NULL`
-comparison.
-
-To archive a saved query through REST, use
-[`DELETE /api/harbors/{harbor_id}/saved-queries/{saved_query_id}`](../../../../../../api-reference/harbors/delete-saved-query).
-Unpublish is available only through the GraphQL `unpublishHarborSavedQuery`
-mutation, not a REST endpoint.
-
-## Results
-
-The response returns a task ID with status `created`, not result rows. Poll
-[`GET /api/queries/{id}`](../../../../../../api-reference/query-runner/get-query) using a credential
-from the same Harbor profile. Query access is checked again before execution and
-result retrieval. Stop polling at `done`, `failed`, or `unknown`; `unknown` means
-execution started but no durable terminal result is available.
-
-Results and detailed failure information expire after 24 hours. Use the
-`expires` field and follow `links.next` to retrieve additional result pages.
-
-## Harbor Activity
-
-Send a new nonzero UUID in `X-Polytomic-Activity-Request-ID`. Missing or invalid
-IDs return `400 Bad Request`. Reusing a consumed ID returns `409 Conflict` and
-does not create another execution.
-
-You may omit `X-Polytomic-Harbor-Session` for direct REST requests. If supplied,
-the session must be active and bound to your credential and Harbor.
-
-Polytomic records `query.submitted` atomically with acceptance. The event
-identifies the saved query, immutable revision, published version, and bounded
-name snapshot. SQL, parameter values and defaults, column names, and result rows
-remain outside Activity metadata. If Activity persistence is unavailable, the
-request returns `503 Service Unavailable` without accepting an execution.
-
-`query.started` records provider invocation. `query.succeeded` means results are
-available for authorized retrieval, not that you have consumed them.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.executeSavedQuery("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**saved_query_id:** `string` — Unique stable identifier of the saved query
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.ExecuteHarborSavedQueryRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">resolveSourceMappings</a>(harbor_id, { ...params }) -> Polytomic.ResolveHarborSourceMappingsEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Resolves documented source table and field identities to the names a Harbor's backing Connection accepts.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.resolveSourceMappings("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.ResolveHarborSourceMappingsRequest` 
     
 </dd>
 </dl>
@@ -8850,303 +5717,6 @@ await client.harbors.getStatus("248df4b7-aa70-47b8-a036-33ac447e668d");
 <dd>
 
 **requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">listUsers</a>(harbor_id, { ...params }) -> Polytomic.HarborUserListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists Harbor-only users assigned to a Harbor.
-
-The response contains only Harbor-only users currently assigned to this Harbor.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.listUsers("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 50,
-    page_token: "page_token"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.HarborsListUsersRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">inviteUser</a>(harbor_id, { ...params }) -> Polytomic.HarborUserEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Invites and assigns a new Harbor-only user.
-
-The invited account is restricted to assigned Harbors and does not receive regular Polytomic application access.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.inviteUser("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    email: "analyst@example.com"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.InviteHarborUserRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">assignUser</a>(harbor_id, user_id) -> Polytomic.HarborUserEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Assigns an existing Harbor-only user to a Harbor.
-
-The assignment is idempotent. Regular Polytomic users cannot be assigned because they already have application access to Harbors.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.assignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**user_id:** `string` — Unique identifier of the Harbor-only user
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.harbors.<a href="/src/api/resources/harbors/client/Client.ts">unassignUser</a>(harbor_id, user_id) -> Polytomic.UnassignedHarborUserEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Removes a Harbor assignment without deleting the user.
-
-This removes only the Harbor assignment. The organization user remains available and may retain assignments to other Harbors.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.harbors.unassignUser("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**harbor_id:** `string` — Unique identifier of the Harbor
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**user_id:** `string` — Unique identifier of the Harbor-only user
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `HarborsClient.IdempotentRequestOptions` 
     
 </dd>
 </dl>
@@ -10144,278 +6714,6 @@ await client.organization.delete("248df4b7-aa70-47b8-a036-33ac447e668d");
 </dl>
 </details>
 
-## Activity
-<details><summary><code>client.activity.<a href="/src/api/resources/activity/client/Client.ts">list</a>({ ...params }) -> Polytomic.HarborActivityListEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Lists Harbor Activity recorded for the caller's organization.
-
-You must be an active Organization administrator to use this endpoint.
-
-`start_time` is inclusive and `end_time` is exclusive. Both filter the time at
-which Polytomic recorded each event, which can differ from `occurred_at`. A
-single request can cover at most 90 days.
-
-Results are ordered from newest to oldest by default. Set `order` to `asc` to
-retrieve the oldest events first. A page contains at most 100 events. Pass
-`next_page_token` from the response as `page_token` with the same time range,
-filters, order, and limit to retrieve the next page. The token expires 24 hours
-after the first page. Pagination uses a live descending cursor, so an event from
-a transaction that commits between pages can require a fresh traversal.
-
-Responses include stable identities, bounded resource snapshots, schema label
-snapshots with truncation state, field counts, and row counts when available.
-They do not include internal recorded-order values, submitted SQL, raw field
-names, detailed provider errors, result rows, or raw pagination tokens.
-
-> ℹ️ Activity retention
->
-> Polytomic retains Activity events for at least 90 days. Pagination tokens
-> expire 24 hours after the first page.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.activity.list({
-    start_time: "2024-01-15T09:30:00Z",
-    end_time: "2024-01-15T09:30:00Z",
-    limit: 1,
-    page_token: "page_token",
-    order: "asc",
-    harbor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-    event_type: ["action.looked_up"],
-    outcome: ["succeeded"],
-    operation_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-    session_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-    actor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-    credential_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
-    connection_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.ActivityListRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `ActivityClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.activity.<a href="/src/api/resources/activity/client/Client.ts">getSession</a>(session_id, { ...params }) -> Polytomic.HarborActivitySessionEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns one Harbor Activity session and its events.
-
-You must be an active Organization administrator to use this endpoint. The
-session must belong to the Organization against which you authenticated.
-
-Events are ordered from oldest to newest by default. Set `order` to `desc` to
-retrieve the newest events first. A page contains at most 100 events. Pass
-`next_page_token` from the response as `page_token` with the same order and
-limit to retrieve the next page.
-
-`history_truncated` is `true` when Activity retention removed events from the
-beginning of the session. The lifecycle summary remains available while the
-session itself is retained.
-
-The response uses the same event allowlist as the Activity list and detail
-endpoints. It does not include session tokens, submitted SQL, raw field names,
-detailed provider errors, result rows, or raw pagination tokens.
-
-> ℹ️ Activity retention
->
-> Polytomic retains Activity events for at least 90 days. Pagination tokens
-> expire 24 hours after the first page.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.activity.getSession("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    limit: 1,
-    page_token: "page_token",
-    order: "asc"
-});
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**session_id:** `string` — Harbor Activity session ID
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**request:** `Polytomic.ActivityGetSessionRequest` 
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `ActivityClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
-<details><summary><code>client.activity.<a href="/src/api/resources/activity/client/Client.ts">get</a>(event_id) -> Polytomic.HarborActivityEventEnvelope</code></summary>
-<dl>
-<dd>
-
-#### 📝 Description
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-Returns one Harbor Activity event from the caller's organization.
-
-You must be an active Organization administrator to use this endpoint. The
-event must belong to the Organization against which you authenticated.
-
-The response can include stable identities, bounded resource snapshots, schema
-label snapshots with truncation state, field counts, and row counts. It does
-not include internal recorded-order values, submitted SQL, raw field names,
-detailed provider errors, result rows, or raw pagination tokens.
-
-> ℹ️ Activity retention
->
-> Polytomic retains Activity events for at least 90 days.
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### 🔌 Usage
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-```typescript
-await client.activity.get("248df4b7-aa70-47b8-a036-33ac447e668d");
-
-```
-</dd>
-</dl>
-</dd>
-</dl>
-
-#### ⚙️ Parameters
-
-<dl>
-<dd>
-
-<dl>
-<dd>
-
-**event_id:** `string` — Activity event ID
-    
-</dd>
-</dl>
-
-<dl>
-<dd>
-
-**requestOptions:** `ActivityClient.RequestOptions` 
-    
-</dd>
-</dl>
-</dd>
-</dl>
-
-
-</dd>
-</dl>
-</details>
-
 ## Users
 <details><summary><code>client.users.<a href="/src/api/resources/users/client/Client.ts">listCurrentOrgUsers</a>() -> Polytomic.CurrentOrgListUsersEnvelope</code></summary>
 <dl>
@@ -10760,9 +7058,12 @@ await client.users.deleteCurrentOrgUser("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 Lists all users in the specified organization.
 
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](../../../../guides/obtaining-api-keys#partner-keys).
+These endpoints accept a [partner key](../../../../guides/obtaining-api-keys#partner-keys)
+or an Organization-scoped key derived from a partner key. An Organization-scoped
+key can access users only in its own Organization.
+
+To manage users with a user API key, use the current-Organization endpoints
+under `/api/organization/users`.
 
 Returns user records including each user's ID, email, and assigned roles.
 </dd>
@@ -10829,9 +7130,12 @@ await client.users.list("248df4b7-aa70-47b8-a036-33ac447e668d");
 
 Creates a new user in the specified organization and assigns the requested permissions roles.
 
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](../../../../guides/obtaining-api-keys#partner-keys).
+These endpoints accept a [partner key](../../../../guides/obtaining-api-keys#partner-keys)
+or an Organization-scoped key derived from a partner key. An Organization-scoped
+key can access users only in its own Organization.
+
+To manage users with a user API key, use the current-Organization endpoints
+under `/api/organization/users`.
 
 The new user receives an invitation email prompting them to set up their
 account. Role assignments take effect as soon as the invitation is accepted.
@@ -10909,9 +7213,12 @@ await client.users.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
 
 Returns a single user in the specified organization.
 
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](../../../../../guides/obtaining-api-keys#partner-keys).
+These endpoints accept a [partner key](../../../../../guides/obtaining-api-keys#partner-keys)
+or an Organization-scoped key derived from a partner key. An Organization-scoped
+key can access users only in its own Organization.
+
+To manage users with a user API key, use the current-Organization endpoints
+under `/api/organization/users`.
 </dd>
 </dl>
 </dd>
@@ -10984,9 +7291,12 @@ await client.users.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47
 
 Updates a user's assigned permissions roles.
 
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](../../../../../guides/obtaining-api-keys#partner-keys).
+These endpoints accept a [partner key](../../../../../guides/obtaining-api-keys#partner-keys)
+or an Organization-scoped key derived from a partner key. An Organization-scoped
+key can access users only in its own Organization.
+
+To manage users with a user API key, use the current-Organization endpoints
+under `/api/organization/users`.
 
 Only the user's role assignments are modified. Profile information such as name
 and email address is not affected by this endpoint.
@@ -11072,9 +7382,12 @@ await client.users.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70
 
 Deletes a user from the specified organization.
 
-> 🚧 Requires partner key
->
-> User endpoints are only accessible using [partner keys](../../../../../guides/obtaining-api-keys#partner-keys).
+These endpoints accept a [partner key](../../../../../guides/obtaining-api-keys#partner-keys)
+or an Organization-scoped key derived from a partner key. An Organization-scoped
+key can access users only in its own Organization.
+
+To manage users with a user API key, use the current-Organization endpoints
+under `/api/organization/users`.
 
 > 🚧 This action is permanent. The user is immediately removed from the
 > organization and loses access to all resources within it. This cannot be
@@ -11303,6 +7616,11 @@ await client.recordViewLinks.create({
 <dd>
 
 Checks whether record-view links can be created for a connection schema.
+
+Use the Connection and schema for the record you want to open. When working
+with Harbor query results, use the source Connection and schema rather than
+assuming the Harbor's backing Connection can create a link. You can use
+record-view links independently of Harbor.
 </dd>
 </dl>
 </dd>
@@ -11410,6 +7728,9 @@ counting toward the limit immediately, before periodic cleanup removes them.
 
 Polytomic periodically removes expired credential records. API usage history
 keeps its credential ID according to the normal API usage retention period.
+
+For a Harbor credential without an expiration, use
+[Create Harbor key](../../api-reference/harbors/keys/create).
 </dd>
 </dl>
 </dd>
@@ -11483,7 +7804,7 @@ Lists the webhooks for the caller's organization.
 >
 > An organization can register a single webhook, which receives every event
 > produced in that organization. See the
-> [Events documentation](../../guides/events) for the
+> [Events documentation](../../guides/events/overview) for the
 > list of event types and payload shapes.
 </dd>
 </dl>
@@ -11545,7 +7866,7 @@ Creates the organization's webhook.
 >
 > An organization can register a single webhook, which receives every event
 > produced in that organization. See the
-> [Events documentation](../../guides/events) for the
+> [Events documentation](../../guides/events/overview) for the
 > list of event types and payload shapes.
 </dd>
 </dl>
@@ -11618,7 +7939,7 @@ Returns a single webhook by ID.
 >
 > An organization can register a single webhook, which receives every event
 > produced in that organization. See the
-> [Events documentation](../../../guides/events) for the
+> [Events documentation](../../../guides/events/overview) for the
 > list of event types and payload shapes.
 </dd>
 </dl>
@@ -11688,7 +8009,7 @@ Updates an existing webhook.
 >
 > An organization can register a single webhook, which receives every event
 > produced in that organization. See the
-> [Events documentation](../../../guides/events) for the
+> [Events documentation](../../../guides/events/overview) for the
 > list of event types and payload shapes.
 </dd>
 </dl>
@@ -11769,7 +8090,7 @@ Deletes a webhook.
 >
 > An organization can register a single webhook, which receives every event
 > produced in that organization. See the
-> [Events documentation](../../../guides/events) for the
+> [Events documentation](../../../guides/events/overview) for the
 > list of event types and payload shapes.
 
 Deletion is permanent. To stop delivery without losing the webhook
@@ -11926,7 +8247,7 @@ Disables a webhook without deleting it.
 >
 > An organization can register a single webhook, which receives every event
 > produced in that organization. See the
-> [Events documentation](../../../../guides/events) for the
+> [Events documentation](../../../../guides/events/overview) for the
 > list of event types and payload shapes.
 
 Events are not queued while the webhook is disabled — any activity that occurs
@@ -12001,7 +8322,7 @@ Re-enables a previously disabled webhook.
 >
 > An organization can register a single webhook, which receives every event
 > produced in that organization. See the
-> [Events documentation](../../../../guides/events) for the
+> [Events documentation](../../../../guides/events/overview) for the
 > list of event types and payload shapes.
 
 Delivery resumes from the next event generated after this call. Events that
@@ -12150,18 +8471,20 @@ await client.bulkSync.executions.listStatus({
 
 Lists executions for a bulk sync.
 
-Results are ordered by start time descending by default. When more results are
-available, the response includes an opaque `pagination.next_page_token`; pass it
-back as the `page_token` query parameter to retrieve the next page. The `limit`
-parameter is optional, and the maximum page size is 100 executions.
+Results are ordered by `created_at` descending by default. Pass the opaque
+`pagination.next_page_token` back as `page_token` to retrieve the next page.
+A token is returned even on the last nonempty page and on subsequent empty
+pages. Stop paging when `data` is empty; the presence of a token does not mean
+more results are available. The maximum page size is 100 executions.
 
-Use `only_terminal=true` to return only finished executions. In that mode,
-executions are ordered by `updated_at` so recently completed runs appear first.
+Use `only_terminal=true` to return only executions in terminal statuses. In
+that mode, ordering and pagination use `updated_at` instead of `created_at`.
 
-Use `ascending=true` to walk forward from the oldest execution instead of
-starting with the newest execution.
+Use `ascending=true` to walk forward from the oldest executions by the selected
+sort timestamp. Each page still lists its executions newest first; subsequent
+pages contain newer executions.
 
-For the full details of a single run — including per-schema execution status —
+For the full details of a single run, including per-schema execution status,
 use [`GET /api/bulk/syncs/{id}/executions/{exec_id}`](../../../../../api-reference/bulk-sync/executions/get).
 </dd>
 </dl>
@@ -12736,7 +9059,12 @@ await client.bulkSync.executions.getSchemaConsoleLogs("248df4b7-aa70-47b8-a036-3
 <dl>
 <dd>
 
-Fetch the latest console log entries for ingestion scoped by connection and optional bulk sync. Returns the most recent 50 entries.
+Fetch up to the most recent 50 retained console log entries for ingestion scoped by Connection and optional Bulk Sync.
+
+Entries are returned in chronological order. Use `after` with the returned
+`next_cursor` to fetch newer entries. Only the most recent 50 entries are
+retained per scope; older entries are discarded. The log expires after 48 hours
+without new entries.
 </dd>
 </dl>
 </dd>
@@ -13451,6 +9779,14 @@ replace existing schedules. Schedule times are interpreted in UTC.
 Creating a schedule only affects future automatic executions. To run the
 sync immediately, call
 [`POST /api/bulk/syncs/{id}/executions`](../../../../../api-reference/bulk-sync/start).
+
+To sync the two selective groups of objects at different frequencies, add one
+schedule with `selectiveMode` set to `incrementalFields` and another with
+`nonincrementalFields`. Set the default schedule to `manual` to avoid an
+additional automatic run covering all selected objects. Check
+`capabilities.supports_selective_modes` on
+[`GET /api/connections/{id}/bulksync/source`](../../../../../api-reference/bulk-sync/get-source)
+first.
 </dd>
 </dl>
 </dd>
@@ -13772,6 +10108,10 @@ replacement for Polytomic's modeled endpoints. The request is executed with the
 connection's stored credentials and inherited base URL, headers, and query
 parameters.
 
+The connection must have proxy access enabled with
+[`PUT /api/connections/{id}/proxy/settings`](../../../../api-reference/connections/update-proxy-settings),
+and its organization must have the Connection Proxy API entitlement.
+
 Before building requests dynamically, call
 [`GET /api/connections/{id}/proxy/info`](../../../../api-reference/connections/get-proxy-info)
 to inspect the inherited base URL, blocked headers, accepted body types, and
@@ -14036,11 +10376,18 @@ The setting is stored on the parent connection. To update proxy access for a
 shared connection, the caller must have edit permission for the parent
 connection.
 
-Enabling proxy access requires a backend that supports the Connection Proxy API.
+Enabling proxy access requires the Connection Proxy API entitlement on the
+organization that owns the parent connection. Without it, the request returns
+`403 Forbidden`. Proxy calls also require the entitlement, on both the calling
+organization and the parent's organization; if it is revoked, proxy access stops
+regardless of this setting.
+
+Enabling proxy access also requires a backend that supports the Connection Proxy API.
 If the connection backend is unsupported, the request returns `400 Bad Request`.
 Disabling proxy access is allowed for any connection the caller can edit.
 
-Setting `enabled` to `false` prevents proxy calls for the connection.
+Connections are disabled until proxy access is explicitly enabled with this
+endpoint. Setting `enabled` to `false` prevents proxy calls for the connection.
 </dd>
 </dl>
 </dd>
@@ -14375,6 +10722,836 @@ await client.connections.sharedConnections.createSharedConnection("248df4b7-aa70
 </dl>
 </details>
 
+## Harbors Connections
+<details><summary><code>client.harbors.connections.<a href="/src/api/resources/harbors/resources/connections/client/Client.ts">list</a>({ ...params }) -> Polytomic.HarborConnectionListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists profile-authorized connections and capabilities for the current Harbor credential.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.connections.list({
+    limit: 1,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ConnectionsListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ConnectionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.connections.<a href="/src/api/resources/harbors/resources/connections/client/Client.ts">listSchemas</a>(connection_id, { ...params }) -> Polytomic.HarborSchemaListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists one bounded page of schema resources authorized by the current Harbor profile.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.connections.listSchemas("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 1,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Connection ID
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ConnectionsListSchemasRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ConnectionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.connections.<a href="/src/api/resources/harbors/resources/connections/client/Client.ts">getSchema</a>(connection_id, schema_id, { ...params }) -> Polytomic.HarborConnectionSchemaEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one schema resource authorized by the current Harbor profile.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.connections.getSchema("248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Connection ID
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**schema_id:** `string` — Schema ID
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ConnectionsGetSchemaRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ConnectionsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Harbors ActionConfiguration
+<details><summary><code>client.harbors.actionConfiguration.<a href="/src/api/resources/harbors/resources/actionConfiguration/client/Client.ts">get</a>(harbor_id) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns configured action grants and revisions for a Harbor.
+
+You must be an Organization administrator with permission to edit the Harbor.
+Use a writable API credential, not a Harbor profile credential. Read-only keys
+are denied because this endpoint requires Harbor edit permission.
+
+This response includes grants for Connections that no longer populate the
+Harbor. You can remove those stale grants without reattaching the Connection.
+Reading configuration does not require the Harbor Actions entitlement.
+
+Use each Connection's `revision` as `expected_revision` when replacing or
+removing its grants. Configuration responses contain metadata only, not provider
+credentials or record values.
+
+To discover and run granted operations with a Harbor credential, use
+[List actions](../../../../api-reference/harbors/actions/list). Configuration describes
+administrative grants; runtime discovery checks what the credential can use.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.actionConfiguration.get("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActionConfigurationClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.actionConfiguration.<a href="/src/api/resources/harbors/resources/actionConfiguration/client/Client.ts">disable</a>(harbor_id) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Disables all configured actions for a Harbor.
+
+You must be an Organization administrator with permission to edit the Harbor.
+Use a normal writable API credential, not a Harbor profile credential. Your
+Organization must have the Harbor Actions entitlement.
+
+> 🚧 Disable all actions
+>
+> This removes every configured action grant from the Harbor, including grants
+> for detached Connections. There is no per-Connection revision check.
+
+The response contains the empty configuration. This request does not delete
+Connections, syncs, or provider records.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.actionConfiguration.disable("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActionConfigurationClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.actionConfiguration.<a href="/src/api/resources/harbors/resources/actionConfiguration/client/Client.ts">listConnections</a>(harbor_id) -> Polytomic.HarborActionSourceConnectionsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists action-capable source Connections that populate a Harbor.
+
+You must be an Organization administrator with permission to edit the Harbor.
+Use a writable API credential, not a Harbor profile credential. Read-only keys
+are denied because this endpoint requires Harbor edit permission. Discovery does
+not require the Harbor Actions entitlement.
+
+A Connection is eligible when it supports actions and is a source of a
+non-deleted Bulk Sync or Model Sync targeting the Harbor's backing Connection.
+Only saved, non-shared Connections in your Organization that you can query are
+included. Disabled syncs still establish source membership.
+
+Discover schemas and operations before choosing the grants to configure.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.actionConfiguration.listConnections("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActionConfigurationClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.actionConfiguration.<a href="/src/api/resources/harbors/resources/actionConfiguration/client/Client.ts">set</a>(harbor_id, connection_id, { ...params }) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates or replaces action grants for an eligible Harbor source Connection.
+
+You must be an Organization administrator with permission to edit both the
+Harbor and the source Connection. Use a normal writable API credential, not a
+Harbor profile credential. Your Organization must have the Harbor Actions
+entitlement.
+
+The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
+Sync targeting its backing Connection. This requirement applies to new grants
+and replacements, even when you only remove fields from an existing grant.
+
+Submit the complete grant set for this Connection. Omit `expected_revision` to
+create it, or supply the current revision to replace it. A missing, stale, or
+unexpected revision returns `409 Conflict`; read configuration again before
+retrying. Successful replacement creates a new revision.
+
+For mutating operations, `field_ids` selects input fields and
+`lookup_field_ids` must be omitted. For read-only operations, `field_ids`
+selects output fields and `lookup_field_ids` selects allowed lookup fields.
+Duplicate operations or field IDs are invalid. An empty grant set is invalid;
+remove the Connection's grants instead.
+
+This request changes permissions only. It does not execute provider actions.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.actionConfiguration.set("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Source Connection whose action grants you want to manage
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.SetHarborActionConfigurationRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActionConfigurationClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.actionConfiguration.<a href="/src/api/resources/harbors/resources/actionConfiguration/client/Client.ts">remove</a>(harbor_id, connection_id, { ...params }) -> Polytomic.HarborActionConfigurationEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Removes a Connection's action grants from a Harbor.
+
+You must be an Organization administrator with permission to edit the Harbor.
+Use a normal writable API credential, not a Harbor profile credential. Your
+Organization must have the Harbor Actions entitlement.
+
+Supply the current `expected_revision` as a query parameter. A stale revision
+returns `409 Conflict`; read configuration again before retrying.
+
+You can remove grants after the Connection stops populating the Harbor, or after
+the Connection is deleted. The response contains the remaining configured action
+Connections. This request does not delete the Connection or provider records.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.actionConfiguration.remove("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    expected_revision: "248df4b7-aa70-47b8-a036-33ac447e668d"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Source Connection whose action grants you want to manage
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ActionConfigurationRemoveRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActionConfigurationClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.actionConfiguration.<a href="/src/api/resources/harbors/resources/actionConfiguration/client/Client.ts">listSchemas</a>(harbor_id, connection_id, { ...params }) -> Polytomic.HarborActionConfigurationSchemasEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists available action schemas for an eligible Harbor source Connection.
+
+You must be an Organization administrator with permission to edit the Harbor
+and query the source Connection. Use a writable API credential, not a Harbor
+profile credential. Read-only keys are denied because this endpoint requires
+Harbor edit permission. Discovery does not require the Harbor Actions entitlement.
+
+The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
+Sync targeting its backing Connection. The response lists action schemas, not
+records. Use the next page token with the same search filter to continue.
+
+Operation IDs in the catalog are hints. Operation discovery returns the current
+configurable fields for a schema.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.actionConfiguration.listSchemas("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    search: "search",
+    limit: 1,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Source Connection whose action grants you want to manage
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ActionConfigurationListSchemasRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActionConfigurationClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.actionConfiguration.<a href="/src/api/resources/harbors/resources/actionConfiguration/client/Client.ts">listOperations</a>(harbor_id, connection_id, schema_id) -> Polytomic.HarborActionConfigurationOperationsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists operations and configurable fields for an eligible Harbor action schema.
+
+You must be an Organization administrator with permission to edit the Harbor
+and query the source Connection. Use a writable API credential, not a Harbor
+profile credential. Read-only keys are denied because this endpoint requires
+Harbor edit permission. Discovery does not require the Harbor Actions entitlement.
+
+The Connection must populate the Harbor through a non-deleted Bulk Sync or Model
+Sync targeting its backing Connection. This request returns operation metadata,
+not provider records, and does not execute an action.
+
+For a mutating operation, choose input field IDs. For a read-only operation,
+choose output field IDs and at least one lookup field ID. Required input fields
+must be included in the grant.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.actionConfiguration.listOperations("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "schema_id");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**connection_id:** `string` — Source Connection whose action grants you want to manage
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**schema_id:** `string` — Exact action schema ID returned by schema discovery
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActionConfigurationClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## Harbors Actions
 <details><summary><code>client.harbors.actions.<a href="/src/api/resources/harbors/resources/actions/client/Client.ts">getExecution</a>(harbor_id, execution_id, { ...params }) -> Polytomic.HarborActionExecutionEnvelope</code></summary>
 <dl>
@@ -14519,6 +11696,10 @@ Send a new nonzero UUID in `X-Polytomic-Activity-Request-ID`. For direct REST
 requests, `X-Polytomic-Harbor-Session` is optional. If supplied, the session must
 be active and bound to the credential and Harbor. Discovery is recorded as
 `action.listed`; no response is returned if that event cannot be recorded.
+
+Organization administrators manage these grants through
+[Harbor action configuration](../../../../api-reference/harbors/action-configuration/get).
+Runtime discovery does not enable additional operations or fields.
 </dd>
 </dl>
 </dd>
@@ -15049,6 +12230,2927 @@ await client.harbors.actions.prepare("248df4b7-aa70-47b8-a036-33ac447e668d", {
 </dl>
 </details>
 
+## Harbors Contexts
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">list</a>(harbor_id, { ...params }) -> Polytomic.HarborContextListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists context document metadata for a Harbor without returning document content.
+
+Collection items include the current published `version` number and omit
+`content`. Use the context item endpoint to retrieve a complete document.
+
+A Harbor profile credential can read context only when `harbor_id` identifies
+its own Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">create</a>(harbor_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates and attaches a context document to a Harbor.
+
+The new document belongs only to this Harbor. Context documents cannot be attached to multiple Harbors.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.create("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.CreateHarborContextRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">listDrafts</a>(harbor_id, { ...params }) -> Polytomic.HarborContextDraftListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists mutable Harbor context drafts without returning document content.
+
+The collection includes drafts for published context documents and initial drafts
+that have not yet been published. Use `context_id` with the draft detail,
+replacement, promotion, and discard endpoints.
+
+Draft metadata does not include `content`. Fetch a selected draft through its
+detail endpoint to read the complete candidate. Normal context list and detail
+operations continue to return published content only.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.listDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsListDraftsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">createDraft</a>(harbor_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates an unpublished context document with its initial mutable draft.
+
+Creates a stable context identity and its initial mutable draft without publishing
+content to the Harbor. The response includes `context_id`, which identifies the
+draft replacement, promotion, and discard routes.
+
+The initial draft has a null `base_revision_id`. It remains absent from normal
+context list/detail, GraphQL, entity lookup, and Harbor MCP reads until promoted.
+Use the regular context creation endpoint instead when the initial payload should
+be published immediately.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.createDraft("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.CreateHarborContextDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">get</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one complete Harbor context document.
+
+The response includes the current published `version` number and complete
+plain-text `content`.
+
+A Harbor profile credential can read context only when `harbor_id` identifies
+its own Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsGetRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">update</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Replaces one Harbor context document.
+
+Each successful request publishes the next immutable version. You can omit
+`change_note`.
+
+A direct publication leaves an existing draft unchanged.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.update("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.SaveHarborContextRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">delete</a>(harbor_id, context_id, { ...params }) -> Polytomic.DeletedHarborContextEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Deletes one context document from a Harbor.
+
+Deleting a context document does not affect the Harbor or its other context documents.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsDeleteRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">getDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the mutable draft for a Harbor context document.
+
+Drafts are available only through the draft endpoints. `base_revision_id`
+identifies the published revision from which the candidate was created. Normal
+context reads and Harbor MCP tools continue to return the current published
+version. Creator and updater IDs are null when their actor type is `system`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.getDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsGetDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">saveDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates or completely replaces the mutable draft for a Harbor context document.
+
+The request supplies the complete draft payload. If a draft already exists,
+this request replaces it while preserving the draft ID, creation metadata, and
+`base_revision_id`.
+
+A new draft for a published document records the current revision as its base.
+An unpublished document's initial draft keeps a null base when replaced. Saving
+a draft does not change published content or its `updated_at`. Creator and
+updater provenance comes from the request actor; system actors have a null actor
+ID.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.saveDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    content: "Bookings use the contract signed date...",
+    title: "Revenue definitions"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.SaveHarborContextDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">deleteDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.DeletedHarborContextDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Discards the mutable draft for a Harbor context document.
+
+Discarding a draft does not change the current published version or its
+history. If the draft belongs to a context that has never been published,
+discarding it also removes the otherwise empty context identity.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.deleteDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsDeleteDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">promoteDraft</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextVersionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Promotes the draft to the next immutable published context version.
+
+Promotion publishes the draft's exact title, description, content, and optional
+change note as the next version. An unpublished context's initial draft becomes
+version 1. The draft is removed after publication.
+
+Promotion returns a conflict when the current published revision differs from
+the draft's `base_revision_id`. The stale draft remains available so an author
+can compare it with the current version before discarding and recreating it.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.promoteDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsPromoteDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">listVersions</a>(harbor_id, context_id, { ...params }) -> Polytomic.HarborContextVersionListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists immutable published versions of a Harbor context document without returning content.
+
+Versions are ordered from newest to oldest. Collection items omit `content`,
+and the draft is never included. Pagination tokens continue from the last
+returned version, so publishing a newer version between requests does not shift
+or duplicate older results.
+
+Published revision IDs are durable artifact identities intended for future
+Harbor activity and audit records. Publisher IDs are paired with actor types.
+System publications have `published_by_type: "system"` and a null
+`published_by` because the system actor has no UUID.
+
+A Harbor profile credential can read versions only when `harbor_id` identifies
+its own Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.listVersions("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsListVersionsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">getVersion</a>(harbor_id, context_id, version_id, { ...params }) -> Polytomic.HarborContextVersionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one immutable published version of a Harbor context document.
+
+The response includes the complete title, description, and plain-text
+`content` captured when the version was published.
+
+Published versions cannot be changed or deleted. System publications have
+`published_by_type: "system"` and a null `published_by`.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.getVersion("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**context_id:** `string` — Unique identifier of the context document
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**version_id:** `string` — Unique identifier of the published context version
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ContextsGetVersionRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.contexts.<a href="/src/api/resources/harbors/resources/contexts/client/Client.ts">resolveSourceMappings</a>(harbor_id, { ...params }) -> Polytomic.ResolveHarborSourceMappingsEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Resolves documented source table and field identities to the names a Harbor's backing Connection accepts.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.contexts.resolveSourceMappings("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    sources: [{
+            connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d"
+        }]
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ResolveHarborSourceMappingsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ContextsClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Harbors Keys
+<details><summary><code>client.harbors.keys.<a href="/src/api/resources/harbors/resources/keys/client/Client.ts">list</a>(harbor_id, { ...params }) -> Polytomic.HarborKeyListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists non-expiring masked credentials for a Harbor.
+
+Only credentials with no expiration timestamp are returned. Credentials with
+an expiration timestamp are excluded, even if they have not yet expired.
+
+Each item contains a masked `key_hint`. Polytomic never returns a credential's
+plaintext value after creation.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.keys.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.KeysListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `KeysClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.keys.<a href="/src/api/resources/harbors/resources/keys/client/Client.ts">create</a>(harbor_id) -> Polytomic.HarborKeyEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Generates a new Harbor credential and returns its plaintext value once.
+
+Store the returned `value` securely. Polytomic returns it only in this response.
+
+For access that expires automatically, issue a Harbor-subject
+[temporary credential](../../../../api-reference/temporary-credentials/create) instead.
+Temporary credential issuance also supports user subjects.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.keys.create("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `KeysClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.keys.<a href="/src/api/resources/harbors/resources/keys/client/Client.ts">delete</a>(harbor_id, key_id) -> Polytomic.RevokedHarborKeyEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Revokes one Harbor credential by its credential ID.
+
+Revocation affects only the selected credential. Other active Harbor credentials remain valid.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.keys.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**key_id:** `string` — Unique identifier of the Harbor credential
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `KeysClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Harbors SavedQueries
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">list</a>(harbor_id, { ...params }) -> Polytomic.HarborSavedQueryListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists current published saved queries for a Harbor.
+
+Saved queries are supported only for Polytomic-managed Harbors whose backing
+Connection type is `polytomic_harbor`.
+
+Collection items contain current published metadata and omit SQL, parameter
+values, and unpublished drafts. A Harbor profile credential can list saved
+queries only when `harbor_id` identifies its own Harbor.
+
+## Harbor Activity
+
+When you use a Harbor profile credential, send a new nonzero UUID in
+`X-Polytomic-Activity-Request-ID` for each request, including each page. A
+missing or invalid ID returns `400 Bad Request`. Reusing a consumed ID returns
+`409 Conflict`.
+
+If you supply `X-Polytomic-Harbor-Session`, the session must be active and bound
+to your credential and Harbor. An invalid session returns `403 Forbidden`.
+Direct scoped REST requests may omit the session header.
+
+Polytomic records `saved_query.listed` before returning data. The event describes
+only the returned page, including saved-query IDs, immutable revision IDs,
+version numbers, and bounded name snapshots. Activity excludes SQL, parameter
+values, and expected column names. If Polytomic cannot record the event, the
+request returns `503 Service Unavailable` without saved-query data.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 1,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.SavedQueriesListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">createDraft</a>(harbor_id, { ...params }) -> Polytomic.HarborSavedQueryDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates a stable Harbor saved query with its initial mutable draft.
+
+Saved queries are supported only for Polytomic-managed Harbors whose backing
+Connection type is `polytomic_harbor`. Customer-managed Harbor backings return
+an unsupported-backing error.
+
+The saved query receives a stable ID, but it remains absent from published
+saved-query reads until an administrator publishes its initial draft.
+
+Use `{{parameter_name}}` references in `sql_template`. Each reference must have
+one scalar declaration. Validation values and defaults must match the declared
+`string`, `number`, `boolean`, `date`, `timestamp`, or `uuid` type.
+
+Unknown JSON fields, including fields inside parameter declarations, return
+`400 Bad Request` before the draft is saved. Use `default_value`, not `default`,
+for parameter defaults.
+
+When you omit a parameter during execution, Polytomic uses its published
+`default_value`, never its draft validation value. An omitted optional parameter
+without a default binds SQL `NULL`. A required parameter allows omission when a
+default exists, but rejects explicit `null` even with a default.
+
+For a report window, use a required parameter with a default so omission selects
+a useful window and explicit `null` is rejected:
+
+```json
+{"name": "days", "type": "number", "required": true, "default_value": 7}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.createDraft("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    name: "Monthly revenue",
+    sql_template: "SELECT account_id, sum(amount) AS revenue FROM orders WHERE created_at >= {{start_date}} GROUP BY account_id"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.CreateHarborSavedQueryDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">listDrafts</a>(harbor_id, { ...params }) -> Polytomic.HarborSavedQueryDraftListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists mutable Harbor saved-query drafts.
+
+Drafts are ordered from newest to oldest and include complete SQL, typed
+parameter declarations, and author-supplied validation values. Harbor profile
+credentials cannot access this endpoint.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.listDrafts("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 1,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.SavedQueriesListDraftsRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">get</a>(harbor_id, saved_query_id, { ...params }) -> Polytomic.HarborSavedQueryEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns the current published version of one Harbor saved query.
+
+The response contains the current immutable `revision_id`, SQL template,
+parameter contract, expected columns, and publication provenance. Validation
+inputs are draft-only and are never part of a published response.
+
+A Harbor profile credential can retrieve a saved query only from its own Harbor.
+
+## Harbor Activity
+
+When you use a Harbor profile credential, send a new nonzero UUID in
+`X-Polytomic-Activity-Request-ID` for each request. A missing or invalid ID
+returns `400 Bad Request`. Reusing a consumed ID returns `409 Conflict`.
+
+If you supply `X-Polytomic-Harbor-Session`, the session must be active and bound
+to your credential and Harbor. An invalid session returns `403 Forbidden`.
+Direct scoped REST requests may omit the session header.
+
+Polytomic records `saved_query.fetched` before returning the definition. The
+event identifies the saved query, exact immutable revision, published version,
+and bounded name snapshot. It does not indicate query execution. Activity
+excludes SQL, parameter defaults and validation values, expected column names,
+and result rows. If Polytomic cannot record the event, the request returns
+`503 Service Unavailable` without saved-query data.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.get("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**saved_query_id:** `string` — Unique stable identifier of the saved query
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.SavedQueriesGetRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">delete</a>(harbor_id, saved_query_id) -> Polytomic.DeletedHarborSavedQueryEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Archives one Harbor saved query and removes it from active reads.
+
+Archiving removes the saved query and any draft from active reads while
+retaining its immutable revisions for provenance. The operation does not run
+the saved SQL or modify the Harbor backing Connection. Archiving does not cancel
+in-flight execution requests or queued executions.
+
+This REST operation archives the saved query; it does not merely unpublish it.
+Unpublish is available only through the GraphQL `unpublishHarborSavedQuery`
+mutation. There is no REST unpublish endpoint.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.delete("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**saved_query_id:** `string` — Unique stable identifier of the saved query
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">saveDraft</a>(harbor_id, saved_query_id, { ...params }) -> Polytomic.HarborSavedQueryDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Creates or completely replaces the mutable draft for a Harbor saved query.
+
+Replacement is complete rather than partial. The next validation or publication
+uses the replacement SQL, parameter declarations, and validation values.
+
+Unknown JSON fields, including fields inside parameter declarations, return
+`400 Bad Request` before the draft is saved. Use `default_value`, not `default`,
+for parameter defaults.
+
+When you omit a parameter during execution, Polytomic uses its published
+`default_value`, never its draft validation value. An omitted optional parameter
+without a default binds SQL `NULL`. A required parameter allows omission when a
+default exists, but rejects explicit `null` even with a default.
+
+For a report window, use a required parameter with a default so omission selects
+a useful window and explicit `null` is rejected:
+
+```json
+{"name": "days", "type": "number", "required": true, "default_value": 7}
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.saveDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d", {
+    name: "Monthly revenue",
+    sql_template: "SELECT account_id, sum(amount) AS revenue FROM orders WHERE created_at >= {{start_date}} GROUP BY account_id"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**saved_query_id:** `string` — Unique stable identifier of the saved query
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.SaveHarborSavedQueryDraftRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">deleteDraft</a>(harbor_id, saved_query_id) -> Polytomic.DeletedHarborSavedQueryDraftEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Discards the mutable draft for one Harbor saved query.
+
+Discarding an initial unpublished draft also removes its otherwise empty stable
+saved-query identity. Discarding a later draft preserves every immutable
+published version.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.deleteDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**saved_query_id:** `string` — Unique stable identifier of the saved query
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">publishDraft</a>(harbor_id, saved_query_id) -> Polytomic.HarborSavedQueryEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Validates and publishes the current draft as the next immutable saved-query version.
+
+Only organization administrators can publish. Publication executes and validates
+the current draft with the Polytomic-managed Harbor's MotherDuck `read_scaling`
+credential. It fails instead of using the Harbor writer credential when the
+reader credential is missing or incomplete.
+
+After execution, publication verifies that the draft did not change. A
+concurrent edit returns a conflict and remains a draft. Successful publication
+creates the next immutable revision, records the observed ordered columns as its
+output contract, removes validation inputs from the published definition, and
+deletes the mutable draft. The response includes the immutable `revision_id`
+that future executions use for exact provenance.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.publishDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**saved_query_id:** `string` — Unique stable identifier of the saved query
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">validateDraft</a>(harbor_id, saved_query_id) -> Polytomic.HarborSavedQueryValidationEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Validates the exact current saved-query draft and returns a bounded ephemeral preview.
+
+Only organization administrators can validate drafts. Named template references
+compile to DuckDB placeholders, and typed values are passed separately rather
+than interpolated into SQL.
+
+The query runs with the Polytomic-managed Harbor's MotherDuck `read_scaling`
+credential. Validation fails when that credential is missing or incomplete and
+never falls back to the Harbor writer credential. Preview rows and serialized
+response size are bounded. The preview and validation attempt are not persisted.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.validateDraft("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**saved_query_id:** `string` — Unique stable identifier of the saved query
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.savedQueries.<a href="/src/api/resources/harbors/resources/savedQueries/client/Client.ts">execute</a>(harbor_id, saved_query_id, { ...params }) -> Polytomic.ExecuteHarborSavedQueryEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Submits the current published Harbor saved query for asynchronous reader-only execution.
+
+Use a Harbor-bound scoped credential with query access to the Harbor's backing
+Connection. Administrator credentials cannot submit executions here. Saved
+queries require a Polytomic-managed Harbor.
+
+Polytomic selects the current published revision while processing your request.
+The response identifies that exact immutable revision. Selection happens before
+Polytomic accepts the execution. Drafts, unpublished queries, and archived
+queries are unavailable for selection. You cannot select a historical revision
+or supply SQL through this endpoint.
+
+> ⚠️ Concurrent publication changes
+>
+> Publishing, unpublishing, or archiving a saved query after selection does not
+> change the selected revision. An in-flight request may still be accepted and
+> execute that revision. Unpublishing or archiving does not cancel in-flight
+> requests or queued executions. Query access is checked again before execution
+> and result retrieval.
+
+Parameter values are bound separately from SQL. Omitted parameters use the
+published `default_value`, never draft validation values. An omitted optional
+parameter without a default binds SQL `NULL`. Required parameters allow omission
+when a default exists, but reject explicit `null` even with a default. Missing
+required values without defaults, explicit `null` for required parameters,
+unknown parameter names, and invalid scalar types return
+`422 Unprocessable Entity` without accepting an execution. Execution requires
+reader credentials and never falls back to writer credentials.
+
+For report windows, define parameters with `required: true` and a
+`default_value`, such as `7` for a `days` parameter. This allows omission while
+preventing explicit `null` from turning a time filter into a SQL `NULL`
+comparison.
+
+To archive a saved query through REST, use
+[`DELETE /api/harbors/{harbor_id}/saved-queries/{saved_query_id}`](../../../../../../api-reference/harbors/saved-queries/delete).
+Unpublish is available only through the GraphQL `unpublishHarborSavedQuery`
+mutation, not a REST endpoint.
+
+## Results
+
+The response returns a task ID with status `created`, not result rows. Poll
+[`GET /api/queries/{id}`](../../../../../../api-reference/query-runner/get-query) using a credential
+from the same Harbor profile. Query access is checked again before execution and
+result retrieval. Stop polling at `done`, `failed`, or `unknown`; `unknown` means
+execution started but no durable terminal result is available.
+
+Results and detailed failure information expire after 24 hours. Use the
+`expires` field and follow `links.next` to retrieve additional result pages.
+
+## Harbor Activity
+
+Send a new nonzero UUID in `X-Polytomic-Activity-Request-ID`. Missing or invalid
+IDs return `400 Bad Request`. Reusing a consumed ID returns `409 Conflict` and
+does not create another execution.
+
+You may omit `X-Polytomic-Harbor-Session` for direct REST requests. If supplied,
+the session must be active and bound to your credential and Harbor.
+
+Polytomic records `query.submitted` atomically with acceptance. The event
+identifies the saved query, immutable revision, published version, and bounded
+name snapshot. SQL, parameter values and defaults, column names, and result rows
+remain outside Activity metadata. If Activity persistence is unavailable, the
+request returns `503 Service Unavailable` without accepting an execution.
+
+`query.started` records provider invocation. `query.succeeded` means results are
+available for authorized retrieval, not that you have consumed them.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.savedQueries.execute("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**saved_query_id:** `string` — Unique stable identifier of the saved query
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ExecuteHarborSavedQueryRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `SavedQueriesClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Harbors Users
+<details><summary><code>client.harbors.users.<a href="/src/api/resources/harbors/resources/users/client/Client.ts">list</a>(harbor_id, { ...params }) -> Polytomic.HarborUserListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists Harbor-only users assigned to a Harbor.
+
+The response contains only Harbor-only users currently assigned to this Harbor.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.users.list("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 50,
+    page_token: "page_token"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.UsersListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `UsersClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.users.<a href="/src/api/resources/harbors/resources/users/client/Client.ts">invite</a>(harbor_id, { ...params }) -> Polytomic.HarborUserEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Invites and assigns a new Harbor-only user.
+
+The invited account is restricted to assigned Harbors and does not receive regular Polytomic application access.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.users.invite("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    email: "analyst@example.com"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.InviteHarborUserRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `UsersClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.users.<a href="/src/api/resources/harbors/resources/users/client/Client.ts">assign</a>(harbor_id, user_id) -> Polytomic.HarborUserEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Assigns an existing Harbor-only user to a Harbor.
+
+The assignment is idempotent. Regular Polytomic users cannot be assigned because they already have application access to Harbors.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.users.assign("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_id:** `string` — Unique identifier of the Harbor-only user
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `UsersClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.users.<a href="/src/api/resources/harbors/resources/users/client/Client.ts">unassign</a>(harbor_id, user_id) -> Polytomic.UnassignedHarborUserEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Removes a Harbor assignment without deleting the user.
+
+This removes only the Harbor assignment. The organization user remains available and may retain assignments to other Harbors.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.users.unassign("248df4b7-aa70-47b8-a036-33ac447e668d", "248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**harbor_id:** `string` — Unique identifier of the Harbor
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**user_id:** `string` — Unique identifier of the Harbor-only user
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `UsersClient.IdempotentRequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+## Harbors Activity
+<details><summary><code>client.harbors.activity.<a href="/src/api/resources/harbors/resources/activity/client/Client.ts">list</a>({ ...params }) -> Polytomic.HarborActivityListEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Lists Harbor Activity recorded for the caller's organization.
+
+You must be an active Organization administrator to use this endpoint.
+
+`start_time` is inclusive and `end_time` is exclusive. Both filter the time at
+which Polytomic recorded each event, which can differ from `occurred_at`. A
+single request can cover at most 90 days.
+
+Results are ordered from newest to oldest by default. Set `order` to `asc` to
+retrieve the oldest events first. A page contains at most 100 events. Pass
+`next_page_token` from the response as `page_token` with the same time range,
+filters, order, and limit to retrieve the next page. The token expires 24 hours
+after the first page. Pagination uses a live descending cursor, so an event from
+a transaction that commits between pages can require a fresh traversal.
+
+Responses include stable identities, bounded resource snapshots, schema label
+snapshots with truncation state, field counts, and row counts when available.
+They do not include internal recorded-order values, submitted SQL, raw field
+names, detailed provider errors, result rows, or raw pagination tokens.
+
+> ℹ️ Activity retention
+>
+> Polytomic retains Activity events for at least 90 days. Pagination tokens
+> expire 24 hours after the first page.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.activity.list({
+    start_time: "2024-01-15T09:30:00Z",
+    end_time: "2024-01-15T09:30:00Z",
+    limit: 1,
+    page_token: "page_token",
+    order: "asc",
+    harbor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    event_type: ["action.looked_up"],
+    outcome: ["succeeded"],
+    operation_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    session_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    actor_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    credential_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"],
+    connection_id: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ActivityListRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActivityClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.activity.<a href="/src/api/resources/harbors/resources/activity/client/Client.ts">getSession</a>(session_id, { ...params }) -> Polytomic.HarborActivitySessionEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one Harbor Activity session and its events.
+
+You must be an active Organization administrator to use this endpoint. The
+session must belong to the Organization against which you authenticated.
+
+Events are ordered from oldest to newest by default. Set `order` to `desc` to
+retrieve the newest events first. A page contains at most 100 events. Pass
+`next_page_token` from the response as `page_token` with the same order and
+limit to retrieve the next page.
+
+`history_truncated` is `true` when Activity retention removed events from the
+beginning of the session. The lifecycle summary remains available while the
+session itself is retained.
+
+The response uses the same event allowlist as the Activity list and detail
+endpoints. It does not include session tokens, submitted SQL, raw field names,
+detailed provider errors, result rows, or raw pagination tokens.
+
+> ℹ️ Activity retention
+>
+> Polytomic retains Activity events for at least 90 days. Pagination tokens
+> expire 24 hours after the first page.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.activity.getSession("248df4b7-aa70-47b8-a036-33ac447e668d", {
+    limit: 1,
+    page_token: "page_token",
+    order: "asc"
+});
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**session_id:** `string` — Harbor Activity session ID
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**request:** `Polytomic.harbors.ActivityGetSessionRequest` 
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActivityClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
+<details><summary><code>client.harbors.activity.<a href="/src/api/resources/harbors/resources/activity/client/Client.ts">get</a>(event_id) -> Polytomic.HarborActivityEventEnvelope</code></summary>
+<dl>
+<dd>
+
+#### 📝 Description
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+Returns one Harbor Activity event from the caller's organization.
+
+You must be an active Organization administrator to use this endpoint. The
+event must belong to the Organization against which you authenticated.
+
+The response can include stable identities, bounded resource snapshots, schema
+label snapshots with truncation state, field counts, and row counts. It does
+not include internal recorded-order values, submitted SQL, raw field names,
+detailed provider errors, result rows, or raw pagination tokens.
+
+> ℹ️ Activity retention
+>
+> Polytomic retains Activity events for at least 90 days.
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### 🔌 Usage
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+```typescript
+await client.harbors.activity.get("248df4b7-aa70-47b8-a036-33ac447e668d");
+
+```
+</dd>
+</dl>
+</dd>
+</dl>
+
+#### ⚙️ Parameters
+
+<dl>
+<dd>
+
+<dl>
+<dd>
+
+**event_id:** `string` — Activity event ID
+    
+</dd>
+</dl>
+
+<dl>
+<dd>
+
+**requestOptions:** `ActivityClient.RequestOptions` 
+    
+</dd>
+</dl>
+</dd>
+</dl>
+
+
+</dd>
+</dl>
+</details>
+
 ## ModelSync Targets
 <details><summary><code>client.modelSync.targets.<a href="/src/api/resources/modelSync/resources/targets/client/Client.ts">getTargetFields</a>(id, { ...params }) -> Polytomic.TargetResponseEnvelope</code></summary>
 <dl>
@@ -15508,14 +15610,20 @@ await client.modelSync.errorHandling.update("248df4b7-aa70-47b8-a036-33ac447e668
 
 Lists executions for a model sync.
 
-Results are ordered by start time descending. If more results are available, the
-response includes `pagination.next_page_token`; pass that token back unchanged
-to continue paging.
+Results are ordered by `created_at` descending. Pass the opaque
+`pagination.next_page_token` back as `page_token` to continue paging. A token is
+returned even on the last page and on empty pages. Stop paging when `data` is
+empty; the presence of a token does not mean more results are available.
 
-The token is opaque. Do not construct or edit it yourself.
+Use `ascending=true` to walk forward from the oldest executions. Each page
+still lists its executions newest first; subsequent pages contain newer
+executions.
 
-For full details about a specific execution — including record counts and error
-summaries — use
+Use `only_completed=true` to return only executions in terminal statuses.
+Ordering and pagination still use `created_at`.
+
+For full details about a specific execution, including record counts and error
+summaries, use
 [`GET /api/syncs/{sync_id}/executions/{id}`](../../../../api-reference/model-sync/executions/get).
 </dd>
 </dl>
@@ -16151,7 +16259,11 @@ they are referenced in a policy; create roles using
 
 ```typescript
 await client.permissions.policies.create({
-    name: "Custom"
+    name: "Custom",
+    policy_actions: [{
+            action: "edit",
+            role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
+        }]
 });
 
 ```
@@ -16288,7 +16400,11 @@ and send the complete object back.
 
 ```typescript
 await client.permissions.policies.update("248df4b7-aa70-47b8-a036-33ac447e668d", {
-    name: "Custom"
+    name: "Custom",
+    policy_actions: [{
+            action: "edit",
+            role_ids: ["248df4b7-aa70-47b8-a036-33ac447e668d"]
+        }]
 });
 
 ```

@@ -40,12 +40,9 @@ export class ConnectionsClient {
     /**
      * Lists all connection types supported by this deployment.
      *
-     * Each entry includes per-type metadata:
-     *
-     * - The available operations the connection type supports.
-     * - Its category.
-     * - Whether the connection type is enabled for the caller's organization.
-     * - Which modes (source, destination, enrichment) it can act as.
+     * Each entry includes the Connection type's ID, name, capabilities, and
+     * configuration schema. Capabilities indicate whether it supports use as a
+     * source, destination, enrichment source, scheduler, or sync event log target.
      *
      * @param {ConnectionsClient.RequestOptions} requestOptions - Request-specific configuration.
      *
@@ -223,7 +220,11 @@ export class ConnectionsClient {
      *
      * @example
      *     await client.connections.getTypeParameterValues("type", {
-     *         field: "field"
+     *         field: "field",
+     *         parameters: {
+     *             "byo_app_token": "secret",
+     *             "name": "Example"
+     *         }
      *     })
      */
     public getTypeParameterValues(

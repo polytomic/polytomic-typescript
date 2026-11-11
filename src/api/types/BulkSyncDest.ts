@@ -5,6 +5,8 @@ import type * as Polytomic from "../index";
 export interface BulkSyncDest {
     /** Destination configuration options this connection accepts, keyed by option name */
     configuration?: Record<string, unknown> | undefined;
+    /** Suggested values for a new destination configuration, when source_connection_id is provided and the destination generates them. Preserve explicit choices and existing configurations. */
+    initial_configuration?: Record<string, unknown> | undefined;
     /** Bulk sync modes this destination supports */
     modes?: Polytomic.SupportedBulkMode[] | undefined;
     /** Resync modes supported by this destination (refetch, resync, rebuild) */

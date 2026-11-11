@@ -3,6 +3,6 @@
 export interface EventingBulkSyncSchedule {
     /** Frequency of the schedule */
     frequency?: string | undefined;
-    /** Bulk sync schedule ID */
+    /** Bulk Sync schedule ID */
     id?: string | undefined;
 }

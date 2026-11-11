@@ -381,7 +381,11 @@ describe("BulkSyncClient", () => {
 
         const rawResponseBody = {
             data: {
-                capabilities: { supports_namespaces: true, supports_tracking_fields: true },
+                capabilities: {
+                    supports_namespaces: true,
+                    supports_selective_modes: true,
+                    supports_tracking_fields: true,
+                },
                 configuration: { key: "value" },
                 schemas: [
                     {
@@ -504,6 +508,7 @@ describe("BulkSyncClient", () => {
                     mirror_schemas: { default: "", required: false },
                     schema: { default: "", required: false },
                 },
+                initial_configuration: { key: "value" },
                 modes: [{ description: "Replace all records", label: "Replace" }],
                 supported_resync_modes: ["refetch"],
                 supports_history_mode: false,
@@ -518,7 +523,9 @@ describe("BulkSyncClient", () => {
             .jsonBody(rawResponseBody)
             .build();
 
-        const response = await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d");
+        const response = await client.bulkSync.getDestination("248df4b7-aa70-47b8-a036-33ac447e668d", {
+            source_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+        });
         expect(response).toEqual(rawResponseBody);
     });
 

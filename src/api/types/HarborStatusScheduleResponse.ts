@@ -27,7 +27,6 @@ export interface HarborStatusScheduleResponse {
     run_after_success_only?: boolean | undefined;
     /** Source schema IDs explicitly selected by this bulk schedule */
     schemas?: string[] | undefined;
-    /** Bulk schedule field-selection mode, when the schedule applies selectively */
     selective_mode?: Polytomic.BulkSelectiveMode | undefined;
     /** Bulk refresh mode selected by this schedule */
     sync_mode?: Polytomic.BulkScheduleSyncMode | undefined;

@@ -23,11 +23,11 @@ export interface HarboractivityapiHarborActivityMetadata {
     client_name?: string | undefined;
     /** MCP-observed client version of the session */
     client_version?: string | undefined;
-    /** Connection name when the query was submitted */
+    /** Connection name when the query was submitted, or of the source a fetched source document describes */
     connection_name?: string | undefined;
     /** Whether the connection name snapshot was truncated */
     connection_name_truncated?: boolean | undefined;
-    /** Connection type of the queried connection */
+    /** Connection type of the queried connection, or of the source a fetched source document describes */
     connection_type?: string | undefined;
     /** Published context version number at fetch time, when recorded */
     context_version?: number | undefined;

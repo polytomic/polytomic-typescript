@@ -11,6 +11,8 @@ export interface BulkSchema {
     disable_data_cutoff?: boolean | undefined;
     /** Whether this schema is included in sync runs */
     enabled?: boolean | undefined;
+    /** IDs of fields that are never synced, even when automatically_add_new_fields would add them. Present in responses wherever fields are; when patching, omit it to keep the current list and send an empty list to clear it. */
+    excluded_fields?: string[] | undefined;
     /** fields is not populated on the list endpoint and will be removed in a future version; retrieve individual schemas for fields. */
     fields?: Polytomic.BulkField[] | undefined;
     /** filters is not populated on the list endpoint and will be removed in a future version; retrieve individual schemas for filters. */

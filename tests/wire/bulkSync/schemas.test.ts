@@ -82,6 +82,7 @@ describe("SchemasClient", () => {
                 destination_history_output_name: "contact__history",
                 disable_data_cutoff: false,
                 enabled: true,
+                excluded_fields: ["ssn"],
                 history_enabled: false,
                 id: "Contact",
                 output_name: "contact",

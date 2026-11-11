@@ -13,6 +13,6 @@ export interface ExecutionsListRequest {
     page_token?: string;
     /** Return only completed executions. */
     only_completed?: boolean;
-    /** Return executions oldest first. */
+    /** Traverse from the oldest executions; each page is ordered newest first. */
     ascending?: boolean;
 }

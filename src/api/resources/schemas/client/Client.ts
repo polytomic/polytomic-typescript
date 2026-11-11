@@ -880,18 +880,11 @@ export class SchemasClient {
     }
 
     /**
-     * Returns a sample of records from a schema on a connection.
+     * Returns all records from a supported schema on a Connection.
      *
-     * The sample is intended for previewing the shape and values of data before
-     * committing to a sync configuration, not for full data export.
-     *
-     * > 🚧 The sample is not guaranteed to be representative of the full dataset.
-     * > Row selection is implementation-defined and may differ across connection
-     * > types.
-     *
-     * > 📘 If the schema's field definitions are stale, refresh them first with
-     * > [`POST /api/connections/{id}/schemas/refresh`](../../../../../../api-reference/schemas/refresh) to ensure
-     * > the sample aligns with the current schema structure.
+     * This endpoint supports only the HubSpot `deals_pipelines` schema. It returns
+     * all records from that schema in a single response, without sampling or
+     * pagination. Other backends and schemas are unsupported.
      *
      * @param {string} id - Unique identifier of the connection
      * @param {string} schema_id - Identifier of the schema within the connection

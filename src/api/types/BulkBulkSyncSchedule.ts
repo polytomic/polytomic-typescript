@@ -27,7 +27,6 @@ export interface BulkBulkSyncSchedule {
     month?: string | undefined;
     /** Schema IDs this schedule applies to; empty means all schemas */
     schemas?: string[] | undefined;
-    /** Whether this schedule runs a full fetch, only incremental fields, or only non-incremental fields */
     selectiveMode?: Polytomic.BulkSelectiveMode | undefined;
     /** Bulk sync ID */
     syncId?: string | undefined;

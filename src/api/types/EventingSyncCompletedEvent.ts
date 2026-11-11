@@ -2,6 +2,9 @@
 
 import type * as Polytomic from "../index";
 
+/**
+ * Fires when a Model Sync execution finishes, whatever its outcome. Read `status` to see the outcome. A failed or canceled execution also fires `sync.failed` or `sync.canceled`, and a completed execution with record errors or warnings also fires `sync.completed_with_errors`. Polytomic sends this event once the execution's record logs are available, so it can arrive after those events. Polytomic does not send it if the Model Sync has been deleted.
+ */
 export interface EventingSyncCompletedEvent {
     /** Number of records deleted */
     deleted_count?: number | undefined;
@@ -25,11 +28,11 @@ export interface EventingSyncCompletedEvent {
     record_count?: number | undefined;
     /** Schedule that started the execution */
     schedule?: Polytomic.EventingSyncSchedule | undefined;
-    /** Final status of the execution */
+    /** Final status of the execution, one of completed, failed, or canceled */
     status?: Polytomic.UtilExecutionStatus | undefined;
-    /** Model sync ID */
+    /** Model Sync ID */
     sync_id?: string | undefined;
-    /** Name of the model sync */
+    /** Name of the Model Sync */
     sync_name?: string | undefined;
     /** Destination connection ID */
     target_connection_id?: string | undefined;

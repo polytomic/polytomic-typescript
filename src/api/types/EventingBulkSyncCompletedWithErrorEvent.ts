@@ -2,6 +2,9 @@
 
 import type * as Polytomic from "../index";
 
+/**
+ * Fires when a Bulk Sync execution finishes with some objects failed and others not, or with an error reported for the execution as a whole. An execution ends with one of `bulk_sync.completed`, `bulk_sync.completed_with_errors`, `bulk_sync.failed`, or `bulk_sync.canceled`.
+ */
 export interface EventingBulkSyncCompletedWithErrorEvent {
     /** Destination connection ID */
     destination_connection_id?: string | undefined;
@@ -13,9 +16,9 @@ export interface EventingBulkSyncCompletedWithErrorEvent {
     schedule?: Polytomic.EventingBulkSyncSchedule | undefined;
     /** Source connection ID */
     source_connection_id?: string | undefined;
-    /** Bulk sync ID */
+    /** Bulk Sync ID */
     sync_id?: string | undefined;
-    /** Name of the bulk sync */
+    /** Name of the Bulk Sync */
     sync_name?: string | undefined;
     /** What started the execution */
     trigger_source?: string | undefined;

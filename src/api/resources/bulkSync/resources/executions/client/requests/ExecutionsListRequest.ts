@@ -14,7 +14,7 @@ export interface ExecutionsListRequest {
     page_token?: string;
     /** When true, only return executions that have finished. Terminal executions are ordered by updated_at. */
     only_terminal?: boolean;
-    /** When true, return executions from oldest to newest. Default is newest first. */
+    /** Traverse from the oldest executions by the selected sort timestamp; each page is ordered newest first. */
     ascending?: boolean;
     /** Maximum number of executions to return. Capped at 100. */
     limit?: number;

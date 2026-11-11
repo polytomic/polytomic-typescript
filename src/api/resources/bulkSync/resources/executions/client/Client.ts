@@ -128,18 +128,20 @@ export class ExecutionsClient {
     /**
      * Lists executions for a bulk sync.
      *
-     * Results are ordered by start time descending by default. When more results are
-     * available, the response includes an opaque `pagination.next_page_token`; pass it
-     * back as the `page_token` query parameter to retrieve the next page. The `limit`
-     * parameter is optional, and the maximum page size is 100 executions.
+     * Results are ordered by `created_at` descending by default. Pass the opaque
+     * `pagination.next_page_token` back as `page_token` to retrieve the next page.
+     * A token is returned even on the last nonempty page and on subsequent empty
+     * pages. Stop paging when `data` is empty; the presence of a token does not mean
+     * more results are available. The maximum page size is 100 executions.
      *
-     * Use `only_terminal=true` to return only finished executions. In that mode,
-     * executions are ordered by `updated_at` so recently completed runs appear first.
+     * Use `only_terminal=true` to return only executions in terminal statuses. In
+     * that mode, ordering and pagination use `updated_at` instead of `created_at`.
      *
-     * Use `ascending=true` to walk forward from the oldest execution instead of
-     * starting with the newest execution.
+     * Use `ascending=true` to walk forward from the oldest executions by the selected
+     * sort timestamp. Each page still lists its executions newest first; subsequent
+     * pages contain newer executions.
      *
-     * For the full details of a single run — including per-schema execution status —
+     * For the full details of a single run, including per-schema execution status,
      * use [`GET /api/bulk/syncs/{id}/executions/{exec_id}`](../../../../../api-reference/bulk-sync/executions/get).
      *
      * @param {string} id - Unique identifier of the bulk sync
@@ -875,7 +877,12 @@ export class ExecutionsClient {
     }
 
     /**
-     * Fetch the latest console log entries for ingestion scoped by connection and optional bulk sync. Returns the most recent 50 entries.
+     * Fetch up to the most recent 50 retained console log entries for ingestion scoped by Connection and optional Bulk Sync.
+     *
+     * Entries are returned in chronological order. Use `after` with the returned
+     * `next_cursor` to fetch newer entries. Only the most recent 50 entries are
+     * retained per scope; older entries are discarded. The log expires after 48 hours
+     * without new entries.
      *
      * @param {string} connection_id - Connection ID
      * @param {Polytomic.bulkSync.ExecutionsGetIngestConsoleLogsRequest} request

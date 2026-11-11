@@ -127,6 +127,14 @@ export class SchedulesClient {
      * sync immediately, call
      * [`POST /api/bulk/syncs/{id}/executions`](../../../../../api-reference/bulk-sync/start).
      *
+     * To sync the two selective groups of objects at different frequencies, add one
+     * schedule with `selectiveMode` set to `incrementalFields` and another with
+     * `nonincrementalFields`. Set the default schedule to `manual` to avoid an
+     * additional automatic run covering all selected objects. Check
+     * `capabilities.supports_selective_modes` on
+     * [`GET /api/connections/{id}/bulksync/source`](../../../../../api-reference/bulk-sync/get-source)
+     * first.
+     *
      * @param {string} sync_id - Unique identifier of the bulk sync to add a schedule to
      * @param {Polytomic.bulkSync.CreateScheduleRequest} request
      * @param {SchedulesClient.IdempotentRequestOptions} requestOptions - Request-specific configuration.

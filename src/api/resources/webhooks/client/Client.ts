@@ -32,7 +32,7 @@ export class WebhooksClient {
      * >
      * > An organization can register a single webhook, which receives every event
      * > produced in that organization. See the
-     * > [Events documentation](../../guides/events) for the
+     * > [Events documentation](../../guides/events/overview) for the
      * > list of event types and payload shapes.
      *
      * @param {WebhooksClient.RequestOptions} requestOptions - Request-specific configuration.
@@ -108,7 +108,7 @@ export class WebhooksClient {
      * >
      * > An organization can register a single webhook, which receives every event
      * > produced in that organization. See the
-     * > [Events documentation](../../guides/events) for the
+     * > [Events documentation](../../guides/events/overview) for the
      * > list of event types and payload shapes.
      *
      * @param {Polytomic.CreateWebhooksSchema} request
@@ -206,7 +206,7 @@ export class WebhooksClient {
      * >
      * > An organization can register a single webhook, which receives every event
      * > produced in that organization. See the
-     * > [Events documentation](../../../guides/events) for the
+     * > [Events documentation](../../../guides/events/overview) for the
      * > list of event types and payload shapes.
      *
      * @param {string} id - Webhook ID
@@ -285,7 +285,7 @@ export class WebhooksClient {
      * >
      * > An organization can register a single webhook, which receives every event
      * > produced in that organization. See the
-     * > [Events documentation](../../../guides/events) for the
+     * > [Events documentation](../../../guides/events/overview) for the
      * > list of event types and payload shapes.
      *
      * @param {string} id - Webhook ID
@@ -386,7 +386,7 @@ export class WebhooksClient {
      * >
      * > An organization can register a single webhook, which receives every event
      * > produced in that organization. See the
-     * > [Events documentation](../../../guides/events) for the
+     * > [Events documentation](../../../guides/events/overview) for the
      * > list of event types and payload shapes.
      *
      * Deletion is permanent. To stop delivery without losing the webhook
@@ -599,7 +599,7 @@ export class WebhooksClient {
      * >
      * > An organization can register a single webhook, which receives every event
      * > produced in that organization. See the
-     * > [Events documentation](../../../../guides/events) for the
+     * > [Events documentation](../../../../guides/events/overview) for the
      * > list of event types and payload shapes.
      *
      * Events are not queued while the webhook is disabled — any activity that occurs
@@ -696,7 +696,7 @@ export class WebhooksClient {
      * >
      * > An organization can register a single webhook, which receives every event
      * > produced in that organization. See the
-     * > [Events documentation](../../../../guides/events) for the
+     * > [Events documentation](../../../../guides/events/overview) for the
      * > list of event types and payload shapes.
      *
      * Delivery resumes from the next event generated after this call. Events that

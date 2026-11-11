@@ -21,6 +21,5 @@ export interface BulkSyncAdditionalScheduleRequest {
     resync_mode?: Polytomic.BulkScheduleSyncMode | undefined;
     /** Optional list of schema IDs this schedule applies to. If empty, the schedule applies to all schemas. */
     schemas?: string[] | undefined;
-    /** Whether this schedule runs a full fetch, only incremental fields, or only non-incremental fields */
     selective_mode?: Polytomic.BulkSelectiveMode | undefined;
 }

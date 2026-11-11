@@ -25,15 +25,18 @@ export class EventsClient {
     /**
      * Lists audit events for the caller's organization.
      *
-     * Results are paginated. If more events are available, the response includes
-     * `pagination.next_page_token`; pass that token back unchanged to continue from
-     * the last item you received.
+     * Results are ordered by `created_at` descending. Use `limit` to control how many
+     * events are returned. The response does not include a pagination token.
      *
-     * Filter by event type using the `event_type` query parameter. Pass one of the
-     * identifiers returned by [`GET /api/events_types`](../../api-reference/events/get-types) to
-     * narrow results to a specific category of activity.
+     * Filter by event type using the `type` query parameter. Pass one of the
+     * identifiers returned by [`GET /api/events_types`](../../api-reference/events/get-types)
+     * to narrow results to a specific category of activity.
      *
-     * > 📘 Events reflect audit activity scoped to the caller's organization.
+     * Use `starting_after` and `ending_before` to restrict results to events created
+     * strictly after or before a timestamp. Results remain newest first when you use
+     * either filter.
+     *
+     * > ℹ️ Events reflect audit activity scoped to your Organization.
      * > The log captures both user-initiated and API-initiated actions.
      *
      * @param {Polytomic.EventsListRequest} request

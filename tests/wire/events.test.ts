@@ -19,10 +19,11 @@ describe("EventsClient", () => {
                 {
                     created_at: "2024-01-01T00:00:00Z",
                     event: {
-                        execution_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                        organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                        sync_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
-                        target_connection_id: "248df4b7-aa70-47b8-a036-33ac447e668d",
+                        execution_id: "0ecd09c1-b901-4d27-9053-f0367c427254",
+                        organization_id: "be80a27e-0e80-4dcb-bee9-1666f02eeb83",
+                        sync_id: "0b155265-c537-44c9-9359-a3ceb468a4da",
+                        sync_name: "Salesforce contacts",
+                        target_connection_id: "7c67e0b3-9759-44eb-b96c-2a7042b583f0",
                     },
                     id: "248df4b7-aa70-47b8-a036-33ac447e668d",
                     organization_id: "248df4b7-aa70-47b8-a036-33ac447e668d",

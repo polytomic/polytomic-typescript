@@ -9,6 +9,8 @@ export interface SchemaConfiguration {
     disable_data_cutoff?: boolean | undefined;
     /** Whether the schema is enabled for syncing */
     enabled?: boolean | undefined;
+    /** IDs of fields that are never synced, even when automatically_add_new_fields would add them. Each must be an existing field that is not part of the primary key, the tracking field, or the partition key. Omit to keep the current list; send an empty list to clear it. */
+    excluded_fields?: string[] | undefined;
     /** Field IDs or field configurations for this schema; an empty list enables every field */
     fields?: SchemaConfiguration.Fields.Item[] | undefined;
     /** Filters applied to records read from this schema */

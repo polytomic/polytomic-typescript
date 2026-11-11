@@ -2,6 +2,9 @@
 
 import type * as Polytomic from "../index";
 
+/**
+ * Fires when a Model Sync execution is canceled. The execution also fires `sync.completed` with a `status` of `canceled`.
+ */
 export interface EventingSyncCanceledEvent {
     /** Execution ID */
     execution_id?: string | undefined;
@@ -9,9 +12,9 @@ export interface EventingSyncCanceledEvent {
     organization_id?: string | undefined;
     /** Status of the execution */
     status?: Polytomic.UtilExecutionStatus | undefined;
-    /** Model sync ID */
+    /** Model Sync ID */
     sync_id?: string | undefined;
-    /** Name of the model sync */
+    /** Name of the Model Sync */
     sync_name?: string | undefined;
     /** Destination connection ID */
     target_connection_id?: string | undefined;

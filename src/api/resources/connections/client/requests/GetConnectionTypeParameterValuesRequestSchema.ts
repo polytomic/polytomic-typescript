@@ -3,7 +3,11 @@
 /**
  * @example
  *     {
- *         field: "field"
+ *         field: "field",
+ *         parameters: {
+ *             "byo_app_token": "secret",
+ *             "name": "Example"
+ *         }
  *     }
  */
 export interface GetConnectionTypeParameterValuesRequestSchema {

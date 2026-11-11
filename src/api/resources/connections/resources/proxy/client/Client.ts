@@ -33,6 +33,10 @@ export class ProxyClient {
      * connection's stored credentials and inherited base URL, headers, and query
      * parameters.
      *
+     * The connection must have proxy access enabled with
+     * [`PUT /api/connections/{id}/proxy/settings`](../../../../api-reference/connections/update-proxy-settings),
+     * and its organization must have the Connection Proxy API entitlement.
+     *
      * Before building requests dynamically, call
      * [`GET /api/connections/{id}/proxy/info`](../../../../api-reference/connections/get-proxy-info)
      * to inspect the inherited base URL, blocked headers, accepted body types, and
@@ -420,11 +424,18 @@ export class ProxyClient {
      * shared connection, the caller must have edit permission for the parent
      * connection.
      *
-     * Enabling proxy access requires a backend that supports the Connection Proxy API.
+     * Enabling proxy access requires the Connection Proxy API entitlement on the
+     * organization that owns the parent connection. Without it, the request returns
+     * `403 Forbidden`. Proxy calls also require the entitlement, on both the calling
+     * organization and the parent's organization; if it is revoked, proxy access stops
+     * regardless of this setting.
+     *
+     * Enabling proxy access also requires a backend that supports the Connection Proxy API.
      * If the connection backend is unsupported, the request returns `400 Bad Request`.
      * Disabling proxy access is allowed for any connection the caller can edit.
      *
-     * Setting `enabled` to `false` prevents proxy calls for the connection.
+     * Connections are disabled until proxy access is explicitly enabled with this
+     * endpoint. Setting `enabled` to `false` prevents proxy calls for the connection.
      *
      * @param {string} id - Unique identifier of the connection whose proxy settings should be updated
      * @param {Polytomic.connections.UpdateConnectionProxySettingsRequest} request

@@ -12,5 +12,7 @@ export interface ConnectionType {
     logo_url?: string | undefined;
     name?: string | undefined;
     oauth_prompt?: Polytomic.BackendOAuthPrompt | undefined;
+    /** Whether this deployment supports creating this connection type through Connect with access set to ["read"]. */
+    supports_read_only_access: boolean;
     use_oauth?: boolean | undefined;
 }

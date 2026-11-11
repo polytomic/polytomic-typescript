@@ -30,6 +30,7 @@ describe("ConnectionsClient", () => {
                     logo_dark_url: "https://connect-assets.polytomic.com/logos/dark/postgresql.svg",
                     logo_url: "https://connect-assets.polytomic.com/logos/postgresql.svg",
                     name: "PostgreSQL",
+                    supports_read_only_access: true,
                     use_oauth: true,
                 },
             ],

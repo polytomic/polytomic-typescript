@@ -149,6 +149,11 @@ export class RecordViewLinksClient {
     /**
      * Checks whether record-view links can be created for a connection schema.
      *
+     * Use the Connection and schema for the record you want to open. When working
+     * with Harbor query results, use the source Connection and schema rather than
+     * assuming the Harbor's backing Connection can create a link. You can use
+     * record-view links independently of Harbor.
+     *
      * @param {Polytomic.RecordViewLinksGetCapabilitiesRequest} request
      * @param {RecordViewLinksClient.RequestOptions} requestOptions - Request-specific configuration.
      *

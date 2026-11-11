@@ -27,14 +27,20 @@ export class ExecutionsClient {
     /**
      * Lists executions for a model sync.
      *
-     * Results are ordered by start time descending. If more results are available, the
-     * response includes `pagination.next_page_token`; pass that token back unchanged
-     * to continue paging.
+     * Results are ordered by `created_at` descending. Pass the opaque
+     * `pagination.next_page_token` back as `page_token` to continue paging. A token is
+     * returned even on the last page and on empty pages. Stop paging when `data` is
+     * empty; the presence of a token does not mean more results are available.
      *
-     * The token is opaque. Do not construct or edit it yourself.
+     * Use `ascending=true` to walk forward from the oldest executions. Each page
+     * still lists its executions newest first; subsequent pages contain newer
+     * executions.
      *
-     * For full details about a specific execution — including record counts and error
-     * summaries — use
+     * Use `only_completed=true` to return only executions in terminal statuses.
+     * Ordering and pagination still use `created_at`.
+     *
+     * For full details about a specific execution, including record counts and error
+     * summaries, use
      * [`GET /api/syncs/{sync_id}/executions/{id}`](../../../../api-reference/model-sync/executions/get).
      *
      * @param {string} sync_id - Model sync ID

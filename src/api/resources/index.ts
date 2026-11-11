@@ -1,6 +1,3 @@
-export * as activity from "./activity";
-export * from "./activity/client/requests";
-export * from "./activity/types";
 export * as bulkSync from "./bulkSync";
 export * from "./bulkSync/client/requests";
 export * as connections from "./connections";

@@ -164,6 +164,10 @@ export class ActionsClient {
      * be active and bound to the credential and Harbor. Discovery is recorded as
      * `action.listed`; no response is returned if that event cannot be recorded.
      *
+     * Organization administrators manage these grants through
+     * [Harbor action configuration](../../../../api-reference/harbors/action-configuration/get).
+     * Runtime discovery does not enable additional operations or fields.
+     *
      * @param {string} harbor_id - Unique identifier of the Harbor
      * @param {Polytomic.harbors.ActionsListRequest} request
      * @param {ActionsClient.RequestOptions} requestOptions - Request-specific configuration.
